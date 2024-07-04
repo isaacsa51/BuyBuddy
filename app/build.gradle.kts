@@ -48,19 +48,24 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
     buildFeatures {
         compose = true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -69,7 +74,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -79,6 +83,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material)
+    implementation(libs.androidx.junit.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -87,9 +92,25 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Core Testing
+    androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("androidx.arch.core:core-testing:2.2.0")
+    testImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    testImplementation("com.google.truth:truth:1.1.3")
+    androidTestImplementation("com.google.truth:truth:1.1.3")
+
+
+    // Compose UI Testing
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.8")
+
+    // ViewModel KTX
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
 
-    // Splash Api
+    // Splash API
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     // Kotlinx Serialization
@@ -102,12 +123,11 @@ dependencies {
     // Compose Foundation
     implementation("androidx.compose.foundation:foundation:1.6.8")
 
-    // Material icons extended
+    // Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended-android:1.6.8")
 
     // Room
     implementation("androidx.room:room-runtime:2.6.1")
-    annotationProcessor("androidx.room:room-compiler:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     testImplementation("androidx.room:room-testing:2.6.1")
@@ -116,21 +136,36 @@ dependencies {
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("com.google.dagger:hilt-android:2.51.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    annotationProcessor("com.google.dagger:hilt-compiler:2.51.1")
-    testImplementation("com.google.dagger:hilt-android-testing:2.51.1")
-    testAnnotationProcessor("com.google.dagger:hilt-compiler:2.51.1")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
+
+    // Espresso
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+
+    // MockK
+    testImplementation("io.mockk:mockk:1.13.11")
+    testImplementation("io.mockk:mockk-agent:1.13.11")
+    androidTestImplementation("io.mockk:mockk-android:1.13.11")
+    androidTestImplementation("io.mockk:mockk-agent:1.13.11")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7")
 
     // Shimmer
     implementation("com.valentinilk.shimmer:compose-shimmer:1.3.0")
 
-    // Firebase crashalytics
+    // Firebase Crashlytics
     implementation(platform("com.google.firebase:firebase-bom:33.1.1"))
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+
+    // AndroidX Test
+    androidTestImplementation("androidx.test:core:1.6.1")
+    androidTestImplementation("androidx.test:runner:1.6.1")
+    androidTestImplementation("androidx.test:rules:1.6.1")
 }
 
 kapt {

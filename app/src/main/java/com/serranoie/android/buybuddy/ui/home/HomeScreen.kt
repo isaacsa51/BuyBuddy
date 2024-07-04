@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,7 +44,6 @@ fun HomeScreen(
     val totalPrice by viewModel.totalPrice.collectAsState()
     val totalBoughtPrice by viewModel.totalBoughtPrice.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
-
 
     BuyBuddyTheme {
         Scaffold(topBar = {
@@ -80,9 +80,13 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier.padding(padding)
                 ) {
-                    TotalAmountCard(totalPrice = totalPrice, totalBoughtPrice = totalBoughtPrice)
+                    TotalAmountCard(
+                        totalPrice = totalPrice,
+                        totalBoughtPrice = totalBoughtPrice,
+                        modifier = Modifier.testTag("TotalAmountCard")
+                    )
 
-                    LazyColumn {
+                    LazyColumn(modifier = Modifier.testTag("LazyColumn")) {
                         items(categoriesWithItems.filter { it.items.isNotEmpty() }) {
                             CategoryCard(categoryWithItems = it, navController = navController)
                         }

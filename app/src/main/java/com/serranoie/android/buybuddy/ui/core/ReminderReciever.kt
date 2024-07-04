@@ -28,7 +28,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val notificationBuilder =
             NotificationCompat
                 .Builder(context, RMNDR_NOTI_CHNNL_ID)
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setSmallIcon(R.drawable.ic_buybuddy_mono)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)

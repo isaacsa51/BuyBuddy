@@ -13,6 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,21 +26,27 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 
 @Composable
-fun TotalAmountCard(totalPrice: Double, totalBoughtPrice: Double) {
+fun TotalAmountCard(
+    totalPrice: Double,
+    totalBoughtPrice: Double,
+    modifier: Modifier,
+) {
     Row(
-        modifier = Modifier
-            .padding(horizontal = extraSmallPadding, vertical = smallPadding)
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(extraSmallPadding)
+        modifier =
+            Modifier
+                .padding(horizontal = extraSmallPadding, vertical = smallPadding)
+                .fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(extraSmallPadding),
     ) {
         Card(
             modifier = Modifier.weight(1f),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.inverseSurface,
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                ),
         ) {
             Column(
-                modifier = Modifier.padding(vertical = mediumPadding, horizontal = basePadding)
+                modifier = Modifier.padding(vertical = mediumPadding, horizontal = basePadding),
             ) {
                 Text(
                     text = stringResource(R.string.total_spent),
@@ -53,16 +60,16 @@ fun TotalAmountCard(totalPrice: Double, totalBoughtPrice: Double) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }
 
         OutlinedCard(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
             Column(
-                modifier = Modifier.padding(vertical = mediumPadding, horizontal = basePadding)
+                modifier = Modifier.padding(vertical = mediumPadding, horizontal = basePadding),
             ) {
                 Text(
                     text = stringResource(R.string.expected_expenses),
@@ -76,7 +83,7 @@ fun TotalAmountCard(totalPrice: Double, totalBoughtPrice: Double) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
             }
         }
@@ -88,7 +95,7 @@ fun TotalAmountCard(totalPrice: Double, totalBoughtPrice: Double) {
 fun TotalAmountCardPreview() {
     BuyBuddyTheme {
         Surface {
-            TotalAmountCard(251.45, 0.0)
+            TotalAmountCard(251.45, 0.0, Modifier.Companion.testTag("TotalAmountCard"))
         }
     }
 }
