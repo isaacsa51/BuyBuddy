@@ -1,4 +1,4 @@
-package com.serranoie.android.buybuddy.ui.home
+package com.serranoie.android.buybuddy.ui.home.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryEntity
@@ -7,6 +7,7 @@ import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
 import com.serranoie.android.buybuddy.domain.usecase.category.GetCategoriesWithItemsUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetTotalPriceOfItemsBoughtUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetTotalPriceOfItemsToBuyUseCase
+import com.serranoie.android.buybuddy.ui.home.HomeViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +15,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -98,8 +98,8 @@ class HomeViewModelTest {
 
         coEvery { getCategoriesWithItemsUseCase.invoke() } returns flowOf(expectedList)
 
-        advanceUntilIdle()
         viewModel.fetchGetCategoriesWithItems()
+        advanceUntilIdle()
 
         Assert.assertEquals(expectedList, viewModel.categoriesWithItems.value)
         Assert.assertFalse(viewModel.isLoading.value)
