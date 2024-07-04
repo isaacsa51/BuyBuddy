@@ -30,10 +30,11 @@
     <string name="usage_barely">Apenas/Casi inexistente</string>
     <string name="notification_title">¡No te olvides de este producto!</string>
     <string name="notification_body">Listo para comprar el producto: %1$s?</string>
-    <string name="reasons">Razones</string>
+    <string name="reasons">Beneficios</string>
     <string name="edit_button_label">Editar botón</string>
     <string name="loading">Cargando…</string>
     <string name="back">Atrás</string>
+    <string name="close">Cerrar</string>
     <string name="delete_current_item">Borrar producto actual</string>
     <string name="loading_category">Cargando categoría…</string>
     <string name="current_item_information">Información actual del producto</string>

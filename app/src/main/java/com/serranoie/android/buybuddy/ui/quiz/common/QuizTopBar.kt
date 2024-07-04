@@ -5,8 +5,13 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
@@ -17,14 +22,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
+import com.serranoie.android.buybuddy.ui.core.theme.stronglyDeemphasizedAlpha
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizTopBar(
     questionIndex: Int,
     totalQuestionsCount: Int,
+    onClosePressed: () -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         CenterAlignedTopAppBar(
@@ -33,6 +41,18 @@ fun QuizTopBar(
                     questionIndex = questionIndex,
                     totalQuestionsCount = totalQuestionsCount,
                 )
+            },
+            actions = {
+                IconButton(
+                    onClick = onClosePressed,
+                    modifier = Modifier.padding(4.dp),
+                ) {
+                    Icon(
+                        Icons.Filled.Close,
+                        contentDescription = stringResource(id = R.string.close),
+                        tint = MaterialTheme.colorScheme.onSurface.copy(stronglyDeemphasizedAlpha),
+                    )
+                }
             },
         )
 
@@ -78,6 +98,7 @@ private fun SurveyTopBarPreview() {
             QuizTopBar(
                 questionIndex = 3,
                 totalQuestionsCount = 6,
+                onClosePressed = { },
             )
         }
     }

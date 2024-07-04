@@ -27,11 +27,12 @@
     <string name="usage_ocasionally">Occasionally</string>
     <string name="usage_rarely">Rarely</string>
     <string name="usage_barely">Barely/Almost nonexistent</string>
-    <string name="reasons">Reasons</string>
+    <string name="reasons">Benefits</string>
     <string name="notification_title">Don\'t forget about this product!</string>
     <string name="notification_body">Ready to buy: %1$s?</string>
     <string name="loading">Loading…</string>
     <string name="back">Back</string>
+    <string name="close">Close</string>
     <string name="delete_current_item">Delete current item</string>
     <string name="edit_button_label">Edit button</string>
     <string name="loading_category">Loading category…</string>

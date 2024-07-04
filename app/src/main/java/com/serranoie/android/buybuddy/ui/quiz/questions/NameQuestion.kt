@@ -21,9 +21,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
+import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 
 @Composable
 fun NameQuestion(
@@ -40,29 +41,33 @@ fun NameQuestion(
     QuestionWrapper(
         titleResourceId = titleResourceId,
         directionsResourceId = directionsResourceId,
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column(
-            modifier = Modifier.padding(
-                vertical = basePadding
-            )
+            modifier =
+                Modifier.padding(
+                    vertical = basePadding,
+                ),
         ) {
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = smallPadding),
                 label = { Text(stringResource(R.string.name)) },
                 value = nameItemResponse,
                 onValueChange = onInputResponse,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 maxLines = 2,
-                textStyle = MaterialTheme.typography.headlineMedium,
+                textStyle = MaterialTheme.typography.headlineSmall,
             )
 
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = smallPadding)
+                        .height(120.dp),
                 value = descriptionResponse,
                 label = { Text(stringResource(R.string.description)) },
                 onValueChange = onDescriptionResponse,
@@ -72,7 +77,10 @@ fun NameQuestion(
             )
 
             OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = smallPadding),
                 label = { Text(stringResource(R.string.price)) },
                 value = priceResponse,
                 onValueChange = onPriceResponse,

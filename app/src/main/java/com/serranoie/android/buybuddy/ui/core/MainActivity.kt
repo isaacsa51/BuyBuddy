@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
     private val onBoardViewModel by viewModels<AppEntryViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -46,7 +48,8 @@ class MainActivity : ComponentActivity() {
             BuyBuddyTheme {
                 navController = rememberNavController()
                 Surface(
-                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     val startDestination = onBoardViewModel.startDestination
                     NavGraph(navController, startDestination)
@@ -58,13 +61,13 @@ class MainActivity : ComponentActivity() {
     private fun requestNotificationPermission() {
         if (ContextCompat.checkSelfPermission(
                 this,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             ) != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                ReminderReceiver.REQUEST_POST_NOTIFICATIONS_PERMISSION
+                ReminderReceiver.REQUEST_POST_NOTIFICATIONS_PERMISSION,
             )
         }
     }
@@ -72,7 +75,7 @@ class MainActivity : ComponentActivity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
@@ -81,7 +84,12 @@ class MainActivity : ComponentActivity() {
                     // Permission granted, proceed with showing the notification
                 } else {
                     // Permission denied, handle the denial
-                    Toast.makeText(this, "Permission denied to post notifications", Toast.LENGTH_SHORT).show()
+                    Toast
+                        .makeText(
+                            this,
+                            "Permission denied to post notifications",
+                            Toast.LENGTH_SHORT,
+                        ).show()
                 }
                 return
             }

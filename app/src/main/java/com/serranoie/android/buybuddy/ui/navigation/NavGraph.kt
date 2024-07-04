@@ -27,7 +27,6 @@ fun NavGraph(
         navController = navController,
         startDestination = startDestination,
     ) {
-
         navigation(
             route = Route.AppStartNavigation.route,
             startDestination = Route.OnBoarding.route,
@@ -44,11 +43,14 @@ fun NavGraph(
             }
 
             composable(route = Route.Quiz.route) {
-                QuizRoute(onQuizComplete = {
-                    navController.navigate(Route.FinishedQuiz.route) {
-                        popUpTo(Route.Quiz.route) { inclusive = true }
-                    }
-                })
+                QuizRoute(
+                    onNavUp = navController::navigateUp,
+                    onQuizComplete = {
+                        navController.navigate(Route.FinishedQuiz.route) {
+                            popUpTo(Route.Quiz.route) { inclusive = true }
+                        }
+                    },
+                )
             }
 
             composable(route = Route.FinishedQuiz.route) {
@@ -63,7 +65,7 @@ fun NavGraph(
 
             composable(
                 route = "edit/{itemId}",
-                arguments = listOf(navArgument("itemId") { type = NavType.IntType })
+                arguments = listOf(navArgument("itemId") { type = NavType.IntType }),
             ) { backStackEntry ->
                 val itemId = backStackEntry.arguments?.getInt("itemId")
                 itemId?.let {

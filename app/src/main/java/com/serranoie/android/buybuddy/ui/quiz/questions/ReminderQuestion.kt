@@ -1,12 +1,11 @@
 package com.serranoie.android.buybuddy.ui.quiz.questions
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
@@ -25,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +32,7 @@ import com.serranoie.android.buybuddy.ui.common.TimePickerDialog
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.quiz.QuizViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
+import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -54,9 +53,8 @@ fun ReminderQuestion(
         directionsResourceId = directionsResourceId,
         modifier = modifier,
     ) {
-        val context = LocalContext.current
-
-        val dateFormat = SimpleDateFormat(stringResource(R.string.edit_screen_date_format), Locale.getDefault())
+        val dateFormat =
+            SimpleDateFormat(stringResource(R.string.edit_screen_date_format), Locale.getDefault())
         dateFormat.timeZone = TimeZone.getDefault()
 
         val initialDate = dateInMillis ?: Date()
@@ -64,9 +62,10 @@ fun ReminderQuestion(
 
         val dateString = dateFormat.format(selectedDate)
 
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = initialDate.time
-        )
+        val datePickerState =
+            rememberDatePickerState(
+                initialSelectedDateMillis = initialDate.time,
+            )
         var showDatePicker by remember { mutableStateOf(false) }
 
         val timePickerState = rememberTimePickerState()
@@ -74,19 +73,22 @@ fun ReminderQuestion(
 
         Column {
             Button(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(46.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(basePadding),
                 onClick = { showDatePicker = true },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface,
+                    ),
                 shape = MaterialTheme.shapes.small,
-                border = BorderStroke(
-                    1.dp,
-                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                ),
+                border =
+                    BorderStroke(
+                        1.dp,
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+                    ),
             ) {
                 Text(
                     text = dateString,
@@ -123,7 +125,7 @@ fun ReminderQuestion(
                     state = datePickerState,
                     dateValidator = { dateInMillis ->
                         dateInMillis >= System.currentTimeMillis()
-                    }
+                    },
                 )
             }
         }
@@ -140,19 +142,14 @@ fun ReminderQuestion(
                             calendar.set(Calendar.MINUTE, timePickerState.minute)
                             calendar.timeZone = TimeZone.getDefault()
                             selectedDate = calendar.time
-                            val selectedCalendar = Calendar.getInstance().apply {
-                                timeInMillis = selectedDate.time
-                            }
+                            val selectedCalendar =
+                                Calendar.getInstance().apply {
+                                    timeInMillis = selectedDate.time
+                                }
                             if (selectedCalendar.after(Calendar.getInstance())) {
                                 onDateTimeSelected(selectedDate)
                                 showTimePicker = false
                             } else {
-                                // Date is not valid, show error message
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.error_selected_date),
-                                    Toast.LENGTH_SHORT
-                                ).show()
                                 selectedDate = initialDate
                             }
                         },

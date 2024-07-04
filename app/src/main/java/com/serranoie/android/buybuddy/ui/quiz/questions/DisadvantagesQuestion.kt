@@ -5,6 +5,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -20,8 +21,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
+import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
+import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 
 @Composable
 fun DisadvantagesQuestion(
@@ -38,14 +40,17 @@ fun DisadvantagesQuestion(
     ) {
         Column {
             OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(220.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = basePadding)
+                        .height(120.dp),
                 label = { Text(stringResource(id = R.string.disadvantages)) },
                 value = contrasResponse,
                 onValueChange = onInputResponse,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 maxLines = 5,
+                minLines = 3,
                 textStyle = MaterialTheme.typography.bodyLarge,
             )
         }

@@ -1,5 +1,6 @@
 package com.serranoie.android.buybuddy.ui.quiz
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.TweenSpec
@@ -25,6 +26,7 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.CONTENT_ANIMATION_DURA
 @Composable
 fun QuizRoute(
     onQuizComplete: () -> Unit,
+    onNavUp: () -> Unit,
 ) {
     val viewModel: QuizViewModel = hiltViewModel()
     val quizScreenData = viewModel.quizScreenData
@@ -34,6 +36,9 @@ fun QuizRoute(
         isNextEnabled = isNextEnabled,
         onPreviousPressed = { viewModel.onPreviousPressed() },
         onNextPressed = { viewModel.onNextPressed() },
+        onClosePressed = {
+            onNavUp()
+        },
         onDonePressed = {
             viewModel.onDonePressed(
                 onQuizComplete
@@ -43,6 +48,12 @@ fun QuizRoute(
         val modifier = Modifier
             .padding(paddingValues)
             .statusBarsPadding()
+
+        BackHandler {
+            if (!viewModel.onBackPressed()) {
+                onNavUp()
+            }
+        }
 
         AnimatedContent(
             targetState = quizScreenData, transitionSpec = {

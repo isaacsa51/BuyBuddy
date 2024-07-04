@@ -35,14 +35,15 @@ fun UsageQuestion(
     @StringRes endTextResource: Int,
     modifier: Modifier = Modifier,
 ) {
-    val steps = listOf(
-        R.string.usage_barely,
-        R.string.usage_rarely,
-        R.string.usage_ocasionally,
-        R.string.usage_sometimes,
-        R.string.usage_often,
-        R.string.usage_almost_everyday,
-    )
+    val steps =
+        listOf(
+            R.string.usage_barely,
+            R.string.usage_rarely,
+            R.string.usage_ocasionally,
+            R.string.usage_sometimes,
+            R.string.usage_often,
+            R.string.usage_almost_everyday,
+        )
 
     val sliderRange = 0f..(steps.size - 1).toFloat()
     var sliderPosition by remember { mutableFloatStateOf(value.toFloat()) }
@@ -56,23 +57,26 @@ fun UsageQuestion(
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Text(
                     text = stringResource(steps[selectedIndex]),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
 
-                Slider(value = sliderPosition,
+                Slider(
+                    value = sliderPosition,
                     valueRange = sliderRange,
                     steps = steps.size - 2,
                     onValueChange = { newValue ->
                         sliderPosition = newValue
                         onValueChange(steps[newValue.roundToInt()])
-                    })
+                    },
+                )
             }
         }
         Row {
@@ -80,25 +84,28 @@ fun UsageQuestion(
                 text = stringResource(id = startTextResource),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Start,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.8f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1.8f),
             )
             Text(
                 text = stringResource(id = neutralTextResource),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.8f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1.8f),
             )
             Text(
                 text = stringResource(id = endTextResource),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1.8f),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1.8f),
             )
         }
     }
@@ -113,14 +120,15 @@ fun PopulateUsageQuestion(
 ) {
     val context = LocalContext.current
 
-    val usageIndex = listOf(
-        R.string.usage_barely,
-        R.string.usage_rarely,
-        R.string.usage_ocasionally,
-        R.string.usage_sometimes,
-        R.string.usage_often,
-        R.string.usage_almost_everyday,
-    ).indexOfFirst { context.getString(it) == value }
+    val usageIndex =
+        listOf(
+            R.string.usage_barely,
+            R.string.usage_rarely,
+            R.string.usage_ocasionally,
+            R.string.usage_sometimes,
+            R.string.usage_often,
+            R.string.usage_almost_everyday,
+        ).indexOfFirst { context.getString(it) == value }
 
     UsageQuestion(
         titleResourceId = R.string.usage_question,
