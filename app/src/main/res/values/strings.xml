@@ -71,4 +71,6 @@
     <string name="total_spent">Total spent</string>
     <string name="date_set_form">Date set at: %1$s</string>
     <string name="edit_screen_date_format">dd \'of\' MMMM, HH:mm a</string>
+    <string name="reminder_saved">Product saved!</string>
+    <string name="invalid_price_format">Please enter a valid price value</string>
 </resources>

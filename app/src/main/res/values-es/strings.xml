@@ -72,4 +72,6 @@
     <string name="total_spent">Total gastado</string>
     <string name="date_set_form">Recordatorio para: %1$s</string>
     <string name="edit_screen_date_format">dd \'de\' MMMM, HH:mm a</string>
+    <string name="reminder_saved">Producto guardado!</string>
+    <string name="invalid_price_format">Por favor ingresa un valor de precio válido</string>
 </resources>

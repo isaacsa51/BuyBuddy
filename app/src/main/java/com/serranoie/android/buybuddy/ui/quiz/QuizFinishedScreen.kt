@@ -11,9 +11,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,15 +31,19 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import kotlinx.coroutines.launch
 
 @Composable
-fun QuizFinishedScreen(
-    onDonePressed: () -> Unit,
-) {
+fun QuizFinishedScreen(onDonePressed: () -> Unit) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Surface {
-        Scaffold(content = { innerPadding ->
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        content = { innerPadding ->
             val modifier = Modifier.padding(innerPadding)
             QuizResult(
                 title = stringResource(R.string.finished_quiz_title),
@@ -43,25 +51,32 @@ fun QuizFinishedScreen(
                 description = stringResource(R.string.finished_quiz_info),
                 modifier = modifier,
             )
-        }, bottomBar = {
+        },
+        bottomBar = {
             Surface(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .fillMaxWidth(),
-                color = Color.Transparent
+                modifier =
+                    Modifier
+                        .navigationBarsPadding()
+                        .fillMaxWidth(),
+                color = Color.Transparent,
             ) {
                 Button(
-                    onClick = onDonePressed,
-
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(basePadding)
+                    onClick = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(context.getString(R.string.reminder_saved))
+                            onDonePressed()
+                        }
+                    },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(basePadding),
                 ) {
                     Text(text = stringResource(id = R.string.done))
                 }
             }
-        })
-    }
+        },
+    )
 }
 
 @Composable
