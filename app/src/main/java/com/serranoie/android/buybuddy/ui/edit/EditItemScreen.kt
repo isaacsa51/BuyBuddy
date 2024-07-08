@@ -102,6 +102,8 @@ fun EditItemScreen(
     val itemBenefits by viewModel.itemBenefits.collectAsState()
     val itemDisadvantages by viewModel.itemDisadvantages.collectAsState()
     val selectedDateTime by viewModel.selectedDateTime.collectAsState()
+    var isValidPrice by remember { mutableStateOf(true) }
+    var priceText by remember { mutableStateOf(itemPrice.toString()) }
 
     var formattedDate by remember(currentItem?.reminderDate) {
         mutableStateOf(
@@ -141,6 +143,10 @@ fun EditItemScreen(
     LaunchedEffect(itemId) {
         viewModel.getItemById(itemId)
         currentItem?.categoryId?.let { viewModel.getCategory(it) }
+    }
+    
+    LaunchedEffect(itemPrice) {
+        priceText = itemPrice.toString()
     }
 
     val scrollBehavior =
@@ -267,23 +273,35 @@ fun EditItemScreen(
                 )
 
                 OutlinedTextField(
-                    modifier =
-                        Modifier
-                            .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(id = R.string.price)) },
-                    value = itemPrice.toString(),
+                    value = priceText,
                     onValueChange = { newValue ->
-                        viewModel.updateItemPrice(newValue.toDoubleOrNull() ?: 0.0)
+                        priceText = newValue
+                        isValidPrice = newValue.matches(Regex("^\\d+(\\.\\d{0,2})?$"))
+
+                        if (isValidPrice) {
+                            viewModel.updateItemPrice(newValue.toDoubleOrNull() ?: 0.0)
+                        }
                     },
-                    keyboardOptions =
-                        KeyboardOptions(
-                            imeAction = ImeAction.Done,
-                            keyboardType = KeyboardType.Number,
-                        ),
+                    isError = !isValidPrice,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Number,
+                    ),
                     maxLines = 1,
                     textStyle = MaterialTheme.typography.titleLarge,
                     shape = RoundedCornerShape(7.dp),
                 )
+
+                if (!isValidPrice) {
+                    Text(
+                        text = stringResource(R.string.invalid_price_format),
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(start = smallPadding),
+                    )
+                }
 
                 Text(
                     text = stringResource(R.string.usage_label),
