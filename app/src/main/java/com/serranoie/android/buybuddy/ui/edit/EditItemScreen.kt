@@ -224,7 +224,7 @@ fun EditItemScreen(
                 modifier =
                     Modifier.padding(
                         horizontal = basePadding,
-                        vertical = largePadding,
+                        vertical = basePadding,
                     ),
             ) {
                 Text(
@@ -240,8 +240,7 @@ fun EditItemScreen(
                 OutlinedTextField(
                     modifier =
                         Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = basePadding),
+                            .fillMaxWidth(),
                     value = itemName,
                     label = { Text(stringResource(id = R.string.name)) },
                     onValueChange = { viewModel.updateItemName(it) },
@@ -254,7 +253,7 @@ fun EditItemScreen(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .padding(vertical = basePadding),
+                            .padding(vertical = smallPadding),
                     value = itemDescription,
                     label = { Text(stringResource(id = R.string.description)) },
                     onValueChange = { viewModel.updateItemDescription(it) },
@@ -267,8 +266,7 @@ fun EditItemScreen(
                 OutlinedTextField(
                     modifier =
                         Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = smallPadding),
+                            .fillMaxWidth(),
                     label = { Text(stringResource(id = R.string.price)) },
                     value = itemPrice.toString(),
                     onValueChange = { newValue ->
@@ -281,6 +279,13 @@ fun EditItemScreen(
                         ),
                     maxLines = 1,
                     textStyle = MaterialTheme.typography.titleLarge,
+                )
+
+                Text(
+                    text = stringResource(R.string.usage_label),
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.fillMaxWidth().padding(top = basePadding),
                 )
 
                 OutlinedCard(
@@ -303,7 +308,7 @@ fun EditItemScreen(
                     shape = RoundedCornerShape(5.dp),
                 ) {
                     Text(
-                        text = currentItem?.usage ?: "",
+                        text = currentItem?.usage ?: "Empty",
                         modifier =
                             Modifier.padding(basePadding),
                         fontSize = 22.sp,

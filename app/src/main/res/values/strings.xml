@@ -39,6 +39,7 @@
     <string name="current_item_information">Current item information</string>
     <string name="benefits">Benefits</string>
     <string name="disadvantages">Disadvantages</string>
+    <string name="usage_label">Total usage of the product</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="done">Done</string>
