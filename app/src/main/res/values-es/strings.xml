@@ -45,6 +45,8 @@
     <string name="done">Listo</string>
     <string name="title_delete_dialog">¿Seguro que quiere borrar este producto?</string>
     <string name="description_delete_dialog">Al confirmar la eliminación de este producto aceptas si el producto actual ya ha sido comprado o si no es necesario.</string>
+    <string name="title_usage_dialog">Seleccione el uso del producto</string>
+    <string name="description_usage_dialog">Usa el slider de abajo para modificar el uso del producto actual.</string>
     <string name="create_item_label">Crear producto</string>
     <string name="onboarding_image_label">OnBoarding imagen</string>
     <string name="next">Siguiente</string>
@@ -74,4 +76,5 @@
     <string name="edit_screen_date_format">dd \'de\' MMMM, HH:mm a</string>
     <string name="reminder_saved">Producto guardado!</string>
     <string name="invalid_price_format">Por favor ingresa un valor de precio válido</string>
+    <string name="product_info">Información del producto</string>
 </resources>
