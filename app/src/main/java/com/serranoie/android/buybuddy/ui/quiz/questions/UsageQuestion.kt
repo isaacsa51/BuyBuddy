@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.quiz.QuizViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
+import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import kotlin.math.roundToInt
 
 @Composable
@@ -60,12 +61,12 @@ fun UsageQuestion(
                 modifier =
                     Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(basePadding),
             ) {
                 Text(
                     text = stringResource(steps[selectedIndex]),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    modifier = Modifier.padding(bottom = basePadding),
                 )
 
                 Slider(

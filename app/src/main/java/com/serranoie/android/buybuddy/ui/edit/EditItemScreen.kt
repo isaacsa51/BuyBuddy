@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -247,6 +248,7 @@ fun EditItemScreen(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     maxLines = 2,
                     textStyle = MaterialTheme.typography.titleLarge,
+                    shape = RoundedCornerShape(7.dp),
                 )
 
                 OutlinedTextField(
@@ -261,6 +263,7 @@ fun EditItemScreen(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     maxLines = 2,
                     textStyle = MaterialTheme.typography.titleLarge,
+                    shape = RoundedCornerShape(7.dp),
                 )
 
                 OutlinedTextField(
@@ -279,6 +282,7 @@ fun EditItemScreen(
                         ),
                     maxLines = 1,
                     textStyle = MaterialTheme.typography.titleLarge,
+                    shape = RoundedCornerShape(7.dp),
                 )
 
                 Text(
@@ -305,7 +309,7 @@ fun EditItemScreen(
                             containerColor = MaterialTheme.colorScheme.surface,
                         ),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    shape = RoundedCornerShape(5.dp),
+                    shape = RoundedCornerShape(7.dp),
                 ) {
                     Text(
                         text = currentItem?.usage ?: "Empty",
@@ -313,25 +317,30 @@ fun EditItemScreen(
                             Modifier.padding(basePadding),
                         fontSize = 22.sp,
                     )
-                }
 
-                if (expanded) {
-                    Column {
-                        Text(
-                            text = stringResource(steps[selectedIndex]),
+                    if (expanded) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center,
                             modifier =
-                                Modifier.padding(basePadding),
-                            fontSize = 22.sp,
-                        )
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(basePadding),
+                        ) {
+                            Text(
+                                text = stringResource(steps[selectedIndex]),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
 
-                        Slider(
-                            value = sliderPosition,
-                            valueRange = sliderRange,
-                            steps = steps.size - 2,
-                            onValueChange = { newValue ->
-                                sliderPosition = newValue
-                            },
-                        )
+                            Slider(
+                                value = sliderPosition,
+                                valueRange = sliderRange,
+                                steps = steps.size - 2,
+                                onValueChange = { newValue ->
+                                    sliderPosition = newValue
+                                },
+                            )
+                        }
                     }
                 }
 
@@ -357,6 +366,7 @@ fun EditItemScreen(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     maxLines = 5,
                     textStyle = MaterialTheme.typography.bodyLarge,
+                    shape = RoundedCornerShape(7.dp),
                 )
 
                 Text(
@@ -381,6 +391,7 @@ fun EditItemScreen(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     maxLines = 5,
                     textStyle = MaterialTheme.typography.bodyLarge,
+                    shape = RoundedCornerShape(7.dp),
                 )
 
                 OutlinedCard(
@@ -396,7 +407,7 @@ fun EditItemScreen(
                             containerColor = MaterialTheme.colorScheme.surface,
                         ),
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    shape = RoundedCornerShape(5.dp),
+                    shape = RoundedCornerShape(7.dp),
                 ) {
                     Text(
                         text = stringResource(R.string.date_set_form, formattedDate),
