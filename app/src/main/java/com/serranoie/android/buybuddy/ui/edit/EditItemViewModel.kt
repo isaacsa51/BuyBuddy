@@ -1,6 +1,8 @@
 package com.serranoie.android.buybuddy.ui.edit
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -12,6 +14,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.DeleteItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
+import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +35,8 @@ class EditItemViewModel
         private val deleteItemUseCase: DeleteItemUseCase,
         private val updateItemUseCase: UpdateItemUseCase,
         private val updateItemStatusUseCase: UpdateItemStatusUseCase,
-    ) : ViewModel() {
+        application: Application
+    ) : AndroidViewModel(application) {
         private val steps =
             listOf(
                 R.string.usage_barely,
@@ -109,6 +113,7 @@ class EditItemViewModel
                 _itemBenefits.value = item.benefits
                 _itemDisadvantages.value = item.disadvantages.toString()
                 _itemUsage.value = mapUsageToStep(item.usage)
+                _selectedDateTime.value = item.reminderDate
 
                 getCategory(item.categoryId)
             }
@@ -134,22 +139,10 @@ class EditItemViewModel
         }
 
         suspend fun updateItem(itemId: Int) {
-            val currentCategoryId = _currentItem.value?.categoryId
+            val isDateModified = _selectedDateTime.value != _currentItem.value?.reminderDate
+            val isTimeModified = _selectedDateTime.value != _currentItem.value?.reminderTime
 
-            if (currentCategoryId == null) {
-                Log.e("DEBUG", "Category ID is null")
-                return
-            }
-
-            // Collect the category to ensure it exists
-            val categoryExists = getCategoryByIdUseCase.getCategoryById(currentCategoryId).firstOrNull()
-
-            if (categoryExists == null) {
-                Log.e("DEBUG", "Invalid category ID: $currentCategoryId")
-                return
-            }
-
-            Log.d("DEBUG", "Valid category ID: $currentCategoryId")
+            val currentCategoryId = _currentItem.value?.categoryId ?: return
 
             val updatedItem =
                 Item(
@@ -161,12 +154,23 @@ class EditItemViewModel
                     benefits = _itemBenefits.value,
                     disadvantages = _itemDisadvantages.value,
                     price = _itemPrice.value!!,
-                    reminderDate = _selectedDateTime.value,
-                    reminderTime = _selectedDateTime.value,
+                    reminderDate = _selectedDateTime.value ?: _currentItem.value?.reminderDate,
+                    reminderTime = _selectedDateTime.value ?: _currentItem.value?.reminderTime,
                     status = _currentItem.value?.status ?: false,
                 )
 
-            Log.d("DEBUG", "Updated Item: $updatedItem")
+            if(isDateModified || isTimeModified) {
+                updatedItem.let {
+                    ScheduleNotification().scheduleNotification(
+                        context = getApplication<Application>().applicationContext,
+                        itemId = updatedItem.itemId!!,
+                        itemName = updatedItem.name,
+                        reminderDate = updatedItem.reminderDate,
+                        reminderTime = updatedItem.reminderTime
+                    )
+
+                }
+            }
 
             updateItemUseCase.invoke(updatedItem)
         }

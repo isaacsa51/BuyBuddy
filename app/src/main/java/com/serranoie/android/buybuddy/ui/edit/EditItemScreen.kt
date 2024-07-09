@@ -79,7 +79,6 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.dateToString
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import java.util.Date
 import java.util.TimeZone
 import kotlin.math.roundToInt
 
@@ -117,14 +116,13 @@ fun EditItemScreen(
 
     val datePickerState =
         rememberDatePickerState(
-            initialSelectedDateMillis = currentItem?.reminderDate?.time,
+            initialSelectedDateMillis = selectedDateTime?.time,
         )
 
     var showDatePicker by remember { mutableStateOf(false) }
-
     val timePickerState = rememberTimePickerState()
     var showTimePicker by remember { mutableStateOf(false) }
-    var selectedDate by remember { mutableStateOf<Date?>(null) }
+    val selectedDate by viewModel.selectedDateTime.collectAsState()
 
     val steps =
         listOf(
@@ -138,7 +136,6 @@ fun EditItemScreen(
 
     val sliderRange = 0f..(steps.size - 1).toFloat()
     var sliderPosition by remember { mutableFloatStateOf(0f) }
-    val selectedIndex = sliderPosition.roundToInt()
 
     val coroutineScope = rememberCoroutineScope()
 
@@ -146,7 +143,7 @@ fun EditItemScreen(
         viewModel.getItemById(itemId)
         currentItem?.categoryId?.let { viewModel.getCategory(it) }
     }
-    
+
     LaunchedEffect(itemPrice) {
         priceText = itemPrice.toString()
     }
@@ -287,10 +284,11 @@ fun EditItemScreen(
                         }
                     },
                     isError = !isValidPrice,
-                    keyboardOptions = KeyboardOptions(
-                        imeAction = ImeAction.Done,
-                        keyboardType = KeyboardType.Number,
-                    ),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Number,
+                        ),
                     maxLines = 1,
                     textStyle = MaterialTheme.typography.titleLarge,
                     shape = RoundedCornerShape(7.dp),
@@ -334,10 +332,12 @@ fun EditItemScreen(
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Text(
-                            text = steps.getOrNull(itemUsage)?.let { stringResource(it) } ?: "Empty",
+                            text =
+                                steps.getOrNull(itemUsage)?.let { stringResource(it) }
+                                    ?: "Empty",
                             modifier = Modifier.padding(basePadding),
                             fontSize = 22.sp,
                         )
@@ -347,9 +347,10 @@ fun EditItemScreen(
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(basePadding),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(basePadding),
                         ) {
                             Slider(
                                 value = sliderPosition,
@@ -519,7 +520,9 @@ fun EditItemScreen(
                                         calendar.set(Calendar.MINUTE, 0)
                                         calendar.set(Calendar.SECOND, 0)
                                         calendar.set(Calendar.MILLISECOND, 0)
-                                        selectedDate = calendar.time
+
+                                        viewModel.updateSelectedDateTime(calendar.time)
+
                                         showDatePicker = false
                                         showTimePicker = true
                                     }
@@ -555,7 +558,7 @@ fun EditItemScreen(
                                     calendar.time = nonNullDate
                                     calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                                     calendar.set(Calendar.MINUTE, timePickerState.minute)
-                                    selectedDate = calendar.time
+                                    viewModel.updateSelectedDateTime(calendar.time)
 
                                     Log.d("DEBUG", "Selected Date (raw): $selectedDate")
                                     Log.d("DEBUG", "Calendar Time Zone: ${calendar.timeZone.id}")
