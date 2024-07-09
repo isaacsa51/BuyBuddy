@@ -15,13 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -38,52 +35,53 @@ import com.serranoie.android.buybuddy.ui.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel = hiltViewModel(), navController: NavController
+    viewModel: HomeViewModel = hiltViewModel(),
+    navController: NavController,
 ) {
     val categoriesWithItems by viewModel.categoriesWithItems.collectAsState()
     val totalPrice by viewModel.totalPrice.collectAsState()
     val totalBoughtPrice by viewModel.totalBoughtPrice.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
     BuyBuddyTheme {
-        Scaffold(topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.app_name),
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Black
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { navController.navigate(Screen.SETTINGS.name) }) {
-                        Icon(Icons.Outlined.Settings, contentDescription = "Add")
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-            )
-        }, floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate(Route.Quiz.route) },
-                containerColor = MaterialTheme.colorScheme.tertiary,
-            ) {
-                Icon(
-                    Icons.Rounded.Add,
-                    contentDescription = stringResource(R.string.create_item_label)
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.app_name),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Black,
+                        )
+                    },
+                    actions = {
+                        IconButton(onClick = { navController.navigate(Screen.SETTINGS.name) }) {
+                            Icon(Icons.Outlined.Settings, contentDescription = "Add")
+                        }
+                    },
                 )
-            }
-        }, modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            },
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { navController.navigate(Route.Quiz.route) },
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                ) {
+                    Icon(
+                        Icons.Rounded.Add,
+                        contentDescription = stringResource(R.string.create_item_label),
+                    )
+                }
+            },
         ) { padding ->
             if (categoriesWithItems.isEmpty() || categoriesWithItems.all { it.items.isEmpty() }) {
                 EmptyListScreen(padding)
             } else {
                 Column(
-                    modifier = Modifier.padding(padding)
+                    modifier = Modifier.padding(padding),
                 ) {
                     TotalAmountCard(
                         totalPrice = totalPrice,
                         totalBoughtPrice = totalBoughtPrice,
-                        modifier = Modifier.testTag("TotalAmountCard")
+                        modifier = Modifier.testTag("TotalAmountCard"),
                     )
 
                     LazyColumn(modifier = Modifier.testTag("LazyColumn")) {

@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="Theme.BuyBuddy" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
-    <style name="Theme.BuyBuddy" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.BuyBuddy.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">#5A3297</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher</item>
+        <item name="postSplashScreenTheme">@style/Theme.BuyBuddy</item>
+    </style>
 </resources>
