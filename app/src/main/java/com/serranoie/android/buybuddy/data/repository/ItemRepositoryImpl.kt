@@ -15,9 +15,9 @@ class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) :
         itemDao.insertItemWithCategory(item.toEntity(0), categoryName)
     }
 
-    override suspend fun insertItem(item: Item) = itemDao.insertItem(item.toEntity(0))
+    override suspend fun insertItem(item: Item) = itemDao.insertItem(item.toEntity(item.categoryId))
 
-    override suspend fun updateItem(item: Item) = itemDao.updateItem(item.toEntity(0))
+    override suspend fun updateItem(item: Item) = itemDao.updateItem(item.toEntity(item.categoryId))
 
     override suspend fun updateItemStatus(itemId: Int, status: Boolean) =
         itemDao.updateItemStatus(itemId, status)

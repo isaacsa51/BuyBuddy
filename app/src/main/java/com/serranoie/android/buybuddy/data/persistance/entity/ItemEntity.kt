@@ -19,7 +19,7 @@ import java.util.Date
     ],
     indices = [Index(value = ["categoryId"])]
 )
-class ItemEntity(
+data class ItemEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "itemId") val itemId: Int?,
     @ColumnInfo(name = "name") val name: String,

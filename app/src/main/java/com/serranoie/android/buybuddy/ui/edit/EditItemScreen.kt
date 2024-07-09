@@ -105,6 +105,8 @@ fun EditItemScreen(
     var isValidPrice by remember { mutableStateOf(true) }
     var priceText by remember { mutableStateOf(itemPrice.toString()) }
 
+    val itemUsage by viewModel.itemUsage.collectAsState()
+
     var formattedDate by remember(currentItem?.reminderDate) {
         mutableStateOf(
             currentItem?.reminderDate?.let { date ->
@@ -329,33 +331,33 @@ fun EditItemScreen(
                     border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
                     shape = RoundedCornerShape(7.dp),
                 ) {
-                    Text(
-                        text = currentItem?.usage ?: "Empty",
-                        modifier =
-                            Modifier.padding(basePadding),
-                        fontSize = 22.sp,
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = steps.getOrNull(itemUsage)?.let { stringResource(it) } ?: "Empty",
+                            modifier = Modifier.padding(basePadding),
+                            fontSize = 22.sp,
+                        )
+                    }
 
                     if (expanded) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.Center,
-                            modifier =
-                                Modifier
-                                    .fillMaxWidth()
-                                    .padding(basePadding),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(basePadding),
                         ) {
-                            Text(
-                                text = stringResource(steps[selectedIndex]),
-                                style = MaterialTheme.typography.titleMedium,
-                            )
-
                             Slider(
                                 value = sliderPosition,
                                 valueRange = sliderRange,
                                 steps = steps.size - 2,
                                 onValueChange = { newValue ->
                                     sliderPosition = newValue
+                                    viewModel.updateItemUsage(newValue.roundToInt())
                                 },
                             )
                         }
@@ -488,14 +490,13 @@ fun EditItemScreen(
                                 .height(48.dp)
                                 .padding(horizontal = extraSmallPadding),
                         onClick = {
-                            // TODO: Handle in viewmodel changes on textinputs
-//                            coroutineScope.launch {
-//                                currentItem?.itemId.let {
-//                                    if (it != null) {
-//                                        viewModel.updateItem(it)
-//                                    }
-//                                }
-//                            }
+                            coroutineScope.launch {
+                                currentItem?.itemId.let {
+                                    if (it != null) {
+                                        viewModel.updateItem(it)
+                                    }
+                                }
+                            }
 
                             navController.navigateUp()
                         },
