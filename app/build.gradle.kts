@@ -166,6 +166,9 @@ dependencies {
     androidTestImplementation("androidx.test:core:1.6.1")
     androidTestImplementation("androidx.test:runner:1.6.1")
     androidTestImplementation("androidx.test:rules:1.6.1")
+
+    implementation("com.google.accompanist:accompanist-insets:0.24.13-rc")
+
 }
 
 kapt {

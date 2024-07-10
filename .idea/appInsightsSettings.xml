@@ -24,9 +24,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="com.serranoie.android.buybuddy.debug" />
-                  <option name="mobileSdkAppId" value="1:764446369317:android:422834ea87617fb088c1cc" />
-                  <option name="projectId" value="buybuddy-android" />
-                  <option name="projectNumber" value="764446369317" />
+                  <option name="mobileSdkAppId" value="1:429681609246:android:32b894a362f8017e8cfc0f" />
+                  <option name="projectId" value="buybuddy-4ndroid" />
+                  <option name="projectNumber" value="429681609246" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
