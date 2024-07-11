@@ -123,9 +123,6 @@ class QuizViewModel @Inject constructor(
         _isNextEnabled.value = getIsNextEnabled()
     }
 
-    /**
-     * Returns true if the ViewModel handled the back press (i.e., it went back one question)
-     */
     fun onBackPressed(): Boolean {
         if (questionIndex == 0) {
             return false
@@ -175,7 +172,8 @@ class QuizViewModel @Inject constructor(
             reminderResponse?.let {
                 ScheduleNotification().scheduleNotification(
                     context = getApplication<Application>().applicationContext,
-                    itemId = itemData.itemId ?: 0,
+                    // Using hashcode() in the name to create a more specific ID for the notification since the ID is generated automatically in Room DB
+                    itemId = itemData.name.hashCode(),
                     itemName = itemData.name,
                     reminderDate = reminderResponse,
                     reminderTime = reminderResponse

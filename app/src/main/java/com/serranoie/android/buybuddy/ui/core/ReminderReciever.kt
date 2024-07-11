@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_CHNNL_ID
+import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_ITEM_ID_KEY
 import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_MESSAGE_KEY
 import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_TITLE_KEY
 
@@ -24,6 +25,7 @@ class ReminderReceiver : BroadcastReceiver() {
     ) {
         val title = intent.getStringExtra(RMNDR_NOTI_TITLE_KEY)
         val message = intent.getStringExtra(RMNDR_NOTI_MESSAGE_KEY)
+        val itemId = intent.getIntExtra(RMNDR_NOTI_ITEM_ID_KEY, -1)
 
         val notificationBuilder =
             NotificationCompat
@@ -48,7 +50,7 @@ class ReminderReceiver : BroadcastReceiver() {
             }
             return
         }
-        notificationManager.notify(1, notificationBuilder.build())
+        notificationManager.notify(itemId, notificationBuilder.build())
     }
 
     companion object {
