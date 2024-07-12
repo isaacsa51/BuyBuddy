@@ -89,20 +89,27 @@
     <string name="theme_dialog_option1">Claro</string>
     <string name="theme_dialog_option2">Oscuro</string>
     <string name="theme_dialog_option3">Predeterminado del Sistema</string>
+
+    <string name="display_settings_title">Tema</string>
+    <string name="theme_setting">Default Theme</string>
+    <string name="theme_setting_desc">Change the theme of the app</string>
+    <string name="material_you_setting">Material You</string>
     <string name="material_you_setting_desc">Switch theme according to your wallpaper (A12+ Only)</string>
     <string name="material_you_error">This feature is only for devices running Android 12 or above.</string>
     <string name="theme_dialog_title">Change Theme</string>
     <string name="theme_dialog_apply_button">Apply</string>
+
+    <!-- Biometric Lock -->
     <string name="security_settings_title">Security</string>
     <string name="security_app_lock">Biometric Lock</string>
     <string name="app_lock_setting_desc">Use your fingerprint to unlock the app.</string>
-
-    <!-- Biometric Lock -->
-    <string name="bio_lock_title">Unlock GreenStash</string>
+    <string name="bio_lock_title">Unlock BuyBuddy</string>
     <string name="bio_lock_subtitle">Confirm your screen lock, PIN or password.</string>
     <string name="auth_successful">Authentication succeeded!</string>
     <string name="auth_failed">Authentication failed!</string>
     <string name="auth_error">Authentication error: %s</string>
+
+    <!--  Info Values  -->
     <string name="misc_setting_title">Information</string>
     <string name="license_setting"><![CDATA[License & Acknowledgement]]></string>
     <string name="license_setting_desc">Show open source license information</string>

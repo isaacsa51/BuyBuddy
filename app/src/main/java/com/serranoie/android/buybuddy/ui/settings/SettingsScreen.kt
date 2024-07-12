@@ -132,9 +132,9 @@ private fun SettingsCategory(title: String) {
         style = MaterialTheme.typography.labelSmall,
         fontWeight = FontWeight.Bold,
         modifier =
-            Modifier
-                .padding(vertical = 8.dp)
-                .padding(horizontal = 14.dp),
+        Modifier
+            .padding(vertical = 8.dp)
+            .padding(horizontal = 14.dp),
     )
 }
 
@@ -154,18 +154,18 @@ fun DisplaySettings() {
     Spacer(modifier = Modifier.height(smallPadding))
 
     SettingsContainer {
-        SettingsCategory(title = "Theme")
+        SettingsCategory(title = stringResource(id = R.string.display_settings_title))
 
         SettingsItem(
-            title = "Default Theme",
-            description = "Description",
+            title = stringResource(id = R.string.theme_setting),
+            description = stringResource(id = R.string.theme_setting_desc),
             icon = Icons.Rounded.BrightnessMedium,
             onClick = { showThemeSheet.value = true },
         )
 
         SettingsItemSwitch(
-            title = "Material You",
-            description = "Description",
+            title = stringResource(id = R.string.material_you_setting),
+            description = stringResource(id = R.string.material_you_setting_desc),
             icon = Icons.Rounded.Palette,
             switchState = materialYouValue,
             onCheckChange = { newValue ->
