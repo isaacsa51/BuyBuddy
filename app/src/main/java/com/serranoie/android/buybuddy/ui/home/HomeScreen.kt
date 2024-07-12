@@ -1,5 +1,10 @@
 package com.serranoie.android.buybuddy.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,8 +21,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -31,6 +39,7 @@ import com.serranoie.android.buybuddy.ui.common.TotalAmountCard
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,18 +84,26 @@ fun HomeScreen(
             if (categoriesWithItems.isEmpty() || categoriesWithItems.all { it.items.isEmpty() }) {
                 EmptyListScreen(padding)
             } else {
-                Column(
-                    modifier = Modifier.padding(padding),
-                ) {
+                Column(modifier = Modifier.padding(padding)) {
                     TotalAmountCard(
                         totalPrice = totalPrice,
                         totalBoughtPrice = totalBoughtPrice,
-                        modifier = Modifier.testTag("TotalAmountCard"),
+                        modifier = Modifier.testTag("TotalAmountCard")
                     )
 
-                    LazyColumn(modifier = Modifier.testTag("LazyColumn")) {
-                        items(categoriesWithItems.filter { it.items.isNotEmpty() }) {
-                            CategoryCard(categoryWithItems = it, navController = navController)
+                    categoriesWithItems.forEachIndexed { index, categoryWithItems ->
+                        val visibleState = remember { mutableStateOf(false) }
+                        LaunchedEffect(key1 = index) {
+                            delay(index * 80L)
+                            visibleState.value = true
+                        }
+
+                        AnimatedVisibility(
+                            visible = visibleState.value,
+                            enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                            exit = fadeOut() + slideOutVertically()
+                        ) {
+                            CategoryCard(categoryWithItems = categoryWithItems, navController = navController)
                         }
                     }
                 }
