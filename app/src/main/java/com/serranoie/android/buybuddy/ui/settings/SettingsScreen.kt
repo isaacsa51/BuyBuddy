@@ -42,6 +42,7 @@ import com.serranoie.android.buybuddy.ui.settings.common.SettingsCategory
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsContainer
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsItem
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsItemSwitch
+import com.serranoie.android.buybuddy.ui.settings.common.ThemePickerDialog
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.getActivity
 import com.serranoie.android.buybuddy.ui.util.toToast
@@ -84,9 +85,9 @@ fun SettingsScreen(navController: NavController) {
         LazyColumn(
             modifier = Modifier.padding(padding),
         ) {
-            item { DisplaySettings() }
+            item { DisplaySettings(viewModel = viewModel) }
 
-            item { InfoSettings() }
+            item { InfoSettings(navController = navController) }
 
             item {
                 SettingsContainer {
@@ -103,17 +104,19 @@ fun SettingsScreen(navController: NavController) {
 }
 
 @Composable
-fun DisplaySettings() {
+fun DisplaySettings(viewModel: SettingsViewModel) {
     val context = LocalContext.current
     val showThemeSheet = remember { mutableStateOf(false) }
 
-//    val themeValue = when (viewModel.getThemeValue()) {
-//        ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
-//        ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
-//        else -> stringResource(id = R.string.theme_dialog_option3)
-//    }
+    val themeValue = when (viewModel.getThemeValue()) {
+        ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
+        ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
+        else -> stringResource(id = R.string.theme_dialog_option3)
+    }
 
-    val materialYouValue = remember { mutableStateOf(false) }
+    val materialYouValue = remember {
+        mutableStateOf(viewModel.getMaterialYouValue())
+    }
 
     Spacer(modifier = Modifier.height(smallPadding))
 
@@ -134,33 +137,34 @@ fun DisplaySettings() {
             switchState = materialYouValue,
             onCheckChange = { newValue ->
                 materialYouValue.value = newValue
+
                 if (newValue) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        true
+                        viewModel.setMaterialYou(true)
                     } else {
                         materialYouValue.value = false
                         context.getString(R.string.material_you_error).toToast(context)
                     }
                 } else {
-                    false
+                    viewModel.setMaterialYou(false)
                 }
             },
         )
 
-//        if (showThemeSheet.value) {
-//            ThemePickerDialog(
-//                themeValue = themeValue,
-//                showThemeDialog = showThemeSheet,
-//                onThemeChange = { newTheme ->
-//                    newTheme
-//                }
-//            )
-//        }
+        if (showThemeSheet.value) {
+            ThemePickerDialog(
+                themeValue = themeValue,
+                showThemeDialog = showThemeSheet,
+                onThemeChange = { newTheme ->
+                    viewModel.setTheme(newTheme)
+                }
+            )
+        }
     }
 }
 
 @Composable
-fun InfoSettings() {
+fun InfoSettings(navController: NavController) {
     SettingsContainer {
         SettingsCategory(title = stringResource(id = R.string.misc_setting_title))
 
