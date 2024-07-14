@@ -6,9 +6,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_CHNNL_ID
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_CHNNL_NAME
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_ID
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_CHNNL_ID
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_CHNNL_NAME
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_ID
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp

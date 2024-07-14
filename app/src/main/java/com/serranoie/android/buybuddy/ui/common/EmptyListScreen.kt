@@ -21,21 +21,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 
 @Composable
 fun EmptyListScreen(padding: PaddingValues) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(padding),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(padding),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(fraction = 0.52f),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(fraction = 0.52f),
             painter = painterResource(id = R.drawable.image_empty),
             contentDescription = "Empty list image",
             contentScale = ContentScale.Fit,
@@ -64,15 +65,13 @@ fun EmptyListScreen(padding: PaddingValues) {
 )
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL,
-    showBackground = false
+    showBackground = false,
 )
 @Composable
 private fun EmptyListScreenPreview() {
     val padding = PaddingValues()
 
-    BuyBuddyTheme {
-        Surface {
-            EmptyListScreen(padding)
-        }
+    Surface {
+        EmptyListScreen(padding)
     }
 }

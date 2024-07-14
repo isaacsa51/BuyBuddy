@@ -15,13 +15,21 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel
-    @Inject
-    constructor(
-        private val getCategoriesWithItemsUseCase: GetCategoriesWithItemsUseCase,
-        private val getTotalPriceOfItemsToBuyUseCase: GetTotalPriceOfItemsToBuyUseCase,
-        private val getTotalPriceOfItemsBoughtUseCase: GetTotalPriceOfItemsBoughtUseCase,
+class HomeViewModel @Inject constructor(
+    private val getCategoriesWithItemsUseCase: GetCategoriesWithItemsUseCase,
+    private val getTotalPriceOfItemsToBuyUseCase: GetTotalPriceOfItemsToBuyUseCase,
+    private val getTotalPriceOfItemsBoughtUseCase: GetTotalPriceOfItemsBoughtUseCase,
     ) : ViewModel() {
+
+
+    private var _appUnlocked = false
+
+    fun isAppUnlocked(): Boolean = _appUnlocked
+
+    fun setAppUnlocked(unlocked: Boolean) {
+        _appUnlocked = unlocked
+    }
+
         private val _categoriesWithItems = MutableStateFlow<List<CategoryWithItemsEntity>>(emptyList())
         val categoriesWithItems: StateFlow<List<CategoryWithItemsEntity>> = _categoriesWithItems
 

@@ -7,7 +7,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
@@ -36,7 +35,6 @@ import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.common.CategoryCard
 import com.serranoie.android.buybuddy.ui.common.EmptyListScreen
 import com.serranoie.android.buybuddy.ui.common.TotalAmountCard
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
 import kotlinx.coroutines.delay
@@ -51,60 +49,61 @@ fun HomeScreen(
     val totalPrice by viewModel.totalPrice.collectAsState()
     val totalBoughtPrice by viewModel.totalBoughtPrice.collectAsState()
 
-    BuyBuddyTheme {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.app_name),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Black,
-                        )
-                    },
-                    actions = {
-                        IconButton(onClick = { navController.navigate(Screen.SETTINGS.name) }) {
-                            Icon(Icons.Outlined.Settings, contentDescription = "Add")
-                        }
-                    },
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Black,
+                    )
+                },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Screen.SETTINGS.name) }) {
+                        Icon(Icons.Outlined.Settings, contentDescription = "Add")
+                    }
+                },
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { navController.navigate(Route.Quiz.route) },
+                containerColor = MaterialTheme.colorScheme.tertiary,
+            ) {
+                Icon(
+                    Icons.Rounded.Add,
+                    contentDescription = stringResource(R.string.create_item_label),
                 )
-            },
-            floatingActionButton = {
-                FloatingActionButton(
-                    onClick = { navController.navigate(Route.Quiz.route) },
-                    containerColor = MaterialTheme.colorScheme.tertiary,
-                ) {
-                    Icon(
-                        Icons.Rounded.Add,
-                        contentDescription = stringResource(R.string.create_item_label),
-                    )
-                }
-            },
-        ) { padding ->
-            if (categoriesWithItems.isEmpty() || categoriesWithItems.all { it.items.isEmpty() }) {
-                EmptyListScreen(padding)
-            } else {
-                Column(modifier = Modifier.padding(padding)) {
-                    TotalAmountCard(
-                        totalPrice = totalPrice,
-                        totalBoughtPrice = totalBoughtPrice,
-                        modifier = Modifier.testTag("TotalAmountCard")
-                    )
+            }
+        },
+    ) { padding ->
+        if (categoriesWithItems.isEmpty() || categoriesWithItems.all { it.items.isEmpty() }) {
+            EmptyListScreen(padding)
+        } else {
+            Column(modifier = Modifier.padding(padding)) {
+                TotalAmountCard(
+                    totalPrice = totalPrice,
+                    totalBoughtPrice = totalBoughtPrice,
+                    modifier = Modifier.testTag("TotalAmountCard"),
+                )
 
-                    categoriesWithItems.forEachIndexed { index, categoryWithItems ->
-                        val visibleState = remember { mutableStateOf(false) }
-                        LaunchedEffect(key1 = index) {
-                            delay(index * 80L)
-                            visibleState.value = true
-                        }
+                categoriesWithItems.forEachIndexed { index, categoryWithItems ->
+                    val visibleState = remember { mutableStateOf(false) }
+                    LaunchedEffect(key1 = index) {
+                        delay(index * 80L)
+                        visibleState.value = true
+                    }
 
-                        AnimatedVisibility(
-                            visible = visibleState.value,
-                            enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
-                            exit = fadeOut() + slideOutVertically()
-                        ) {
-                            CategoryCard(categoryWithItems = categoryWithItems, navController = navController)
-                        }
+                    AnimatedVisibility(
+                        visible = visibleState.value,
+                        enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                        exit = fadeOut() + slideOutVertically(),
+                    ) {
+                        CategoryCard(
+                            categoryWithItems = categoryWithItems,
+                            navController = navController,
+                        )
                     }
                 }
             }

@@ -6,9 +6,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_ITEM_ID_KEY
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_MESSAGE_KEY
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_TITLE_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_ITEM_ID_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_MESSAGE_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_TITLE_KEY
 import java.util.Calendar
 import java.util.Date
 

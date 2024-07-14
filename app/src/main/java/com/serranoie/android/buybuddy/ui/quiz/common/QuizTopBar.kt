@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.core.theme.stronglyDeemphasizedAlpha
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,13 +92,11 @@ private fun TopAppBarTitle(
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun SurveyTopBarPreview() {
-    BuyBuddyTheme {
-        Surface {
-            QuizTopBar(
-                questionIndex = 3,
-                totalQuestionsCount = 6,
-                onClosePressed = { },
-            )
-        }
+    Surface {
+        QuizTopBar(
+            questionIndex = 3,
+            totalQuestionsCount = 6,
+            onClosePressed = { },
+        )
     }
 }

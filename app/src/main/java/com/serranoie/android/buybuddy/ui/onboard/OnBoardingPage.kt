@@ -17,19 +17,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 
 @Composable
-fun OnBoardingPage(
-    page: Page,
-) {
+fun OnBoardingPage(page: Page) {
     Column(modifier = Modifier) {
         Image(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(fraction = 0.5f),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(fraction = 0.5f),
             painter = painterResource(id = page.image),
             contentDescription = stringResource(R.string.onboarding_image_label),
             contentScale = ContentScale.Fit,
@@ -53,9 +51,7 @@ fun OnBoardingPage(
 @Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewOnBoardingPage() {
-    BuyBuddyTheme {
-        Surface {
-            OnBoardingPage(page = pages[0])
-        }
+    Surface {
+        OnBoardingPage(page = pages[0])
     }
 }

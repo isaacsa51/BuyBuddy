@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 
 /**
  * A scrollable container with the question's title, direction, and dynamic content.
@@ -40,9 +39,10 @@ fun QuestionWrapper(
     content: @Composable () -> Unit,
 ) {
     Column(
-        modifier = modifier
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            modifier
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
     ) {
         Spacer(Modifier.height(32.dp))
         QuestionTitle(titleResourceId)
@@ -64,13 +64,13 @@ private fun QuestionTitle(
         style = MaterialTheme.typography.displaySmall,
         fontWeight = FontWeight.Black,
         color = MaterialTheme.colorScheme.surface,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                color = MaterialTheme.colorScheme.inverseSurface,
-                shape = MaterialTheme.shapes.small,
-            )
-            .padding(vertical = 24.dp, horizontal = 16.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .background(
+                    color = MaterialTheme.colorScheme.inverseSurface,
+                    shape = MaterialTheme.shapes.small,
+                ).padding(vertical = 24.dp, horizontal = 16.dp),
     )
 }
 
@@ -83,9 +83,10 @@ private fun QuestionDirections(
         text = stringResource(id = directionsResourceId),
         color = MaterialTheme.colorScheme.onSurface,
         style = MaterialTheme.typography.bodyLarge,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp),
     )
 }
 
@@ -93,12 +94,10 @@ private fun QuestionDirections(
 @PreviewLightDark
 @Composable
 private fun QuestionWrapperPreview() {
-    BuyBuddyTheme {
-        Surface {
-            Column {
-                QuestionTitle(title = R.string.name_question)
-                QuestionDirections(directionsResourceId = R.string.name_helper)
-            }
+    Surface {
+        Column {
+            QuestionTitle(title = R.string.name_question)
+            QuestionDirections(directionsResourceId = R.string.name_helper)
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.serranoie.android.buybuddy.ui.util
 
-object Constants {
+object NotificationConstants {
     const val RMNDR_ID = 15
     const val RMNDR_NOTI_ID = "buy_buddy_reminder_notification"
     const val RMNDR_NOTI_CHNNL_NAME = "Buy Buddy Reminder"

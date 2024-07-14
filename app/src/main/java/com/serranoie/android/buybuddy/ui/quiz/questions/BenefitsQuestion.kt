@@ -21,7 +21,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 
@@ -76,16 +75,14 @@ fun PopulateBenefitsQuestion(
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun BenefitsPreview() {
-    BuyBuddyTheme {
-        Surface {
-            val onInputResponse by remember { mutableStateOf("") }
+    Surface {
+        val onInputResponse by remember { mutableStateOf("") }
 
-            BenefitsQuestion(
-                titleResourceId = R.string.benefit_question,
-                directionsResourceId = R.string.reasons_helper,
-                benefitsResponse = "",
-                onInputResponse = { onInputResponse },
-            )
-        }
+        BenefitsQuestion(
+            titleResourceId = R.string.benefit_question,
+            directionsResourceId = R.string.reasons_helper,
+            benefitsResponse = "",
+            onInputResponse = { onInputResponse },
+        )
     }
 }

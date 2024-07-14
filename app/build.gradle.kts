@@ -84,6 +84,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -167,7 +169,10 @@ dependencies {
     androidTestImplementation("androidx.test:runner:1.6.1")
     androidTestImplementation("androidx.test:rules:1.6.1")
 
-    implementation("com.google.accompanist:accompanist-insets:0.24.13-rc")
+    // Biometrics
+    implementation("androidx.biometric:biometric:1.1.0")
+
+    implementation("androidx.compose.ui:ui-test-junit4-android:1.6.8")
 
 }
 

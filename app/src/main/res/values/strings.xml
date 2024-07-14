@@ -98,6 +98,13 @@
     <string name="theme_dialog_title">Change Theme</string>
     <string name="theme_dialog_apply_button">Apply</string>
 
+    <!-- App lock -->
+    <string name="app_lock_screen_title">GreenStash is locked</string>
+    <string name="app_lock_screen_subtitle">Click the button below to authenticate.</string>
+    <string name="app_lock_button_text">Authorize</string>
+    <string name="app_lock_button_icon_desc">Unlock App</string>
+    <string name="app_lock_unable_to_authenticate">App-lock is disabled because the device is unable to authenticate</string>
+
     <!-- Biometric Lock -->
     <string name="security_settings_title">Security</string>
     <string name="security_app_lock">Biometric Lock</string>

@@ -29,6 +29,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategoryUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
+import com.serranoie.android.buybuddy.ui.util.PreferenceUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -62,6 +63,10 @@ object DependenciesProvider {
     fun provideLocalUserManager(
         application: Application,
     ): LocalUserManager = LocalUserManagerImpl(application)
+
+    @Provides
+    @Singleton
+    fun providePreferenceUtil(@ApplicationContext context: Context) = PreferenceUtil(context)
 
     @Provides
     @Singleton

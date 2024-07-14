@@ -58,7 +58,6 @@ import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
 import androidx.wear.compose.material.swipeable
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalWearMaterialApi::class)
@@ -71,18 +70,19 @@ fun SlideToConfirm(
     onCancelPressed: () -> Unit,
 ): Boolean {
     val hapticFeedback = LocalHapticFeedback.current
-    val swipeState = rememberSwipeableState(
-        initialValue = if (isLoading) Anchor.End else Anchor.Start,
-        confirmStateChange = { anchor ->
-            if (anchor == Anchor.End) {
-                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-                onUnlockRequested()
-                true
-            } else {
-                false
-            }
-        },
-    )
+    val swipeState =
+        rememberSwipeableState(
+            initialValue = if (isLoading) Anchor.End else Anchor.Start,
+            confirmStateChange = { anchor ->
+                if (anchor == Anchor.End) {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onUnlockRequested()
+                    true
+                } else {
+                    false
+                }
+            },
+        )
 
     val swipeFraction by remember {
         derivedStateOf { calculateSwipeFraction(swipeState.progress) }
@@ -103,21 +103,24 @@ fun SlideToConfirm(
             swipeFraction = swipeFraction,
             isLoading = isLoading,
             onCancelPressed = onCancelPressed,
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(PaddingValues(horizontal = Thumb.Size + 8.dp))
-                .fillMaxWidth(),
+            modifier =
+                Modifier
+                    .align(Alignment.Center)
+                    .padding(PaddingValues(horizontal = Thumb.Size + 8.dp))
+                    .fillMaxWidth(),
         )
 
         Thumb(
-            isLoading = isLoading, modifier = Modifier.offset {
-                IntOffset(swipeState.offset.value.roundToInt(), 0)
-            }, onCancelPressed = onCancelPressed
+            isLoading = isLoading,
+            modifier =
+                Modifier.offset {
+                    IntOffset(swipeState.offset.value.roundToInt(), 0)
+                },
+            onCancelPressed = onCancelPressed,
         )
     }
 
     return swipeState.offset.value == Track.EndOfTrackPx
-
 }
 
 @OptIn(ExperimentalWearMaterialApi::class)
@@ -148,9 +151,10 @@ fun Track(
     val horizontalPadding = 10.dp
 
     val startOfTrackPx = 0f
-    val endOfTrackPx = remember(fullWidth) {
-        with(density) { fullWidth - (2 * horizontalPadding + Thumb.Size).toPx() }
-    }
+    val endOfTrackPx =
+        remember(fullWidth) {
+            with(density) { fullWidth - (2 * horizontalPadding + Thumb.Size).toPx() }
+        }
 
     val snapThreshold = 0.8f
     val thresholds = { from: Anchor, _: Anchor ->
@@ -162,48 +166,50 @@ fun Track(
     }
 
     Box(
-        modifier = modifier
-            .onSizeChanged { fullWidth = it.width }
-            .height(56.dp)
-            .fillMaxWidth()
-            .swipeable(
-                enabled = enabled,
-                state = swipeState,
-                orientation = Orientation.Horizontal,
-                anchors = mapOf(
-                    startOfTrackPx to Anchor.Start,
-                    endOfTrackPx to Anchor.End,
+        modifier =
+            modifier
+                .onSizeChanged { fullWidth = it.width }
+                .height(56.dp)
+                .fillMaxWidth()
+                .swipeable(
+                    enabled = enabled,
+                    state = swipeState,
+                    orientation = Orientation.Horizontal,
+                    anchors =
+                        mapOf(
+                            startOfTrackPx to Anchor.Start,
+                            endOfTrackPx to Anchor.End,
+                        ),
+                    thresholds = thresholds,
+                    velocityThreshold = Track.VelocityThreshold,
+                ).background(
+                    color = MaterialTheme.colorScheme.tertiary,
+                    shape = RoundedCornerShape(percent = 10),
+                ).padding(
+                    PaddingValues(
+                        horizontal = horizontalPadding,
+                        vertical = 8.dp,
+                    ),
                 ),
-                thresholds = thresholds,
-                velocityThreshold = Track.VelocityThreshold,
-            )
-            .background(
-                color = MaterialTheme.colorScheme.tertiary,
-                shape = RoundedCornerShape(percent = 10),
-            )
-            .padding(
-                PaddingValues(
-                    horizontal = horizontalPadding,
-                    vertical = 8.dp,
-                ),
-            ),
         content = content,
     )
 }
 
 @Composable
 fun Thumb(
-    isLoading: Boolean, modifier: Modifier, onCancelPressed: () -> Unit
+    isLoading: Boolean,
+    modifier: Modifier,
+    onCancelPressed: () -> Unit,
 ) {
     Box(
-        modifier = modifier
-            .size(Thumb.Size)
-            .clickable { if (isLoading) onCancelPressed() }
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(5.dp),
-            )
-            .padding(8.dp),
+        modifier =
+            modifier
+                .size(Thumb.Size)
+                .clickable { if (isLoading) onCancelPressed() }
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = RoundedCornerShape(5.dp),
+                ).padding(8.dp),
     ) {
         if (isLoading) {
             Icon(imageVector = Icons.Rounded.Done, contentDescription = "Mark it purchased")
@@ -225,13 +231,16 @@ fun Hint(
     val hintColor =
         if (isLoading) MaterialTheme.colorScheme.surface else calculateHintTextColor(swipeFraction)
 
-    Text(text = hintText,
+    Text(
+        text = hintText,
         color = hintColor,
         style = MaterialTheme.typography.titleSmall,
-        modifier = modifier
-            .clickable { if (isLoading) onCancelPressed() }
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.Center))
+        modifier =
+            modifier
+                .clickable { if (isLoading) onCancelPressed() }
+                .fillMaxWidth()
+                .wrapContentSize(Alignment.Center),
+    )
 }
 
 @Composable
@@ -241,7 +250,7 @@ fun calculateHintTextColor(swipeFraction: Float): Color {
     return lerp(
         MaterialTheme.colorScheme.surface,
         MaterialTheme.colorScheme.surface.copy(alpha = 0f),
-        fraction
+        fraction,
     )
 }
 
@@ -260,45 +269,44 @@ private object Track {
 @Composable
 private fun Preview() {
     var isLoading by remember { mutableStateOf(false) }
-    BuyBuddyTheme {
-        Surface {
-            Column(
-                verticalArrangement = Arrangement.Absolute.spacedBy(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Column(modifier = Modifier.width(IntrinsicSize.Max)) {
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(text = "Normal")
-                        Spacer(modifier = Modifier.weight(1f))
-                        Thumb(isLoading = false, modifier = Modifier, onCancelPressed = { })
-                    }
 
-                    SlideToConfirm(
-                        isLoading = isLoading,
-                        onUnlockRequested = { isLoading = true },
-                        onCancelPressed = { isLoading = false },
-                        currentStatus = false
-                    )
+    Surface {
+        Column(
+            verticalArrangement = Arrangement.Absolute.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Column(modifier = Modifier.width(IntrinsicSize.Max)) {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(text = "Normal")
+                    Spacer(modifier = Modifier.weight(1f))
+                    Thumb(isLoading = false, modifier = Modifier, onCancelPressed = { })
+                }
 
-                    Spacer(modifier = Modifier.padding(8.dp))
+                SlideToConfirm(
+                    isLoading = isLoading,
+                    onUnlockRequested = { isLoading = true },
+                    onCancelPressed = { isLoading = false },
+                    currentStatus = false,
+                )
 
-                    SlideToConfirm(
-                        isLoading = !isLoading,
-                        onUnlockRequested = { isLoading = false },
-                        onCancelPressed = { isLoading = false },
-                        currentStatus = true
-                    )
+                Spacer(modifier = Modifier.padding(8.dp))
 
-                    OutlinedButton(
-                        colors = ButtonDefaults.outlinedButtonColors(),
-                        shape = RoundedCornerShape(percent = 50),
-                        onClick = { isLoading = false },
-                    ) {
-                        Text(text = "Cancel loading", style = MaterialTheme.typography.labelMedium)
-                    }
+                SlideToConfirm(
+                    isLoading = !isLoading,
+                    onUnlockRequested = { isLoading = false },
+                    onCancelPressed = { isLoading = false },
+                    currentStatus = true,
+                )
+
+                OutlinedButton(
+                    colors = ButtonDefaults.outlinedButtonColors(),
+                    shape = RoundedCornerShape(percent = 50),
+                    onClick = { isLoading = false },
+                ) {
+                    Text(text = "Cancel loading", style = MaterialTheme.typography.labelMedium)
                 }
             }
         }

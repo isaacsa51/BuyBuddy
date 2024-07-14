@@ -25,7 +25,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
@@ -144,18 +143,16 @@ fun PopulateNameQuestion(
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun NameItemQuestionPreview() {
-    BuyBuddyTheme {
-        Surface {
-            NameQuestion(
-                titleResourceId = R.string.name_question,
-                directionsResourceId = R.string.name_helper,
-                onInputResponse = { },
-                nameItemResponse = "",
-                descriptionResponse = "",
-                onDescriptionResponse = { },
-                onPriceResponse = { },
-                priceResponse = "",
-            )
-        }
+    Surface {
+        NameQuestion(
+            titleResourceId = R.string.name_question,
+            directionsResourceId = R.string.name_helper,
+            onInputResponse = { },
+            nameItemResponse = "",
+            descriptionResponse = "",
+            onDescriptionResponse = { },
+            onPriceResponse = { },
+            priceResponse = "",
+        )
     }
 }

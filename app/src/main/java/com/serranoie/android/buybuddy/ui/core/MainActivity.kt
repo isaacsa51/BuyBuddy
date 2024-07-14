@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.WindowInsets
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -13,7 +12,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
@@ -23,11 +21,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
+import com.serranoie.android.buybuddy.ui.home.HomeViewModel
 import com.serranoie.android.buybuddy.ui.navigation.NavGraph
+import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -36,14 +36,27 @@ class MainActivity : ComponentActivity() {
 
     private val onBoardViewModel by viewModels<AppEntryViewModel>()
 
+    lateinit var settingsViewModel: SettingsViewModel
+    lateinit var homeViewModel: HomeViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
+        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
         enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.auto(Color.Transparent.toArgb(), Color.Transparent.toArgb()),
-            navigationBarStyle = SystemBarStyle.auto(Color.Transparent.toArgb(), Color.Transparent.toArgb())
+            statusBarStyle =
+                SystemBarStyle.auto(
+                    Color.Transparent.toArgb(),
+                    Color.Transparent.toArgb(),
+                ),
+            navigationBarStyle =
+                SystemBarStyle.auto(
+                    Color.Transparent.toArgb(),
+                    Color.Transparent.toArgb(),
+                ),
         )
-
-        super.onCreate(savedInstanceState)
 
         actionBar?.hide()
 
@@ -60,12 +73,13 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            BuyBuddyTheme {
+            BuyBuddyTheme(settingsViewModel = settingsViewModel) {
                 navController = rememberNavController()
                 Surface(
-                    modifier = Modifier
-                        .imePadding()
-                        .fillMaxSize(),
+                    modifier =
+                        Modifier
+                            .imePadding()
+                            .fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val startDestination = onBoardViewModel.startDestination

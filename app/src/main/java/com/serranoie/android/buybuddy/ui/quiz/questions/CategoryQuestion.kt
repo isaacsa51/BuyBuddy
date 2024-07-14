@@ -15,7 +15,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.quiz.QuizViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.quiz.common.RadioButtonOption
@@ -105,15 +104,13 @@ private fun CategoryPreview() {
             Category(9, R.string.category_tools),
         )
 
-    BuyBuddyTheme {
-        Surface {
-            CategoryQuestion(
-                titleResourceId = R.string.category_question,
-                directionsResourceId = R.string.category_helper,
-                possibleAnswers = possibleAnswers,
-                selectedAnswer = "",
-                onOptionSelected = {},
-            )
-        }
+    Surface {
+        CategoryQuestion(
+            titleResourceId = R.string.category_question,
+            directionsResourceId = R.string.category_helper,
+            possibleAnswers = possibleAnswers,
+            selectedAnswer = "",
+            onOptionSelected = {},
+        )
     }
 }

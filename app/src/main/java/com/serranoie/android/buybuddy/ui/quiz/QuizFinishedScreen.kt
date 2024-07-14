@@ -29,7 +29,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import kotlinx.coroutines.launch
 
@@ -125,11 +124,9 @@ private fun QuizResult(
 @PreviewLightDark
 @Composable
 private fun PreviewSurveyResult() {
-    BuyBuddyTheme {
-        Surface {
-            QuizFinishedScreen(
-                onDonePressed = {},
-            )
-        }
+    Surface {
+        QuizFinishedScreen(
+            onDonePressed = {},
+        )
     }
 }

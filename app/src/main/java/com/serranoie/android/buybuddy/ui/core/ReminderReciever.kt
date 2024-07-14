@@ -12,10 +12,10 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_CHNNL_ID
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_ITEM_ID_KEY
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_MESSAGE_KEY
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_TITLE_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_CHNNL_ID
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_ITEM_ID_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_MESSAGE_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_TITLE_KEY
 
 class ReminderReceiver : BroadcastReceiver() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)

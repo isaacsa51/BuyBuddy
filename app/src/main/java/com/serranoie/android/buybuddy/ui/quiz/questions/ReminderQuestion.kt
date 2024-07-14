@@ -29,7 +29,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.common.TimePickerDialog
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.quiz.QuizViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
@@ -187,14 +186,12 @@ fun PopulateReminderQuestion(
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun ReminderPreview() {
-    BuyBuddyTheme {
-        Surface {
-            ReminderQuestion(
-                titleResourceId = R.string.reminder_question,
-                directionsResourceId = R.string.select_date,
-                dateInMillis = Date(),
-                onDateTimeSelected = {},
-            )
-        }
+    Surface {
+        ReminderQuestion(
+            titleResourceId = R.string.reminder_question,
+            directionsResourceId = R.string.select_date,
+            dateInMillis = Date(),
+            onDateTimeSelected = {},
+        )
     }
 }
