@@ -7,4 +7,5 @@ enum class Screen {
     ONBOARDING,
     EDIT,
     SETTINGS,
+    ABOUT,
 }

@@ -18,4 +18,6 @@ sealed class Route(val route: String) {
     }
 
     data object Settings : Route(Screen.SETTINGS.name)
+
+    data object About : Route(Screen.ABOUT.name)
 }

@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.settings
 
-import android.hardware.biometrics.BiometricPrompt
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Spacer
@@ -11,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalPolice
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.rounded.BrightnessMedium
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material3.Button
@@ -38,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.MainActivity
+import com.serranoie.android.buybuddy.ui.navigation.Screen
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsCategory
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsContainer
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsItem
@@ -47,7 +46,6 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.getActivity
 import com.serranoie.android.buybuddy.ui.util.toToast
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
-import java.util.concurrent.Executor
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,15 +106,17 @@ fun DisplaySettings(viewModel: SettingsViewModel) {
     val context = LocalContext.current
     val showThemeSheet = remember { mutableStateOf(false) }
 
-    val themeValue = when (viewModel.getThemeValue()) {
-        ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
-        ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
-        else -> stringResource(id = R.string.theme_dialog_option3)
-    }
+    val themeValue =
+        when (viewModel.getThemeValue()) {
+            ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
+            ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
+            else -> stringResource(id = R.string.theme_dialog_option3)
+        }
 
-    val materialYouValue = remember {
-        mutableStateOf(viewModel.getMaterialYouValue())
-    }
+    val materialYouValue =
+        remember {
+            mutableStateOf(viewModel.getMaterialYouValue())
+        }
 
     Spacer(modifier = Modifier.height(smallPadding))
 
@@ -157,7 +157,7 @@ fun DisplaySettings(viewModel: SettingsViewModel) {
                 showThemeDialog = showThemeSheet,
                 onThemeChange = { newTheme ->
                     viewModel.setTheme(newTheme)
-                }
+                },
             )
         }
     }
@@ -169,16 +169,10 @@ fun InfoSettings(navController: NavController) {
         SettingsCategory(title = stringResource(id = R.string.misc_setting_title))
 
         SettingsItem(
-            title = stringResource(id = R.string.license_setting),
-            description = stringResource(id = R.string.license_setting_desc),
-            icon = Icons.Filled.LocalPolice,
-            onClick = { },
-        )
-        SettingsItem(
             title = stringResource(id = R.string.app_info_setting),
             description = stringResource(id = R.string.app_info_setting_desc),
             icon = Icons.Filled.Info,
-            onClick = { },
+            onClick = { navController.navigate(Screen.ABOUT.name) },
         )
     }
     Spacer(modifier = Modifier.height(2.dp))

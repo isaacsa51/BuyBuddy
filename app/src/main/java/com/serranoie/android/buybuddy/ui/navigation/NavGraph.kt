@@ -14,6 +14,7 @@ import com.serranoie.android.buybuddy.ui.onboard.OnBoardingScreen
 import com.serranoie.android.buybuddy.ui.onboard.OnBoardingViewModel
 import com.serranoie.android.buybuddy.ui.quiz.QuizFinishedScreen
 import com.serranoie.android.buybuddy.ui.quiz.QuizRoute
+import com.serranoie.android.buybuddy.ui.settings.AboutScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsScreen
 
 @Composable
@@ -73,6 +74,10 @@ fun NavGraph(
 
             composable(route = Route.Settings.route) {
                 SettingsScreen(navController = navController)
+            }
+
+            composable(route = Route.About.route) {
+                AboutScreen(navController = navController)
             }
         }
     }

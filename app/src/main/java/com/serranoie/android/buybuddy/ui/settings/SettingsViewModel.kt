@@ -20,7 +20,7 @@ class SettingsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _theme = MutableLiveData(ThemeMode.Auto)
-    private val _materialYou = MutableLiveData(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+    private val _materialYou = MutableLiveData(false)
 
     val theme: LiveData<ThemeMode> = _theme
     val materialYou: LiveData<Boolean> = _materialYou
@@ -49,7 +49,7 @@ class SettingsViewModel @Inject constructor(
     )
 
     fun getMaterialYouValue() = preferenceUtil.getBoolean(
-        PreferenceUtil.MATERIAL_YOU_BOOL, Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+        PreferenceUtil.MATERIAL_YOU_BOOL, false
     )
 
     fun getAppLockValue() = preferenceUtil.getBoolean(

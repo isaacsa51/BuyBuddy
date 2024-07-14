@@ -1,5 +1,9 @@
 package com.serranoie.android.buybuddy.ui.util
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_WEAK
@@ -24,5 +28,21 @@ object Utils {
         BIOMETRIC_WEAK or DEVICE_CREDENTIAL
     } else {
         BIOMETRIC_STRONG or DEVICE_CREDENTIAL
+    }
+
+    /**
+     * Open the web link in the browser.
+     *
+     * @param context The context
+     * @param url The URL to open
+     */
+    fun openWebLink(context: Context, url: String) {
+        val uri: Uri = Uri.parse(url)
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        try {
+            context.startActivity(intent)
+        } catch (exc: ActivityNotFoundException) {
+            exc.printStackTrace()
+        }
     }
 }
