@@ -5,7 +5,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -37,17 +39,20 @@ import com.serranoie.android.buybuddy.ui.common.EmptyListScreen
 import com.serranoie.android.buybuddy.ui.common.TotalAmountCard
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
+import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
+    settingsViewModel: SettingsViewModel = hiltViewModel(),
     navController: NavController,
 ) {
     val categoriesWithItems by viewModel.categoriesWithItems.collectAsState()
     val totalPrice by viewModel.totalPrice.collectAsState()
     val totalBoughtPrice by viewModel.totalBoughtPrice.collectAsState()
+    val categoryVisibility by settingsViewModel.categoryVisibility.collectAsState()
 
     Scaffold(
         topBar = {
@@ -81,30 +86,37 @@ fun HomeScreen(
         if (categoriesWithItems.isEmpty() || categoriesWithItems.all { it.items.isEmpty() }) {
             EmptyListScreen(padding)
         } else {
-            Column(modifier = Modifier.padding(padding)) {
-                TotalAmountCard(
-                    totalPrice = totalPrice,
-                    totalBoughtPrice = totalBoughtPrice,
-                    modifier = Modifier.testTag("TotalAmountCard"),
-                )
+            Box(modifier = Modifier.padding(padding)) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    TotalAmountCard(
+                        totalPrice = totalPrice,
+                        totalBoughtPrice = totalBoughtPrice,
+                        modifier = Modifier.testTag("TotalAmountCard"),
+                    )
 
-                categoriesWithItems.forEachIndexed { index, categoryWithItems ->
-                    val visibleState = remember { mutableStateOf(false) }
-                    LaunchedEffect(key1 = index) {
-                        delay(index * 80L)
-                        visibleState.value = true
-                    }
+                    categoriesWithItems
+                        .filter { categoryWithItems ->
+                            categoryWithItems.items.isNotEmpty() || categoryVisibility
+                        }
+                        .forEachIndexed { index, categoryWithItems ->
+                            val visibleState = remember { mutableStateOf(false) }
 
-                    AnimatedVisibility(
-                        visible = visibleState.value,
-                        enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
-                        exit = fadeOut() + slideOutVertically(),
-                    ) {
-                        CategoryCard(
-                            categoryWithItems = categoryWithItems,
-                            navController = navController,
-                        )
-                    }
+                            LaunchedEffect(key1 = index) {
+                                delay(index * 100L)
+                                visibleState.value = true
+                            }
+
+                            AnimatedVisibility(
+                                visible = visibleState.value,
+                                enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                                exit = fadeOut() + slideOutVertically(),
+                            ) {
+                                CategoryCard(
+                                    categoryWithItems = categoryWithItems,
+                                    navController = navController,
+                                )
+                            }
+                        }
                 }
             }
         }

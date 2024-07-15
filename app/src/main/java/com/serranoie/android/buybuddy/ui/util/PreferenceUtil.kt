@@ -11,6 +11,7 @@ class PreferenceUtil @Inject constructor(context: Context) {
         // Main preference keys
         const val APP_THEME_INT = "theme_settings"
         const val MATERIAL_YOU_BOOL = "material_you"
+        const val CATEGORY_VISIBILITY_BOOL = "category_visibility"
         const val APP_LOCK_BOOL = "app_lock"
     }
 

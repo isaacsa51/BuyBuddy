@@ -11,7 +11,9 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.LocalPolice
 import androidx.compose.material.icons.rounded.BrightnessMedium
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -87,6 +89,8 @@ fun SettingsScreen(navController: NavController) {
 
             item { InfoSettings(navController = navController) }
 
+            item { BehaviourSettings(viewModel = viewModel) }
+            
             item {
                 SettingsContainer {
                     Button(
@@ -171,11 +175,32 @@ fun InfoSettings(navController: NavController) {
         SettingsItem(
             title = stringResource(id = R.string.app_info_setting),
             description = stringResource(id = R.string.app_info_setting_desc),
-            icon = Icons.Filled.Info,
+            icon = Icons.Rounded.Info,
             onClick = { navController.navigate(Screen.ABOUT.name) },
         )
     }
     Spacer(modifier = Modifier.height(2.dp))
+}
+
+@Composable
+fun BehaviourSettings(viewModel: SettingsViewModel) {
+
+    val categoryVisibilityValue = remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
+
+    SettingsContainer {
+        SettingsCategory(title = "Behaviour")
+
+        SettingsItemSwitch(
+            title = "Show Empty Categories",
+            description = "Be able to see empty categories in home screen",
+            icon = Icons.Rounded.RemoveCircleOutline,
+            switchState = categoryVisibilityValue,
+            onCheckChange = { newValue ->
+                categoryVisibilityValue.value = newValue
+                viewModel.setCategoryVisibility(newValue)
+            }
+        )
+    }
 }
 
 @RequiresApi(Build.VERSION_CODES.P)

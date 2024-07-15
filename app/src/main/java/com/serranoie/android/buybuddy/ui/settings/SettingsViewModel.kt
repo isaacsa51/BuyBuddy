@@ -8,6 +8,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.serranoie.android.buybuddy.ui.util.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 enum class ThemeMode {
@@ -21,13 +23,16 @@ class SettingsViewModel @Inject constructor(
 
     private val _theme = MutableLiveData(ThemeMode.Auto)
     private val _materialYou = MutableLiveData(false)
+    private val _categoryVisiblity = MutableStateFlow(false)
 
     val theme: LiveData<ThemeMode> = _theme
     val materialYou: LiveData<Boolean> = _materialYou
+    val categoryVisibility: StateFlow<Boolean> = _categoryVisiblity
 
     init {
         _theme.value = ThemeMode.entries.toTypedArray()[getThemeValue()]
         _materialYou.value = getMaterialYouValue()
+        _categoryVisiblity.value = getCategoryVisibilityValue()
     }
 
     fun setTheme(newTheme: ThemeMode) {
@@ -44,6 +49,11 @@ class SettingsViewModel @Inject constructor(
         preferenceUtil.putBoolean(PreferenceUtil.APP_LOCK_BOOL, newValue)
     }
 
+    fun setCategoryVisibility(newValue: Boolean) {
+        _categoryVisiblity.value
+        preferenceUtil.putBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, newValue)
+    }
+
     fun getThemeValue() = preferenceUtil.getInt(
         PreferenceUtil.APP_THEME_INT, ThemeMode.Auto.ordinal
     )
@@ -55,6 +65,8 @@ class SettingsViewModel @Inject constructor(
     fun getAppLockValue() = preferenceUtil.getBoolean(
         PreferenceUtil.APP_LOCK_BOOL, false
     )
+
+    fun getCategoryVisibilityValue() = preferenceUtil.getBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, false)
 
     /**
      * Get the current theme of the app, regardless of the system theme.
