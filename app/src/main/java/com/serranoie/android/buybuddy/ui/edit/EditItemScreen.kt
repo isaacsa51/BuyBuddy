@@ -96,7 +96,6 @@ fun EditItemScreen(
     viewModel: EditItemViewModel = hiltViewModel(),
 ) {
     val isLoading by viewModel.isLoading.collectAsState()
-    var isSlideToConfirmLoading by remember { mutableStateOf(false) }
     val openDialog = remember { mutableStateOf<DialogType?>(null) }
 
     val currentItem by viewModel.currentItem.collectAsState()
@@ -201,95 +200,33 @@ fun EditItemScreen(
                     enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    Column {
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        currentItem?.status?.let {
-                            SlideToConfirm(
-                                modifier = Modifier.padding(vertical = 16.dp),
-                                isLoading = it,
-                                currentStatus = currentItem?.status ?: false,
-                                onUnlockRequested = {
-                                    if (!currentItem?.status!!) {
-                                        isSlideToConfirmLoading = true
-                                        coroutineScope.launch {
-                                            currentItem?.itemId?.let { id ->
-                                                viewModel.updateItemStatus(id, true)
-                                            }
-                                        }
-                                    }
-                                },
-                                onCancelPressed = {
-                                    if (currentItem?.status!!) {
-                                        isSlideToConfirmLoading = false
-                                        coroutineScope.launch {
-                                            currentItem?.itemId?.let { id ->
-                                                viewModel.updateItemStatus(id, false)
-                                            }
-                                        }
-                                    }
-                                },
-                            )
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = largePadding),
-                        ) {
-                            OutlinedButton(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(48.dp)
-                                    .padding(horizontal = extraSmallPadding),
-                                onClick = { navController.navigateUp() },
-                            ) {
-                                Text(text = stringResource(R.string.cancel))
-                            }
-
-                            Button(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .height(48.dp)
-                                    .padding(horizontal = extraSmallPadding),
-                                onClick = {
-                                    coroutineScope.launch {
-                                        currentItem?.itemId.let {
-                                            if (it != null) {
-                                                viewModel.updateItem(it)
-                                            }
-                                        }
-                                    }
-
-                                    navController.navigateUp()
-                                },
-                            ) {
-                                Text(text = stringResource(R.string.save))
-                            }
-                        }
-
-                        when (openDialog.value) {
-                            DialogType.DELETE -> {
-                                AlertDialogModal(
-                                    onDismissRequest = { openDialog.value = null },
-                                    onConfirmation = {
-                                        coroutineScope.launch {
-                                            currentItem?.itemId?.let { itemId ->
-                                                viewModel.deleteItem(itemId)
-                                                navController.navigateUp()
-                                            }
-                                        }
-                                        openDialog.value = null
-                                    },
-                                    dialogTitle = stringResource(R.string.title_delete_dialog),
-                                    dialogText = stringResource(R.string.description_delete_dialog),
-                                    icon = Icons.Rounded.Info,
-                                )
-                            }
-
-                            null -> {}
-                        }
+                    currentItem?.itemId?.let {
+                        ActionsHolder(
+                            currentItem?.status, navController, it, viewModel
+                        )
                     }
+                }
+
+                when (openDialog.value) {
+                    DialogType.DELETE -> {
+                        AlertDialogModal(
+                            onDismissRequest = { openDialog.value = null },
+                            onConfirmation = {
+                                coroutineScope.launch {
+                                    currentItem?.itemId?.let { itemId ->
+                                        viewModel.deleteItem(itemId)
+                                        navController.navigateUp()
+                                    }
+                                }
+                                openDialog.value = null
+                            },
+                            dialogTitle = stringResource(R.string.title_delete_dialog),
+                            dialogText = stringResource(R.string.description_delete_dialog),
+                            icon = Icons.Rounded.Info,
+                        )
+                    }
+
+                    null -> {}
                 }
             }
         }
@@ -490,9 +427,7 @@ private fun BasicInfoHolder(
 
 @Composable
 private fun ReasonsHolder(
-    itemBenefits: String,
-    ItemDisadvantages: String,
-    viewModel: EditItemViewModel
+    itemBenefits: String, ItemDisadvantages: String, viewModel: EditItemViewModel
 ) {
     Column {
         Text(
@@ -671,8 +606,75 @@ private fun DateHolder(viewModel: EditItemViewModel, selectedDateTime: Date?, re
 }
 
 @Composable
-private fun ActionsHolder(viewModel: EditItemViewModel) {
+private fun ActionsHolder(
+    currentItemStatus: Boolean?,
+    navController: NavController,
+    itemId: Int,
+    viewModel: EditItemViewModel
+) {
+    var isSlideToConfirmLoading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
+
+    Column {
+        Spacer(modifier = Modifier.weight(1f))
+
+        SlideToConfirm(
+            modifier = Modifier.padding(vertical = 16.dp),
+            isLoading = currentItemStatus ?: false,
+            currentStatus = currentItemStatus ?: false,
+            onUnlockRequested = {
+                if (!currentItemStatus!!) {
+                    isSlideToConfirmLoading = true
+                    coroutineScope.launch {
+                        viewModel.updateItemStatus(itemId, true)
+                    }
+                }
+            },
+            onCancelPressed = {
+                if (currentItemStatus!!) {
+                    isSlideToConfirmLoading = false
+                    coroutineScope.launch {
+                        coroutineScope.launch {
+                            viewModel.updateItemStatus(itemId, false)
+                        }
+                    }
+                }
+            },
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = largePadding),
+        ) {
+            OutlinedButton(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .padding(horizontal = extraSmallPadding),
+                onClick = { navController.navigateUp() },
+            ) {
+                Text(text = stringResource(R.string.cancel))
+            }
+
+            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .padding(horizontal = extraSmallPadding),
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.updateItem(itemId)
+                    }
+
+                    navController.navigateUp()
+                },
+            ) {
+                Text(text = stringResource(R.string.save))
+            }
+        }
+    }
 }
 
 private enum class DialogType { DELETE }
