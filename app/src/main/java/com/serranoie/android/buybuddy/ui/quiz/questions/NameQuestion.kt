@@ -51,15 +51,15 @@ fun NameQuestion(
     ) {
         Column(
             modifier =
-                Modifier.padding(
-                    vertical = basePadding,
-                ),
+            Modifier.padding(
+                vertical = basePadding,
+            ),
         ) {
             OutlinedTextField(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = smallPadding),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = smallPadding),
                 label = { Text(stringResource(R.string.name)) },
                 value = nameItemResponse,
                 onValueChange = onInputResponse,
@@ -70,10 +70,10 @@ fun NameQuestion(
 
             OutlinedTextField(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = smallPadding)
-                        .height(120.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = smallPadding)
+                    .height(120.dp),
                 value = descriptionResponse,
                 label = { Text(stringResource(R.string.description)) },
                 onValueChange = onDescriptionResponse,
@@ -84,9 +84,9 @@ fun NameQuestion(
 
             OutlinedTextField(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = smallPadding),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = smallPadding),
                 label = { Text(stringResource(R.string.price)) },
                 value = priceText,
                 onValueChange = { newValue ->

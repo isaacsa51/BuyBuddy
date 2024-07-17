@@ -22,7 +22,6 @@ import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateReminderQuestion
 import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateUsageQuestion
 import com.serranoie.android.buybuddy.ui.util.UiConstants.CONTENT_ANIMATION_DURATION
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizRoute(
     onQuizComplete: () -> Unit,

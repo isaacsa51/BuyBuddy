@@ -112,6 +112,9 @@ dependencies {
     // Compose navigation
     implementation(libs.androidx.navigation.compose)
 
+    // Compose animation
+    implementation("androidx.compose.animation:animation:1.7.0-beta05")
+
     // ViewModel KTX
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
 

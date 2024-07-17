@@ -114,7 +114,7 @@ fun NavGraph(
                     )
                 ) + slideIntoContainer(
                     animationSpec = tween(300, easing = EaseIn),
-                    towards = AnimatedContentTransitionScope.SlideDirection.Down
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
                 )
             }, exitTransition = {
                 fadeOut(
