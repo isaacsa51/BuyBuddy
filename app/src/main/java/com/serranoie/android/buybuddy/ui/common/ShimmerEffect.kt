@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,16 +28,17 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 
 @Composable
-fun ShimmerListItem(
+fun ShimmerItem(
     isLoading: Boolean,
     contentAfterLoading: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (isLoading) {
         Row(modifier = modifier) {
-            Column {
+            Column(modifier = Modifier.padding(basePadding)) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -78,9 +80,9 @@ fun Modifier.shimmerEffect(): Modifier = composed {
     background(
         brush = Brush.linearGradient(
             colors = listOf(
-                Color(0xffd0cece),
-                Color(0xff9f9e9e),
-                Color(0xffd0cece),
+                Color(0xffdedede),
+                Color(0xff9a9a9a),
+                Color(0xffdedede),
             ),
             start = Offset(startOffsetX, 0f),
             end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat()),
