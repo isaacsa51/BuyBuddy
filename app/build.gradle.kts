@@ -109,6 +109,9 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.8")
 
+    // Compose navigation
+    implementation(libs.androidx.navigation.compose)
+
     // ViewModel KTX
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
 
@@ -171,7 +174,6 @@ dependencies {
 
     // Biometrics
     implementation("androidx.biometric:biometric:1.1.0")
-
     implementation("androidx.compose.ui:ui-test-junit4-android:1.6.8")
 
 }

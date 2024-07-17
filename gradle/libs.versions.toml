@@ -13,10 +13,12 @@ material3Android = "1.2.1"
 firebaseCrashlyticsGradle = "3.0.2"
 junitKtx = "1.2.1"
 appcompat = "1.7.0"
+navigationCompose = "2.7.7"
 runtimeLivedata = "1.6.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
