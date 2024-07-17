@@ -1,9 +1,14 @@
 package com.serranoie.android.buybuddy.ui.edit
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -152,107 +157,139 @@ fun EditItemScreen(
                 .padding(padding),
         ) {
 
-            CategoryHolder(currentCategory?.name, isLoading)
+            // Category Holder with animation
+            AnimatedVisibility(
+                visible = !isLoading,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                exit = fadeOut() + slideOutVertically(),
+            ) {
+                CategoryHolder(currentCategory?.name)
+            }
 
-            BasicInfoHolder(isLoading, itemName, itemDescription, itemUsage, viewModel)
+            // Basic Info Holder with animation
+            AnimatedVisibility(
+                visible = !isLoading,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                exit = fadeOut() + slideOutVertically(),
+            ) {
+                BasicInfoHolder(itemName, itemDescription, itemUsage, viewModel)
+            }
 
             Column(
                 modifier = Modifier.padding(
                     horizontal = basePadding,
                 )
             ) {
-
-                ReasonsHolder(itemBenefits, itemDisadvantages, viewModel)
-
-                DateHolder(viewModel, selectedDateTime, currentItem?.reminderDate)
-
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                currentItem?.status?.let {
-                    SlideToConfirm(
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        isLoading = it,
-                        currentStatus = currentItem?.status ?: false,
-                        onUnlockRequested = {
-                            if (!currentItem?.status!!) {
-                                isSlideToConfirmLoading = true
-                                coroutineScope.launch {
-                                    currentItem?.itemId?.let { id ->
-                                        viewModel.updateItemStatus(id, true)
-                                    }
-                                }
-                            }
-                        },
-                        onCancelPressed = {
-                            if (currentItem?.status!!) {
-                                isSlideToConfirmLoading = false
-                                coroutineScope.launch {
-                                    currentItem?.itemId?.let { id ->
-                                        viewModel.updateItemStatus(id, false)
-                                    }
-                                }
-                            }
-                        },
-                    )
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = largePadding),
+                AnimatedVisibility(
+                    visible = !isLoading,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                    exit = fadeOut() + slideOutVertically()
                 ) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .padding(horizontal = extraSmallPadding),
-                        onClick = { navController.navigateUp() },
-                    ) {
-                        Text(text = stringResource(R.string.cancel))
-                    }
-
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .padding(horizontal = extraSmallPadding),
-                        onClick = {
-                            coroutineScope.launch {
-                                currentItem?.itemId.let {
-                                    if (it != null) {
-                                        viewModel.updateItem(it)
-                                    }
-                                }
-                            }
-
-                            navController.navigateUp()
-                        },
-                    ) {
-                        Text(text = stringResource(R.string.save))
-                    }
+                    ReasonsHolder(itemBenefits, itemDisadvantages, viewModel)
                 }
 
-                when (openDialog.value) {
-                    DialogType.DELETE -> {
-                        AlertDialogModal(
-                            onDismissRequest = { openDialog.value = null },
-                            onConfirmation = {
-                                coroutineScope.launch {
-                                    currentItem?.itemId?.let { itemId ->
-                                        viewModel.deleteItem(itemId)
-                                        navController.navigateUp()
-                                    }
-                                }
-                                openDialog.value = null
-                            },
-                            dialogTitle = stringResource(R.string.title_delete_dialog),
-                            dialogText = stringResource(R.string.description_delete_dialog),
-                            icon = Icons.Rounded.Info,
-                        )
-                    }
+                AnimatedVisibility(
+                    visible = !isLoading,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    DateHolder(viewModel, selectedDateTime, currentItem?.reminderDate)
+                }
 
-                    null -> {}
+                AnimatedVisibility(
+                    visible = !isLoading,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    Column {
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        currentItem?.status?.let {
+                            SlideToConfirm(
+                                modifier = Modifier.padding(vertical = 16.dp),
+                                isLoading = it,
+                                currentStatus = currentItem?.status ?: false,
+                                onUnlockRequested = {
+                                    if (!currentItem?.status!!) {
+                                        isSlideToConfirmLoading = true
+                                        coroutineScope.launch {
+                                            currentItem?.itemId?.let { id ->
+                                                viewModel.updateItemStatus(id, true)
+                                            }
+                                        }
+                                    }
+                                },
+                                onCancelPressed = {
+                                    if (currentItem?.status!!) {
+                                        isSlideToConfirmLoading = false
+                                        coroutineScope.launch {
+                                            currentItem?.itemId?.let { id ->
+                                                viewModel.updateItemStatus(id, false)
+                                            }
+                                        }
+                                    }
+                                },
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = largePadding),
+                        ) {
+                            OutlinedButton(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(48.dp)
+                                    .padding(horizontal = extraSmallPadding),
+                                onClick = { navController.navigateUp() },
+                            ) {
+                                Text(text = stringResource(R.string.cancel))
+                            }
+
+                            Button(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(48.dp)
+                                    .padding(horizontal = extraSmallPadding),
+                                onClick = {
+                                    coroutineScope.launch {
+                                        currentItem?.itemId.let {
+                                            if (it != null) {
+                                                viewModel.updateItem(it)
+                                            }
+                                        }
+                                    }
+
+                                    navController.navigateUp()
+                                },
+                            ) {
+                                Text(text = stringResource(R.string.save))
+                            }
+                        }
+
+                        when (openDialog.value) {
+                            DialogType.DELETE -> {
+                                AlertDialogModal(
+                                    onDismissRequest = { openDialog.value = null },
+                                    onConfirmation = {
+                                        coroutineScope.launch {
+                                            currentItem?.itemId?.let { itemId ->
+                                                viewModel.deleteItem(itemId)
+                                                navController.navigateUp()
+                                            }
+                                        }
+                                        openDialog.value = null
+                                    },
+                                    dialogTitle = stringResource(R.string.title_delete_dialog),
+                                    dialogText = stringResource(R.string.description_delete_dialog),
+                                    icon = Icons.Rounded.Info,
+                                )
+                            }
+
+                            null -> {}
+                        }
+                    }
                 }
             }
         }
@@ -260,7 +297,7 @@ fun EditItemScreen(
 }
 
 @Composable
-private fun CategoryHolder(name: String?, isLoading: Boolean) {
+private fun CategoryHolder(name: String?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -294,7 +331,6 @@ private fun CategoryHolder(name: String?, isLoading: Boolean) {
 
 @Composable
 private fun BasicInfoHolder(
-    isLoading: Boolean,
     itemName: String, itemDescription: String, itemUsage: Int, viewModel: EditItemViewModel
 ) {
     val itemPrice by viewModel.itemPrice.collectAsState()
@@ -458,51 +494,54 @@ private fun ReasonsHolder(
     ItemDisadvantages: String,
     viewModel: EditItemViewModel
 ) {
-    Text(
-        text = stringResource(R.string.benefits),
-        color = MaterialTheme.colorScheme.onSurface,
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier
-            .padding(vertical = extraSmallPadding)
-            .fillMaxWidth(),
-    )
+    Column {
+        Text(
+            text = stringResource(R.string.benefits),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(vertical = extraSmallPadding)
+                .fillMaxWidth(),
+        )
 
-    OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(220.dp)
-            .padding(vertical = extraSmallPadding),
-        value = itemBenefits,
-        onValueChange = { viewModel.updateItemBenefits(it) },
-        trailingIcon = { Icons.Outlined.Edit },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        maxLines = 5,
-        textStyle = MaterialTheme.typography.bodyLarge,
-        shape = RoundedCornerShape(7.dp),
-    )
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+                .padding(vertical = extraSmallPadding),
+            value = itemBenefits,
+            onValueChange = { viewModel.updateItemBenefits(it) },
+            trailingIcon = { Icons.Outlined.Edit },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            maxLines = 5,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            shape = RoundedCornerShape(7.dp),
+        )
 
-    Text(
-        text = stringResource(R.string.disadvantages),
-        color = MaterialTheme.colorScheme.onSurface,
-        style = MaterialTheme.typography.bodySmall,
-        modifier = Modifier
-            .padding(vertical = 4.dp)
-            .fillMaxWidth(),
-    )
+        Text(
+            text = stringResource(R.string.disadvantages),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth(),
+        )
 
-    OutlinedTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(220.dp)
-            .padding(vertical = extraSmallPadding),
-        value = ItemDisadvantages,
-        trailingIcon = { Icons.Outlined.Edit },
-        onValueChange = { viewModel.updateItemDisadvantages(it) },
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        maxLines = 5,
-        textStyle = MaterialTheme.typography.bodyLarge,
-        shape = RoundedCornerShape(7.dp),
-    )
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+                .padding(vertical = extraSmallPadding),
+            value = ItemDisadvantages,
+            trailingIcon = { Icons.Outlined.Edit },
+            onValueChange = { viewModel.updateItemDisadvantages(it) },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            maxLines = 5,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            shape = RoundedCornerShape(7.dp),
+        )
+    }
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -631,5 +670,9 @@ private fun DateHolder(viewModel: EditItemViewModel, selectedDateTime: Date?, re
     }
 }
 
+@Composable
+private fun ActionsHolder(viewModel: EditItemViewModel) {
+
+}
 
 private enum class DialogType { DELETE }

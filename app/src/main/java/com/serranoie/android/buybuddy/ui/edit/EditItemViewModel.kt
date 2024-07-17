@@ -137,7 +137,7 @@ class EditItemViewModel
             }
         }
 
-        delay(1000)
+        delay(80)
         _isLoading.value = false
     }
 
