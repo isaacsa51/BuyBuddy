@@ -212,10 +212,14 @@ fun EditItemScreen(
                         AlertDialogModal(
                             onDismissRequest = { openDialog.value = null },
                             onConfirmation = {
+
+                                Log.d("DEBUG", "Current item info: ${currentItem.toString()}")
+
+                                navController.navigateUp()
+
                                 coroutineScope.launch {
                                     currentItem?.itemId?.let { itemId ->
                                         viewModel.deleteItem(itemId)
-                                        navController.navigateUp()
                                     }
                                 }
                                 openDialog.value = null

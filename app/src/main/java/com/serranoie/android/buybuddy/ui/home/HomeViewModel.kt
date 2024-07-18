@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,9 +20,9 @@ class HomeViewModel @Inject constructor(
     private val getCategoriesWithItemsUseCase: GetCategoriesWithItemsUseCase,
     private val getTotalPriceOfItemsToBuyUseCase: GetTotalPriceOfItemsToBuyUseCase,
     private val getTotalPriceOfItemsBoughtUseCase: GetTotalPriceOfItemsBoughtUseCase,
-    ) : ViewModel() {
+) : ViewModel() {
 
-
+    // TODO: Implement Biometrics authentication
     private var _appUnlocked = false
 
     fun isAppUnlocked(): Boolean = _appUnlocked
@@ -30,47 +31,83 @@ class HomeViewModel @Inject constructor(
         _appUnlocked = unlocked
     }
 
-        private val _categoriesWithItems = MutableStateFlow<List<CategoryWithItemsEntity>>(emptyList())
-        val categoriesWithItems: StateFlow<List<CategoryWithItemsEntity>> = _categoriesWithItems
+    private val _triggerDataFetch = MutableStateFlow(false)
+    val triggerDataFetch: StateFlow<Boolean> = _triggerDataFetch
 
-        private val _isLoading = MutableStateFlow(false)
-        val isLoading: StateFlow<Boolean> = _isLoading
+    // Response states
+    private val _categoriesWithItems = mutableStateOf<List<CategoryWithItemsEntity>>(emptyList())
+    val categoriesWithItems: List<CategoryWithItemsEntity>
+        get() = _categoriesWithItems.value
 
-        private val _totalPrice = MutableStateFlow(0.0)
-        val totalPrice: StateFlow<Double> = _totalPrice
+    private val _isLoading = mutableStateOf(false)
+    val isLoading: Boolean
+        get() = _isLoading.value
 
-        private val _totalBoughtPrice = MutableStateFlow(0.0)
-        val totalBoughtPrice: StateFlow<Double> = _totalBoughtPrice
+    private val _totalPrice = mutableStateOf(0.0)
+    val totalPrice: Double
+        get() = _totalPrice.value
 
-        init {
-            fetchGetCategoriesWithItems()
-            fetchTotalPrices()
-        }
+    private val _totalBoughtPrice = mutableStateOf(0.0)
+    val totalBoughtPrice: Double
+        get() = _totalBoughtPrice.value
 
-        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        fun fetchGetCategoriesWithItems() {
-            viewModelScope.launch(Dispatchers.IO) {
-                _isLoading.value = true
-                getCategoriesWithItemsUseCase.invoke().collect { categoriesWithItems ->
-                    _categoriesWithItems.value = categoriesWithItems
-                    _isLoading.value = false
-                }
-            }
-        }
+    // States exposed to UI
+    fun setCategoriesWithItems(categoriesWithItems: List<CategoryWithItemsEntity>) {
+        _categoriesWithItems.value = categoriesWithItems
+    }
 
-        @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-        fun fetchTotalPrices() {
-            viewModelScope.launch(Dispatchers.IO) {
-                launch {
-                    getTotalPriceOfItemsBoughtUseCase().collect { totalBoughtPrice ->
-                        _totalBoughtPrice.value = totalBoughtPrice ?: 0.0
-                    }
-                }
-                launch {
-                    getTotalPriceOfItemsToBuyUseCase().collect { totalPrice ->
-                        _totalPrice.value = totalPrice ?: 0.0
-                    }
+    fun setIsLoading(isLoading: Boolean) {
+        _isLoading.value = isLoading
+    }
+
+    fun setTotalPrice(totalPrice: Double) {
+        _totalPrice.value = totalPrice
+    }
+
+    fun setTotalBoughtPrice(totalBoughtPrice: Double) {
+        _totalBoughtPrice.value = totalBoughtPrice
+    }
+
+    fun triggerDataFetch() {
+        _triggerDataFetch.value = true
+    }
+
+    init {
+        viewModelScope.launch {
+            triggerDataFetch.collect { shouldFetch ->
+                if (shouldFetch) {
+                    fetchGetCategoriesWithItems()
+                    fetchTotalPrices()
+                    _triggerDataFetch.value = false
                 }
             }
         }
     }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun fetchGetCategoriesWithItems() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
+            getCategoriesWithItemsUseCase.invoke().collect { categoriesWithItems ->
+                _categoriesWithItems.value = categoriesWithItems
+                _isLoading.value = false
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun fetchTotalPrices() {
+        viewModelScope.launch(Dispatchers.IO) {
+            launch {
+                getTotalPriceOfItemsBoughtUseCase().collect { totalBoughtPrice ->
+                    _totalBoughtPrice.value = totalBoughtPrice ?: 0.0
+                }
+            }
+            launch {
+                getTotalPriceOfItemsToBuyUseCase().collect { totalPrice ->
+                    _totalPrice.value = totalPrice ?: 0.0
+                }
+            }
+        }
+    }
+}

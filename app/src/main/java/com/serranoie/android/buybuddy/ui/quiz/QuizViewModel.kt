@@ -2,9 +2,7 @@ package com.serranoie.android.buybuddy.ui.quiz
 
 import android.app.Application
 import androidx.annotation.StringRes
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
@@ -40,7 +38,7 @@ class QuizViewModel @Inject constructor(
     val isNextEnabled: Boolean
         get() = _isNextEnabled.value
 
-    // Responses exposed as State
+    // Responses States
     private val _nameItemResponse = mutableStateOf("")
     val nameItemResponse: String
         get() = _nameItemResponse.value

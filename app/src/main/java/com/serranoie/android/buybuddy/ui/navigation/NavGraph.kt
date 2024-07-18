@@ -10,6 +10,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -17,14 +24,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
+import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
 import com.serranoie.android.buybuddy.ui.edit.EditItemScreen
 import com.serranoie.android.buybuddy.ui.home.HomeScreen
+import com.serranoie.android.buybuddy.ui.home.HomeViewModel
 import com.serranoie.android.buybuddy.ui.onboard.OnBoardingScreen
 import com.serranoie.android.buybuddy.ui.onboard.OnBoardingViewModel
 import com.serranoie.android.buybuddy.ui.quiz.QuizFinishedScreen
 import com.serranoie.android.buybuddy.ui.quiz.QuizRoute
 import com.serranoie.android.buybuddy.ui.settings.AboutScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsScreen
+import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
@@ -81,7 +91,33 @@ fun NavGraph(
                 )
             }) {
             composable(route = Route.Home.route) {
-                HomeScreen(navController = navController)
+                val homeViewModel = hiltViewModel<HomeViewModel>()
+                val settingsViewModel = hiltViewModel<SettingsViewModel>()
+
+                val categoriesWithItems =
+                    remember { mutableStateOf<List<CategoryWithItemsEntity>>(emptyList()) }
+                val totalPrice = remember { mutableDoubleStateOf(0.0) }
+                val totalBoughtPrice = remember { mutableDoubleStateOf(0.0) }
+                val categoryVisibility by settingsViewModel.categoryVisibility.collectAsState()
+
+                LaunchedEffect(Unit) {
+                    homeViewModel.triggerDataFetch()
+
+                    snapshotFlow { homeViewModel.categoriesWithItems }
+                        .collect { categoriesWithItems.value = it }
+                    snapshotFlow { homeViewModel.totalPrice }
+                        .collect { totalPrice.doubleValue = it }
+                    snapshotFlow { homeViewModel.totalBoughtPrice }
+                        .collect { totalBoughtPrice.doubleValue = it }
+                }
+
+                HomeScreen(
+                    navController = navController,
+                    categoriesWithItems = categoriesWithItems.value,
+                    totalPrice = totalPrice.doubleValue,
+                    totalBoughtPrice = totalBoughtPrice.doubleValue,
+                    categoryVisibility = categoryVisibility,
+                )
             }
 
             composable(route = Route.Quiz.route, enterTransition = {

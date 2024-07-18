@@ -84,8 +84,6 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.junit.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -110,10 +108,13 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.8")
 
     // Compose navigation
-    implementation(libs.androidx.navigation.compose)
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
     // Compose animation
     implementation("androidx.compose.animation:animation:1.7.0-beta05")
+
+    // Live Data
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
 
     // ViewModel KTX
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
@@ -177,8 +178,6 @@ dependencies {
 
     // Biometrics
     implementation("androidx.biometric:biometric:1.1.0")
-    implementation("androidx.compose.ui:ui-test-junit4-android:1.6.8")
-
 }
 
 kapt {
