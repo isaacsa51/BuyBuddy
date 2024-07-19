@@ -682,7 +682,6 @@ private fun ActionsHolder(
                     .padding(horizontal = extraSmallPadding),
                 onClick = {
                     coroutineScope.launch {
-                        //TODO: Save changes from the UI
                         onUpdateItemEvent(itemId)
                     }
 
