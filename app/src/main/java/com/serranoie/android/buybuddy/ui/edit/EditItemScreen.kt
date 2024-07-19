@@ -53,7 +53,6 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -68,11 +67,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.domain.model.Category
+import com.serranoie.android.buybuddy.domain.model.Item
 import com.serranoie.android.buybuddy.ui.common.AlertDialogModal
 import com.serranoie.android.buybuddy.ui.common.SlideToConfirm
 import com.serranoie.android.buybuddy.ui.common.TimePickerDialog
@@ -82,6 +84,8 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.dateToString
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -92,28 +96,29 @@ import kotlin.math.roundToInt
 @Composable
 fun EditItemScreen(
     navController: NavController,
-    itemId: Int,
-    viewModel: EditItemViewModel = hiltViewModel(),
+    productInfo: Item?,
+    categoryInfo: Category?,
+    isLoading: Boolean,
+    nameItemResponse: String,
+    onNameItemResponse: (String) -> Unit,
+    itemDescription: String,
+    onItemDescriptionResponse: (String) -> Unit,
+    itemPrice: Double?,
+    onItemPriceResponse: (Double) -> Unit,
+    itemBenefits: String,
+    onItemBenefitsResponse: (String) -> Unit,
+    itemDisadvantages: String,
+    onItemDisadvantagesResponse: (String) -> Unit,
+    selectedDateTime: Date?,
+    onSelectedDateTimeResponse: (Date) -> Unit,
+    itemUsage: Int,
+    onItemUsageResponse: (Int) -> Unit,
+    onItemStatusResponse: (Boolean) -> Unit,
+    onUpdateItemEvent: (Int) -> Job,
+    onDeleteItemEvent: (Int) -> Job,
 ) {
-    val isLoading by viewModel.isLoading.collectAsState()
     val openDialog = remember { mutableStateOf<DialogType?>(null) }
-
-    val currentItem by viewModel.currentItem.collectAsState()
-    val currentCategory by viewModel.categoryInfo.collectAsState()
-    val itemName by viewModel.itemName.collectAsState()
-    val itemDescription by viewModel.itemDescription.collectAsState()
-    val itemBenefits by viewModel.itemBenefits.collectAsState()
-    val itemDisadvantages by viewModel.itemDisadvantages.collectAsState()
-    val selectedDateTime by viewModel.selectedDateTime.collectAsState()
-    val itemUsage by viewModel.itemUsage.collectAsState()
-
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(itemId) {
-        viewModel.getItemById(itemId)
-        currentItem?.categoryId?.let { viewModel.getCategory(it) }
-    }
-
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
@@ -155,23 +160,29 @@ fun EditItemScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(padding),
         ) {
-
-            // Category Holder with animation
             AnimatedVisibility(
                 visible = !isLoading,
                 enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                 exit = fadeOut() + slideOutVertically(),
             ) {
-                CategoryHolder(currentCategory?.name)
+                CategoryHolder(categoryInfo?.name)
             }
 
-            // Basic Info Holder with animation
             AnimatedVisibility(
                 visible = !isLoading,
                 enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                 exit = fadeOut() + slideOutVertically(),
             ) {
-                BasicInfoHolder(itemName, itemDescription, itemUsage, viewModel)
+                BasicInfoHolder(
+                    nameItemResponse,
+                    onNameItemResponse,
+                    itemDescription,
+                    onItemDescriptionResponse,
+                    itemPrice,
+                    onItemPriceResponse,
+                    itemUsage,
+                    onItemUsageResponse,
+                )
             }
 
             Column(
@@ -184,7 +195,12 @@ fun EditItemScreen(
                     enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    ReasonsHolder(itemBenefits, itemDisadvantages, viewModel)
+                    ReasonsHolder(
+                        itemBenefits,
+                        onItemBenefitsResponse,
+                        itemDisadvantages,
+                        onItemDisadvantagesResponse
+                    )
                 }
 
                 AnimatedVisibility(
@@ -192,7 +208,7 @@ fun EditItemScreen(
                     enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    DateHolder(viewModel, selectedDateTime, currentItem?.reminderDate)
+                    DateHolder(selectedDateTime, onSelectedDateTimeResponse)
                 }
 
                 AnimatedVisibility(
@@ -200,11 +216,13 @@ fun EditItemScreen(
                     enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    currentItem?.itemId?.let {
-                        ActionsHolder(
-                            currentItem?.status, navController, it, viewModel
-                        )
-                    }
+                    ActionsHolder(
+                        productInfo?.status,
+                        onItemStatusResponse,
+                        navController,
+                        productInfo?.itemId!!,
+                        onUpdateItemEvent
+                    )
                 }
 
                 when (openDialog.value) {
@@ -212,17 +230,13 @@ fun EditItemScreen(
                         AlertDialogModal(
                             onDismissRequest = { openDialog.value = null },
                             onConfirmation = {
-
-                                Log.d("DEBUG", "Current item info: ${currentItem.toString()}")
-
                                 navController.navigateUp()
+                                openDialog.value = null
 
                                 coroutineScope.launch {
-                                    currentItem?.itemId?.let { itemId ->
-                                        viewModel.deleteItem(itemId)
-                                    }
+                                    Log.d("DEBUG", "onDeleteItemEvent: ${productInfo?.itemId!!}")
+                                    onDeleteItemEvent(productInfo.itemId)
                                 }
-                                openDialog.value = null
                             },
                             dialogTitle = stringResource(R.string.title_delete_dialog),
                             dialogText = stringResource(R.string.description_delete_dialog),
@@ -272,9 +286,15 @@ private fun CategoryHolder(name: String?) {
 
 @Composable
 private fun BasicInfoHolder(
-    itemName: String, itemDescription: String, itemUsage: Int, viewModel: EditItemViewModel
+    itemName: String,
+    onItemNameResponse: (String) -> Unit,
+    itemDescription: String,
+    onItemDescriptionResponse: (String) -> Unit,
+    itemPrice: Double?,
+    onItemPriceResponse: (Double) -> Unit,
+    itemUsage: Int,
+    onItemUsageResponse: (Int) -> Unit,
 ) {
-    val itemPrice by viewModel.itemPrice.collectAsState()
     var expanded by remember { mutableStateOf(false) }
     var isValidPrice by remember { mutableStateOf(true) }
     var priceText by remember { mutableStateOf(itemPrice.toString()) }
@@ -289,7 +309,7 @@ private fun BasicInfoHolder(
     )
 
     val sliderRange = 0f..(steps.size - 1).toFloat()
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
+    var sliderPosition by remember { mutableFloatStateOf(itemUsage.toFloat()) }
 
     LaunchedEffect(itemPrice) {
         priceText = itemPrice.toString()
@@ -315,7 +335,7 @@ private fun BasicInfoHolder(
             modifier = Modifier.fillMaxWidth(),
             value = itemName,
             label = { Text(stringResource(id = R.string.name)) },
-            onValueChange = { viewModel.updateItemName(it) },
+            onValueChange = onItemNameResponse,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 2,
             textStyle = MaterialTheme.typography.titleLarge,
@@ -328,7 +348,7 @@ private fun BasicInfoHolder(
                 .padding(vertical = smallPadding),
             value = itemDescription,
             label = { Text(stringResource(id = R.string.description)) },
-            onValueChange = { viewModel.updateItemDescription(it) },
+            onValueChange = onItemDescriptionResponse,
             trailingIcon = { Icons.Outlined.Edit },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 2,
@@ -340,12 +360,13 @@ private fun BasicInfoHolder(
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(id = R.string.price)) },
             value = priceText,
+            prefix = { Text("$") },
             onValueChange = { newValue ->
                 priceText = newValue
                 isValidPrice = newValue.matches(Regex("^\\d+(\\.\\d{0,2})?$"))
 
                 if (isValidPrice) {
-                    viewModel.updateItemPrice(newValue.toDoubleOrNull() ?: 0.0)
+                    onItemPriceResponse
                 }
             },
             isError = !isValidPrice,
@@ -419,19 +440,21 @@ private fun BasicInfoHolder(
                         steps = steps.size - 2,
                         onValueChange = { newValue ->
                             sliderPosition = newValue
-                            viewModel.updateItemUsage(newValue.roundToInt())
+                            onItemUsageResponse(newValue.roundToInt())
                         },
                     )
                 }
             }
         }
     }
-
 }
 
 @Composable
 private fun ReasonsHolder(
-    itemBenefits: String, ItemDisadvantages: String, viewModel: EditItemViewModel
+    itemBenefits: String,
+    onItemBenefitsResponse: (String) -> Unit,
+    itemDisadvantages: String,
+    onItemDisadvantagesResponse: (String) -> Unit
 ) {
     Column {
         Text(
@@ -449,7 +472,7 @@ private fun ReasonsHolder(
                 .height(220.dp)
                 .padding(vertical = extraSmallPadding),
             value = itemBenefits,
-            onValueChange = { viewModel.updateItemBenefits(it) },
+            onValueChange = onItemBenefitsResponse,
             trailingIcon = { Icons.Outlined.Edit },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 5,
@@ -471,9 +494,9 @@ private fun ReasonsHolder(
                 .fillMaxWidth()
                 .height(220.dp)
                 .padding(vertical = extraSmallPadding),
-            value = ItemDisadvantages,
+            value = itemDisadvantages,
             trailingIcon = { Icons.Outlined.Edit },
-            onValueChange = { viewModel.updateItemDisadvantages(it) },
+            onValueChange = onItemDisadvantagesResponse,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 5,
             textStyle = MaterialTheme.typography.bodyLarge,
@@ -485,7 +508,7 @@ private fun ReasonsHolder(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DateHolder(viewModel: EditItemViewModel, selectedDateTime: Date?, reminderDate: Date?) {
+private fun DateHolder(selectedDateTime: Date?, onSelectedDateTimeResponse: (Date) -> Unit) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateTime?.time,
     )
@@ -493,11 +516,10 @@ private fun DateHolder(viewModel: EditItemViewModel, selectedDateTime: Date?, re
     var showDatePicker by remember { mutableStateOf(false) }
     val timePickerState = rememberTimePickerState()
     var showTimePicker by remember { mutableStateOf(false) }
-    val selectedDate by viewModel.selectedDateTime.collectAsState()
 
-    var formattedDate by remember(reminderDate) {
+    var formattedDate by remember(selectedDateTime) {
         mutableStateOf(
-            reminderDate?.let { date ->
+            selectedDateTime?.let { date ->
                 dateToString(date)
             } ?: "Invalid date",
         )
@@ -538,7 +560,7 @@ private fun DateHolder(viewModel: EditItemViewModel, selectedDateTime: Date?, re
                             calendar.set(Calendar.SECOND, 0)
                             calendar.set(Calendar.MILLISECOND, 0)
 
-                            viewModel.updateSelectedDateTime(calendar.time)
+                            onSelectedDateTimeResponse(calendar.time)
 
                             showDatePicker = false
                             showTimePicker = true
@@ -570,26 +592,17 @@ private fun DateHolder(viewModel: EditItemViewModel, selectedDateTime: Date?, re
             onDismissRequest = { showTimePicker = false },
             confirmButton = {
                 TextButton(onClick = {
-                    selectedDate?.let { nonNullDate ->
+                    selectedDateTime?.let { nonNullDate ->
                         val calendar = Calendar.getInstance(TimeZone.getDefault())
                         calendar.time = nonNullDate
                         calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                         calendar.set(Calendar.MINUTE, timePickerState.minute)
-                        viewModel.updateSelectedDateTime(calendar.time)
-
-                        Log.d("DEBUG", "Selected Date (raw): $selectedDate")
-                        Log.d(
-                            "DEBUG", "Calendar Time Zone: ${calendar.timeZone.id}"
-                        )
-                        Log.d(
-                            "DEBUG",
-                            "Selected Date (formatted): ${dateToString(selectedDate!!)}",
-                        )
+                        onSelectedDateTimeResponse(calendar.time)
 
                         if (calendar.after(Calendar.getInstance())) {
-                            viewModel.updateSelectedDateTime(selectedDate!!)
+                            onSelectedDateTimeResponse(selectedDateTime)
                             showTimePicker = false
-                            formattedDate = dateToString(selectedDate!!)
+                            formattedDate = dateToString(selectedDateTime)
                         }
                     }
                 }) { Text("OK") }
@@ -612,13 +625,13 @@ private fun DateHolder(viewModel: EditItemViewModel, selectedDateTime: Date?, re
 @Composable
 private fun ActionsHolder(
     currentItemStatus: Boolean?,
+    onItemStatusResponse: (Boolean) -> Unit,
     navController: NavController,
     itemId: Int,
-    viewModel: EditItemViewModel
+    onUpdateItemEvent: (Int) -> Job,
 ) {
     var isSlideToConfirmLoading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-
 
     Column {
         Spacer(modifier = Modifier.weight(1f))
@@ -631,7 +644,7 @@ private fun ActionsHolder(
                 if (!currentItemStatus!!) {
                     isSlideToConfirmLoading = true
                     coroutineScope.launch {
-                        viewModel.updateItemStatus(itemId, true)
+                        onItemStatusResponse(true)
                     }
                 }
             },
@@ -640,7 +653,7 @@ private fun ActionsHolder(
                     isSlideToConfirmLoading = false
                     coroutineScope.launch {
                         coroutineScope.launch {
-                            viewModel.updateItemStatus(itemId, false)
+                            onItemStatusResponse(false)
                         }
                     }
                 }
@@ -669,7 +682,8 @@ private fun ActionsHolder(
                     .padding(horizontal = extraSmallPadding),
                 onClick = {
                     coroutineScope.launch {
-                        viewModel.updateItem(itemId)
+                        //TODO: Save changes from the UI
+                        onUpdateItemEvent(itemId)
                     }
 
                     navController.navigateUp()
@@ -682,3 +696,49 @@ private fun ActionsHolder(
 }
 
 private enum class DialogType { DELETE }
+
+@Preview(showBackground = true)
+@Composable
+private fun EditItemScreenPreview() {
+    val navController = rememberNavController()
+    val dummyJob = Job()
+
+    EditItemScreen(
+        navController = navController,
+        productInfo = Item(
+            itemId = 1,
+            categoryId = 1,
+            name = "Item",
+            description = "Description",
+            price = 10.0,
+            usage = "Regularly",
+            benefits = "Benefits",
+            disadvantages = "Disadvantages",
+            reminderDate = Date(),
+            reminderTime = Date(),
+            status = false,
+        ),
+        categoryInfo = Category(
+            categoryId = 1,
+            name = "Art",
+        ),
+        isLoading = true,
+        nameItemResponse = "Item",
+        onNameItemResponse = { },
+        itemDescription = "Description",
+        onItemDescriptionResponse = { },
+        itemPrice = 150.0,
+        onItemPriceResponse = { },
+        itemBenefits = "Benefits",
+        onItemBenefitsResponse = { },
+        itemDisadvantages = "Disadvantages",
+        onItemDisadvantagesResponse = { },
+        selectedDateTime = Date(),
+        onSelectedDateTimeResponse = { },
+        itemUsage = 3,
+        onItemUsageResponse = { },
+        onItemStatusResponse = { },
+        onUpdateItemEvent = { dummyJob },
+        onDeleteItemEvent = { dummyJob },
+    )
+}

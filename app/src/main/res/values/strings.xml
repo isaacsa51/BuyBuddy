@@ -21,12 +21,15 @@
     <string name="reasons_helper">Write some reasons below</string>
     <string name="reminder_question">When shall we check-in with you about this item?</string>
     <string name="select_date">Select date</string>
+
+    <!-- Usage values -->
     <string name="usage_almost_everyday">Almost everyday</string>
     <string name="usage_often">Frequently</string>
     <string name="usage_sometimes">Regularly</string>
     <string name="usage_ocasionally">Occasionally</string>
     <string name="usage_rarely">Rarely</string>
     <string name="usage_barely">Barely/Almost nonexistent</string>
+
     <string name="reasons">Benefits</string>
     <string name="notification_title">Don\'t forget about this product!</string>
     <string name="notification_body">Ready to buy: %1$s?</string>

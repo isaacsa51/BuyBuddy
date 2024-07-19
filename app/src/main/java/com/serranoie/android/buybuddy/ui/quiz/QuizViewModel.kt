@@ -75,11 +75,11 @@ class QuizViewModel @Inject constructor(
     val reminderResponse: Date?
         get() = _reminderResponse.value
 
-    // Quiz status exposed as state
     private val _quizScreenData = mutableStateOf(createQuizScreenData())
     val quizScreenData: QuizScreenData
         get() = _quizScreenData.value
 
+    // Quiz status exposed as state
     fun onNameResponse(itemName: String) {
         _nameItemResponse.value = itemName
         _isNextEnabled.value = getIsNextEnabled()

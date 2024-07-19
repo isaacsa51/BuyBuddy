@@ -264,8 +264,7 @@ private object Track {
     var EndOfTrackPx: Float = 0f
 }
 
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, showBackground = true)
 @Composable
 private fun Preview() {
     var isLoading by remember { mutableStateOf(false) }
