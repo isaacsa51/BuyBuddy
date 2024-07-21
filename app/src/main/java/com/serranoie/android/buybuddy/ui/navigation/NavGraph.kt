@@ -191,7 +191,7 @@ fun NavGraph(
                     )
                 }) { backStackEntry ->
                 val itemId = backStackEntry.arguments?.getInt("itemId")
-                val coroutineScope = rememberCoroutineScope() // Remember coroutine scope here
+                val coroutineScope = rememberCoroutineScope()
 
                 itemId?.let { id ->
                     val viewModel = hiltViewModel<EditItemViewModel>()
@@ -200,7 +200,7 @@ fun NavGraph(
                         viewModel.triggerProductData(id)
                     }
 
-                    Log.d("DEBUG", viewModel.currentItem.toString())
+                    Log.d("DEBUG", "Item information: ${viewModel.currentItem}")
 
                     EditItemScreen(
                         navController = navController,

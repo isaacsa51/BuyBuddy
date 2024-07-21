@@ -92,6 +92,8 @@ import java.util.Date
 import java.util.TimeZone
 import kotlin.math.roundToInt
 
+private enum class DialogType { DELETE }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditItemScreen(
@@ -121,6 +123,8 @@ fun EditItemScreen(
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
+    Log.d("DEBUG", itemPrice.toString())
 
     Scaffold(
         topBar = {
@@ -693,8 +697,6 @@ private fun ActionsHolder(
         }
     }
 }
-
-private enum class DialogType { DELETE }
 
 @Preview(showBackground = true)
 @Composable
