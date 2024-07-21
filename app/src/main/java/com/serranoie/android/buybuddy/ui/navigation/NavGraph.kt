@@ -200,8 +200,6 @@ fun NavGraph(
                         viewModel.triggerProductData(id)
                     }
 
-                    Log.d("DEBUG", "Item information: ${viewModel.currentItem}")
-
                     EditItemScreen(
                         navController = navController,
                         isLoading = viewModel.isLoading,

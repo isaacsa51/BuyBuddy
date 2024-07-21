@@ -2,6 +2,9 @@
 <resources>
     <string name="app_name">BuyBuddy</string>
 
+    <!-- Edit Screen -->
+    <string name="field_required">Es necesario completar este campo</string>
+
     <string name="category_art">Arte</string>
     <string name="category_automotive">Automotriz</string>
     <string name="category_beauty">Belleza</string>
