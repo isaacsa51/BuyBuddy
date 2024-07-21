@@ -178,6 +178,9 @@ dependencies {
 
     // Biometrics
     implementation("androidx.biometric:biometric:1.1.0")
+
+    // Coil image loader
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
 
 kapt {
