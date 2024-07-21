@@ -1,6 +1,9 @@
 package com.serranoie.android.buybuddy.ui.home
 
+import android.util.Log
 import androidx.annotation.VisibleForTesting
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
@@ -12,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,21 +39,17 @@ class HomeViewModel @Inject constructor(
     val triggerDataFetch: StateFlow<Boolean> = _triggerDataFetch
 
     // Response states
-    private val _categoriesWithItems = mutableStateOf<List<CategoryWithItemsEntity>>(emptyList())
-    val categoriesWithItems: List<CategoryWithItemsEntity>
-        get() = _categoriesWithItems.value
+    private val _categoriesWithItems = MutableStateFlow<List<CategoryWithItemsEntity>>(emptyList())
+    val categoriesWithItems: StateFlow<List<CategoryWithItemsEntity>> = _categoriesWithItems.asStateFlow()
 
-    private val _isLoading = mutableStateOf(false)
-    val isLoading: Boolean
-        get() = _isLoading.value
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
-    private val _totalPrice = mutableStateOf(0.0)
-    val totalPrice: Double
-        get() = _totalPrice.value
+    private val _totalPrice = MutableStateFlow(0.0)
+    val totalPrice = _totalPrice.asStateFlow()
 
-    private val _totalBoughtPrice = mutableStateOf(0.0)
-    val totalBoughtPrice: Double
-        get() = _totalBoughtPrice.value
+    private val _totalBoughtPrice = MutableStateFlow(0.0)
+    val totalBoughtPrice: StateFlow<Double> = _totalBoughtPrice.asStateFlow()
 
     // States exposed to UI
     fun setCategoriesWithItems(categoriesWithItems: List<CategoryWithItemsEntity>) {
@@ -60,13 +60,13 @@ class HomeViewModel @Inject constructor(
         _isLoading.value = isLoading
     }
 
-    fun setTotalPrice(totalPrice: Double) {
-        _totalPrice.value = totalPrice
-    }
-
-    fun setTotalBoughtPrice(totalBoughtPrice: Double) {
-        _totalBoughtPrice.value = totalBoughtPrice
-    }
+//    fun setTotalPrice(totalPrice: Double) {
+//        _totalPrice.doubleValue = totalPrice
+//    }
+//
+//    fun setTotalBoughtPrice(totalBoughtPrice: Double) {
+//        _totalBoughtPrice.doubleValue = totalBoughtPrice
+//    }
 
     fun triggerDataFetch() {
         _triggerDataFetch.value = true
@@ -79,6 +79,7 @@ class HomeViewModel @Inject constructor(
                     fetchGetCategoriesWithItems()
                     fetchTotalPrices()
                     _triggerDataFetch.value = false
+                    _isLoading.value = false
                 }
             }
         }
@@ -90,7 +91,6 @@ class HomeViewModel @Inject constructor(
             _isLoading.value = true
             getCategoriesWithItemsUseCase.invoke().collect { categoriesWithItems ->
                 _categoriesWithItems.value = categoriesWithItems
-                _isLoading.value = false
             }
         }
     }

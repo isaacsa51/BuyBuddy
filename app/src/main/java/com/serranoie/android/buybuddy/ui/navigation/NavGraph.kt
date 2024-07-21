@@ -1,6 +1,7 @@
 package com.serranoie.android.buybuddy.ui.navigation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
@@ -97,48 +98,38 @@ fun NavGraph(
                 val homeViewModel = hiltViewModel<HomeViewModel>()
                 val settingsViewModel = hiltViewModel<SettingsViewModel>()
 
-                val categoriesWithItems =
-                    remember { mutableStateOf<List<CategoryWithItemsEntity>>(emptyList()) }
-                val totalPrice = remember { mutableDoubleStateOf(0.0) }
-                val totalBoughtPrice = remember { mutableDoubleStateOf(0.0) }
+                val categoriesWithItems by homeViewModel.categoriesWithItems.collectAsState()
+                val totalPrice by homeViewModel.totalPrice.collectAsState()
+                val totalBoughtPrice by homeViewModel.totalBoughtPrice.collectAsState()
                 val categoryVisibility by settingsViewModel.categoryVisibility.collectAsState()
+                val isLoading by homeViewModel.isLoading.collectAsState()
 
                 LaunchedEffect(Unit) {
                     homeViewModel.triggerDataFetch()
-
-                    snapshotFlow { homeViewModel.categoriesWithItems }
-                        .collect { categoriesWithItems.value = it }
-                    snapshotFlow { homeViewModel.totalPrice }
-                        .collect { totalPrice.doubleValue = it }
-                    snapshotFlow { homeViewModel.totalBoughtPrice }
-                        .collect { totalBoughtPrice.doubleValue = it }
                 }
 
                 HomeScreen(
                     navController = navController,
-                    categoriesWithItems = categoriesWithItems.value,
-                    totalPrice = totalPrice.doubleValue,
-                    totalBoughtPrice = totalBoughtPrice.doubleValue,
+                    categoriesWithItems = categoriesWithItems,
+                    totalPrice = totalPrice,
+                    totalBoughtPrice = totalBoughtPrice,
                     categoryVisibility = categoryVisibility,
                 )
             }
 
-            composable(
-                route = Route.Quiz.route,
-                enterTransition = {
-                    fadeIn(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
+            composable(route = Route.Quiz.route, enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                },
-                exitTransition = {
-                    fadeOut(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
+                )
+            }, exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                }) {
+                )
+            }) {
                 QuizRoute(
                     onNavUp = navController::navigateUp,
                     onQuizComplete = {
@@ -149,28 +140,25 @@ fun NavGraph(
                 )
             }
 
-            composable(
-                route = Route.FinishedQuiz.route,
-                enterTransition = {
-                    fadeIn(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideIntoContainer(
-                        animationSpec = tween(300, easing = EaseIn),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+            composable(route = Route.FinishedQuiz.route, enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                },
-                exitTransition = {
-                    fadeOut(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideOutOfContainer(
-                        animationSpec = tween(300, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Up
+                ) + slideIntoContainer(
+                    animationSpec = tween(300, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            }, exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                }) {
+                ) + slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up
+                )
+            }) {
                 QuizFinishedScreen(
                     onDonePressed = {
                         navController.navigate(Route.Home.route) {
@@ -180,8 +168,7 @@ fun NavGraph(
                 )
             }
 
-            composable(
-                route = "edit/{itemId}",
+            composable(route = "edit/{itemId}",
                 arguments = listOf(navArgument("itemId") { type = NavType.IntType }),
                 enterTransition = {
                     fadeIn(
@@ -212,6 +199,8 @@ fun NavGraph(
                     LaunchedEffect(id) {
                         viewModel.triggerProductData(id)
                     }
+
+                    Log.d("DEBUG", viewModel.currentItem.toString())
 
                     EditItemScreen(
                         navController = navController,
