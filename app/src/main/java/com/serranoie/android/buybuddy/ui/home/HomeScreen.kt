@@ -1,5 +1,6 @@
 package com.serranoie.android.buybuddy.ui.home
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut

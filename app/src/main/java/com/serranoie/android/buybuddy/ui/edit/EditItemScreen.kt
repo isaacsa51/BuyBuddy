@@ -76,6 +76,7 @@ import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.Category
 import com.serranoie.android.buybuddy.domain.model.Item
 import com.serranoie.android.buybuddy.ui.common.AlertDialogModal
+import com.serranoie.android.buybuddy.ui.common.ErrorLabelTxtFld
 import com.serranoie.android.buybuddy.ui.common.SlideToConfirm
 import com.serranoie.android.buybuddy.ui.common.TimePickerDialog
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
@@ -83,14 +84,16 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.extraSmallPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
-import com.serranoie.android.buybuddy.ui.util.dateToString
+import com.serranoie.android.buybuddy.ui.util.Utils.dateToString
+import com.serranoie.android.buybuddy.ui.util.Utils.formatPrice
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
 import kotlin.math.roundToInt
+
+private enum class DialogType { DELETE }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -311,6 +314,11 @@ private fun BasicInfoHolder(
     val sliderRange = 0f..(steps.size - 1).toFloat()
     var sliderPosition by remember { mutableFloatStateOf(itemUsage.toFloat()) }
 
+    // States for empty fields
+    var isItemNameEmpty by remember { mutableStateOf(itemName.isEmpty()) }
+    var isItemDescriptionEmpty by remember { mutableStateOf(itemDescription.isEmpty()) }
+    var isItemPriceEmpty by remember { mutableStateOf(itemPrice == null) }
+
     LaunchedEffect(itemPrice) {
         priceText = itemPrice.toString()
     }
@@ -335,38 +343,53 @@ private fun BasicInfoHolder(
             modifier = Modifier.fillMaxWidth(),
             value = itemName,
             label = { Text(stringResource(id = R.string.name)) },
-            onValueChange = onItemNameResponse,
+            onValueChange = {
+                onItemNameResponse(it)
+                isItemNameEmpty = it.isEmpty()
+            },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 2,
             textStyle = MaterialTheme.typography.titleLarge,
             shape = RoundedCornerShape(7.dp),
+            isError = isItemNameEmpty
         )
+
+        if (isItemNameEmpty) ErrorLabelTxtFld(text = stringResource(id = R.string.field_required))
 
         OutlinedTextField(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = smallPadding),
+                .fillMaxWidth(),
             value = itemDescription,
             label = { Text(stringResource(id = R.string.description)) },
-            onValueChange = onItemDescriptionResponse,
+            onValueChange = {
+                onItemDescriptionResponse(it)
+                isItemDescriptionEmpty = it.isEmpty()
+            },
             trailingIcon = { Icons.Outlined.Edit },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 2,
             textStyle = MaterialTheme.typography.titleLarge,
             shape = RoundedCornerShape(7.dp),
+            isError = isItemDescriptionEmpty
         )
+
+        if (isItemDescriptionEmpty) ErrorLabelTxtFld(text = stringResource(id = R.string.field_required))
 
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(id = R.string.price)) },
-            value = priceText,
+            value = if (priceText.isBlank()) {
+                formatPrice(0.0) // Use the formatting function here
+            } else {
+                formatPrice(priceText.toDoubleOrNull() ?: 0.0)
+            },
             prefix = { Text("$") },
             onValueChange = { newValue ->
                 priceText = newValue
                 isValidPrice = newValue.matches(Regex("^\\d+(\\.\\d{0,2})?$"))
 
                 if (isValidPrice) {
-                    onItemPriceResponse
+                    onItemPriceResponse(newValue.toDoubleOrNull() ?: 0.0) // Handle null case
                 }
             },
             isError = !isValidPrice,
@@ -374,19 +397,12 @@ private fun BasicInfoHolder(
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Number,
             ),
-            maxLines = 1,
+            singleLine = true, // Use singleLine instead of maxLines = 1
             textStyle = MaterialTheme.typography.titleLarge,
             shape = RoundedCornerShape(7.dp),
         )
 
-        if (!isValidPrice) {
-            Text(
-                text = stringResource(R.string.invalid_price_format),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(start = smallPadding),
-            )
-        }
+        if (!isValidPrice) ErrorLabelTxtFld(text = stringResource(id = R.string.invalid_price_format))
 
         Text(
             text = stringResource(R.string.usage_label),
@@ -694,8 +710,6 @@ private fun ActionsHolder(
     }
 }
 
-private enum class DialogType { DELETE }
-
 @Preview(showBackground = true)
 @Composable
 private fun EditItemScreenPreview() {
@@ -721,7 +735,7 @@ private fun EditItemScreenPreview() {
             categoryId = 1,
             name = "Art",
         ),
-        isLoading = true,
+        isLoading = false,
         nameItemResponse = "Item",
         onNameItemResponse = { },
         itemDescription = "Description",

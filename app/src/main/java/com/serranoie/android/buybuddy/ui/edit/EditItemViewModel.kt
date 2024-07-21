@@ -126,20 +126,19 @@ class EditItemViewModel
         _isLoading.value = true
 
         getItemByIdUseCase.invoke(id).collect { item ->
-            if (item != null) { // Check if item is not null
+            if (item != null) {
                 _currentItem.value = item
                 _itemName.value = item.name
                 _itemDescription.value = item.description
-                // ... set other properties ...
+                _itemPrice.value = item.price
+                _itemBenefits.value = item.benefits
+                _itemDisadvantages.value = item.disadvantages.toString()
+                _selectedDateTime.value = item.reminderDate
+                _itemUsage.intValue = mapUsageToStep(item.usage)
+
                 getCategory(item.categoryId)
             } else {
-                // Handle the case where the item is not found
-                // For example,you could:
-                // - Show an error message to the user
-                // - Navigate back to the previous screen
-                // - Set a flag to indicate that the item was not found
-                _isLoading.value = false // Stop loading state
-                // ... other actions ...
+                _isLoading.value = false
             }
         }
     }
@@ -171,7 +170,7 @@ class EditItemViewModel
             usage = getUsageFromStep(_itemUsage.value),
             benefits = _itemBenefits.value,
             disadvantages = _itemDisadvantages.value,
-            price = _itemPrice.value!!,
+            price = _itemPrice.value ?: 0.0,
             reminderDate = _selectedDateTime.value ?: _currentItem.value?.reminderDate,
             reminderTime = _selectedDateTime.value ?: _currentItem.value?.reminderTime,
             status = _currentItem.value?.status ?: false,
@@ -208,26 +207,19 @@ class EditItemViewModel
 
     private fun mapUsageToStep(usage: String): Int {
         val context = getApplication<Application>().applicationContext
-        val lowerCaseUsage = usage.lowercase()
 
-        return when (lowerCaseUsage) {
-            context.getString(R.string.usage_barely)
-                .lowercase() -> steps.indexOf(R.string.usage_barely)
+        return when (usage) {
+            context.getString(R.string.usage_barely) -> steps.indexOf(R.string.usage_barely)
 
-            context.getString(R.string.usage_rarely)
-                .lowercase() -> steps.indexOf(R.string.usage_rarely)
+            context.getString(R.string.usage_rarely) -> steps.indexOf(R.string.usage_rarely)
 
-            context.getString(R.string.usage_ocasionally)
-                .lowercase() -> steps.indexOf(R.string.usage_ocasionally)
+            context.getString(R.string.usage_ocasionally) -> steps.indexOf(R.string.usage_ocasionally)
 
-            context.getString(R.string.usage_sometimes)
-                .lowercase() -> steps.indexOf(R.string.usage_sometimes)
+            context.getString(R.string.usage_sometimes) -> steps.indexOf(R.string.usage_sometimes)
 
-            context.getString(R.string.usage_often)
-                .lowercase() -> steps.indexOf(R.string.usage_often)
+            context.getString(R.string.usage_often) -> steps.indexOf(R.string.usage_often)
 
-            context.getString(R.string.usage_almost_everyday)
-                .lowercase() -> steps.indexOf(R.string.usage_almost_everyday)
+            context.getString(R.string.usage_almost_everyday) -> steps.indexOf(R.string.usage_almost_everyday)
 
             else -> {
                 Log.w("EditItemViewModel", "Unknown usage string: $usage")
