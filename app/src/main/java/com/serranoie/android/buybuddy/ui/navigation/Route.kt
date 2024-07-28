@@ -10,6 +10,8 @@ sealed class Route(val route: String) {
 
     data object OnBoarding : Route(Screen.ONBOARDING.name)
     data object Home : Route(Screen.HOME.name)
+    data object Summary : Route(Screen.SUMMARY.name)
+    data object Backup: Route(Screen.BACKUP.name)
     data object Quiz : Route(Screen.QUIZ.name)
     data object FinishedQuiz : Route(Screen.FINISHED_QUIZ.name)
 
