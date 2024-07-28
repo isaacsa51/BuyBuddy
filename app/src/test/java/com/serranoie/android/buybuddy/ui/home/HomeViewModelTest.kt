@@ -18,6 +18,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryEntity
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.launch
@@ -137,7 +138,6 @@ class HomeViewModelTest {
             }
         }
 
-        // Cancel the collection jobs after assertions
         categoriesJob.cancel()
         totalPriceJob.cancel()
         totalBoughtPriceJob.cancel()
