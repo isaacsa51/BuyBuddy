@@ -27,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
+import com.serranoie.android.buybuddy.ui.backup.BackupScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemViewModel
 import com.serranoie.android.buybuddy.ui.home.HomeScreen
@@ -38,6 +39,7 @@ import com.serranoie.android.buybuddy.ui.quiz.QuizRoute
 import com.serranoie.android.buybuddy.ui.settings.AboutScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
+import com.serranoie.android.buybuddy.ui.summary.SummaryScreen
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -141,6 +143,32 @@ fun NavGraph(
             }
 
             composable(
+                route = Route.Summary.route,
+                enterTransition = {
+                    fadeIn(
+                        animationSpec = tween(
+                            300, easing = LinearEasing
+                        )
+                    ) + slideIntoContainer(
+                        animationSpec = tween(300, easing = EaseIn),
+                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+                    )
+                },
+                exitTransition = {
+                    fadeOut(
+                        animationSpec = tween(
+                            300, easing = LinearEasing
+                        )
+                    ) + slideOutOfContainer(
+                        animationSpec = tween(300, easing = EaseOut),
+                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                    )
+                }
+            ) {
+                SummaryScreen(navController = navController)
+            }
+
+            composable(
                 route = Route.Backup.route,
                 enterTransition = {
                     fadeIn(
@@ -163,7 +191,7 @@ fun NavGraph(
                     )
                 }
             ) {
-
+                BackupScreen(navController = navController)
             }
 
             composable(route = Route.FinishedQuiz.route, enterTransition = {

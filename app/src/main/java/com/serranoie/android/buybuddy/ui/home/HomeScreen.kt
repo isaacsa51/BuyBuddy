@@ -114,7 +114,6 @@ fun HomeScreen(
                             selected = selectedItemIndex == index,
                             onClick = {
                                 navController.navigate(item.route)
-                                selectedItemIndex = index
                                 scope.launch {
                                     drawerState.close()
                                 }
@@ -207,7 +206,7 @@ private fun DrawerHeader(themeMode: ThemeMode) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.width(20.dp))
-        // Logo or image
+
         Box(
             modifier = Modifier
                 .size(60.dp)
@@ -224,10 +223,10 @@ private fun DrawerHeader(themeMode: ThemeMode) {
             )
         }
         Spacer(modifier = Modifier.width(18.dp))
-        // App name
+
         Text(
             text = stringResource(id = R.string.app_name),
-            fontSize = 22.sp,
+            style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
         )
     }
