@@ -20,10 +20,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -65,6 +67,7 @@ import com.serranoie.android.buybuddy.ui.common.CategoryCard
 import com.serranoie.android.buybuddy.ui.common.EmptyListScreen
 import com.serranoie.android.buybuddy.ui.common.TotalAmountCard
 import com.serranoie.android.buybuddy.ui.core.MainActivity
+import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
 import com.serranoie.android.buybuddy.ui.navigation.items
 import com.serranoie.android.buybuddy.ui.settings.ThemeMode
@@ -155,6 +158,17 @@ fun HomeScreen(
                             }
                         },
                     )
+                },
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { navController.navigate(Route.Quiz.route) },
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                    ) {
+                        Icon(
+                            Icons.Rounded.Add,
+                            contentDescription = stringResource(R.string.create_item_label)
+                        )
+                    }
                 }
             ) { padding ->
                 if (categoriesWithItems.isEmpty() || categoriesWithItems.all { it.items.isEmpty() }) {
