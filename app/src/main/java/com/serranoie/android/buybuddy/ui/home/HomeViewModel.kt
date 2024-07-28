@@ -51,23 +51,6 @@ class HomeViewModel @Inject constructor(
     private val _totalBoughtPrice = MutableStateFlow(0.0)
     val totalBoughtPrice: StateFlow<Double> = _totalBoughtPrice.asStateFlow()
 
-    // States exposed to UI
-    fun setCategoriesWithItems(categoriesWithItems: List<CategoryWithItemsEntity>) {
-        _categoriesWithItems.value = categoriesWithItems
-    }
-
-    fun setIsLoading(isLoading: Boolean) {
-        _isLoading.value = isLoading
-    }
-
-//    fun setTotalPrice(totalPrice: Double) {
-//        _totalPrice.doubleValue = totalPrice
-//    }
-//
-//    fun setTotalBoughtPrice(totalBoughtPrice: Double) {
-//        _totalBoughtPrice.doubleValue = totalBoughtPrice
-//    }
-
     fun triggerDataFetch() {
         _triggerDataFetch.value = true
     }
