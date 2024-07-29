@@ -50,9 +50,6 @@ class EditItemViewModelTest {
     private lateinit var updateItemStatusUseCase: UpdateItemStatusUseCase
 
     @MockK
-    private lateinit var scheduleNotification: ScheduleNotification
-
-    @MockK
     private lateinit var application: Application
 
     private lateinit var viewModel: EditItemViewModel
