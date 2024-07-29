@@ -1,6 +1,7 @@
 package com.serranoie.android.buybuddy.ui.quiz
 
 import android.app.Application
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +16,7 @@ import com.serranoie.android.buybuddy.ui.quiz.questions.Category
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.concurrent.Executor
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,6 +24,8 @@ class QuizViewModel @Inject constructor(
     private val insertItemWithCategoryUseCase: InsertItemWithCategoryUseCase,
     application: Application
 ) : AndroidViewModel(application) {
+
+    private val scheduleNotification by lazy { ScheduleNotification() }
 
     private val questionOrder: List<Questions> = listOf(
         Questions.NAME,
@@ -164,21 +168,25 @@ class QuizViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            insertItemWithCategoryUseCase(itemData, selectedCategoryName)
 
-            // Schedule the notification
-            reminderResponse?.let {
-                ScheduleNotification().scheduleNotification(
-                    context = getApplication<Application>().applicationContext,
-                    // Using hashcode() in the name to create a more specific ID for the notification since the ID is generated automatically in Room DB
-                    itemId = itemData.name.hashCode(),
-                    itemName = itemData.name,
-                    reminderDate = reminderResponse,
-                    reminderTime = reminderResponse
-                )
+            try {
+                insertItemWithCategoryUseCase(itemData, selectedCategoryName)
+
+                reminderResponse?.let {
+                    scheduleNotification.scheduleNotification(
+                        context = getApplication<Application>().applicationContext,
+                        // Using hashcode() in the name to create a more specific ID for the notification since the ID is generated automatically in Room DB
+                        itemId = itemData.name.hashCode(),
+                        itemName = itemData.name,
+                        reminderDate = reminderResponse,
+                        reminderTime = reminderResponse
+                    )
+                }
+
+                onSurveyComplete()
+            } catch (e: Exception) {
+                Log.e("DEBUG", e.message.toString())
             }
-
-            onSurveyComplete()
         }
     }
 

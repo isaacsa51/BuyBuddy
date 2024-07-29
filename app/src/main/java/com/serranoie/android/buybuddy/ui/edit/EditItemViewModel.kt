@@ -43,12 +43,15 @@ class EditItemViewModel
         R.string.usage_almost_everyday,
     )
 
+    var scheduleNotification: ScheduleNotification = ScheduleNotification()
+
     private val _isLoading = mutableStateOf(true)
     val isLoading: Boolean
         get() = _isLoading.value
 
     // Response states
-    private val _currentItem = mutableStateOf<Item?>(null)
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val _currentItem = mutableStateOf<Item?>(null)
     val currentItem: Item?
         get() = _currentItem.value
 
@@ -167,7 +170,7 @@ class EditItemViewModel
             name = _itemName.value,
             categoryId = currentCategoryId,
             description = _itemDescription.value,
-            usage = getUsageFromStep(_itemUsage.value),
+            usage = getUsageFromStep(_itemUsage.intValue),
             benefits = _itemBenefits.value,
             disadvantages = _itemDisadvantages.value,
             price = _itemPrice.value ?: 0.0,
@@ -177,19 +180,20 @@ class EditItemViewModel
         )
 
         if (isDateModified || isTimeModified) {
-            updatedItem.let {
-                ScheduleNotification().scheduleNotification(
-                    context = getApplication<Application>().applicationContext,
-                    itemId = updatedItem.itemId!!,
-                    itemName = updatedItem.name,
-                    reminderDate = updatedItem.reminderDate,
-                    reminderTime = updatedItem.reminderTime
-                )
-
-            }
+            createUpdatedNotification(updatedItem)
         }
 
         updateItemUseCase.invoke(updatedItem)
+    }
+
+    private fun createUpdatedNotification(updatedItem: Item) {
+        scheduleNotification.scheduleNotification(
+            context = getApplication<Application>().applicationContext,
+            itemId = updatedItem.itemId!!,
+            itemName = updatedItem.name,
+            reminderDate = updatedItem.reminderDate,
+            reminderTime = updatedItem.reminderTime
+        )
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -205,7 +209,8 @@ class EditItemViewModel
         updateItemStatusUseCase.invoke(id, status)
     }
 
-    private fun mapUsageToStep(usage: String): Int {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun mapUsageToStep(usage: String): Int {
         val context = getApplication<Application>().applicationContext
 
         return when (usage) {
@@ -220,10 +225,8 @@ class EditItemViewModel
             context.getString(R.string.usage_often) -> steps.indexOf(R.string.usage_often)
 
             context.getString(R.string.usage_almost_everyday) -> steps.indexOf(R.string.usage_almost_everyday)
-
             else -> {
-                Log.w("EditItemViewModel", "Unknown usage string: $usage")
-                0
+                steps.indexOf(R.string.usage_barely)
             }
         }
     }
