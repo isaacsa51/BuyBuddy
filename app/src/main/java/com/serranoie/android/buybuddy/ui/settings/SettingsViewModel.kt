@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.settings
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.LiveData
@@ -23,16 +22,16 @@ class SettingsViewModel @Inject constructor(
 
     private val _theme = MutableLiveData(ThemeMode.Auto)
     private val _materialYou = MutableLiveData(false)
-    private val _categoryVisiblity = MutableStateFlow(false)
+    private val _categoryVisibility = MutableStateFlow(false)
 
     val theme: LiveData<ThemeMode> = _theme
     val materialYou: LiveData<Boolean> = _materialYou
-    val categoryVisibility: StateFlow<Boolean> = _categoryVisiblity
+    val categoryVisibility: StateFlow<Boolean> = _categoryVisibility
 
     init {
         _theme.value = ThemeMode.entries.toTypedArray()[getThemeValue()]
         _materialYou.value = getMaterialYouValue()
-        _categoryVisiblity.value = getCategoryVisibilityValue()
+        _categoryVisibility.value = getCategoryVisibilityValue()
     }
 
     fun setTheme(newTheme: ThemeMode) {
@@ -50,7 +49,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setCategoryVisibility(newValue: Boolean) {
-        _categoryVisiblity.value
+        _categoryVisibility.value
         preferenceUtil.putBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, newValue)
     }
 
@@ -66,7 +65,8 @@ class SettingsViewModel @Inject constructor(
         PreferenceUtil.APP_LOCK_BOOL, false
     )
 
-    fun getCategoryVisibilityValue() = preferenceUtil.getBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, false)
+    fun getCategoryVisibilityValue() =
+        preferenceUtil.getBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, false)
 
     /**
      * Get the current theme of the app, regardless of the system theme.
