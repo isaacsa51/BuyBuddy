@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -181,6 +182,8 @@ dependencies {
 
     // Coil image loader
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    implementation ("io.github.ehsannarmani:compose-charts:0.0.13")
 }
 
 kapt {
