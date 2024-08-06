@@ -36,6 +36,7 @@ import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.common.CustomTabIndicator
 import com.serranoie.android.buybuddy.ui.common.noRippleClickable
+import com.serranoie.android.buybuddy.ui.summary.screens.incoming.IncomingScreen
 import com.serranoie.android.buybuddy.ui.summary.screens.spent.SpentScreen
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.extraSmallPadding
@@ -112,20 +113,11 @@ fun SummaryScreen(navController: NavController) {
             HorizontalPager(state = pagerState, userScrollEnabled = false) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
                 ) {
                     tabRowItems[pagerState.currentPage].screen()
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun IncomingScreen() {
-    Column {
-        Text("Incoming")
     }
 }
 
