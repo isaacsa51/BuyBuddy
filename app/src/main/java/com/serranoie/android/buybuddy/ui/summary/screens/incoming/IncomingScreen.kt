@@ -34,7 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import com.serranoie.android.buybuddy.ui.summary.screens.spent.ChartProvider
+import com.serranoie.android.buybuddy.ui.summary.screens.ChartProvider
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
@@ -240,16 +240,9 @@ private fun LineChartYearSummary() {
                     )
                 ),
                 Bars(
-                    label = "1", values = listOf(
+                    label = "10", values = listOf(
                         Bars.Data(
                             value = 32.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "0", values = listOf(
-                        Bars.Data(
-                            value = 51.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
                         )
                     )
                 ),

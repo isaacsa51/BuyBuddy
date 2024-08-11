@@ -14,4 +14,5 @@ interface ItemRepository {
     fun getItemById(itemId: Int): Flow<Item?>
     suspend fun getTotalPriceOfItemsToBuy(): Flow<Double?>
     suspend fun getTotalPriceOfItemsBought(): Flow<Double?>
+    suspend fun getSummaryToBuyPricesByMonth(month: String): Flow<List<Item>>
 }

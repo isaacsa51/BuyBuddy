@@ -20,7 +20,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,13 +29,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.summary.screens.ChartProvider
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding

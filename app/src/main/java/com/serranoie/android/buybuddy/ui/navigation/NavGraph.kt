@@ -40,6 +40,7 @@ import com.serranoie.android.buybuddy.ui.settings.AboutScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 import com.serranoie.android.buybuddy.ui.summary.SummaryScreen
+import com.serranoie.android.buybuddy.ui.summary.SummaryViewModel
 import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -104,7 +105,6 @@ fun NavGraph(
                 val totalPrice by homeViewModel.totalPrice.collectAsState()
                 val totalBoughtPrice by homeViewModel.totalBoughtPrice.collectAsState()
                 val categoryVisibility by settingsViewModel.categoryVisibility.collectAsState()
-                val isLoading by homeViewModel.isLoading.collectAsState()
 
                 LaunchedEffect(Unit) {
                     homeViewModel.triggerDataFetch()
@@ -165,6 +165,8 @@ fun NavGraph(
                     )
                 }
             ) {
+                val summaryViewModel = hiltViewModel<SummaryViewModel>()
+
                 SummaryScreen(navController = navController)
             }
 

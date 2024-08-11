@@ -35,4 +35,8 @@ class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) :
 
     override suspend fun getTotalPriceOfItemsBought(): Flow<Double?> =
         itemDao.getTotalPriceOfItemsBought()
+
+    override suspend fun getSummaryToBuyPricesByMonth(month: String): Flow<List<Item>> =
+        itemDao.getSummaryToBuyPricesByMonth(month)
+            .map { entities -> entities.map { it.toDomain() } }
 }

@@ -64,6 +64,9 @@ interface BuyBuddyDao {
     @Query("SELECT SUM(price) FROM item WHERE status = 0")
     fun getTotalPriceOfItemsToBuy(): Flow<Double?>
 
+    @Query("SELECT price FROM item WHERE strftime('%m', reminderDate / 1000, 'unixepoch') = :currentMonth AND status = 0")
+    fun getSummaryToBuyPricesByMonth(currentMonth: String): Flow<List<ItemEntity>>
+
     @Query("SELECT SUM(price) FROM item WHERE status = 1")
     fun getTotalPriceOfItemsBought(): Flow<Double?>
 

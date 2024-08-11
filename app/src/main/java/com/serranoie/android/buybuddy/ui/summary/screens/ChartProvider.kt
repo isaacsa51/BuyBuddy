@@ -1,4 +1,4 @@
-package com.serranoie.android.buybuddy.ui.summary.screens.spent
+package com.serranoie.android.buybuddy.ui.summary.screens
 
 import androidx.compose.runtime.Composable
 
