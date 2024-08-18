@@ -3,9 +3,9 @@ package com.serranoie.android.buybuddy.data.repository
 import com.serranoie.android.buybuddy.data.mapper.toDomain
 import com.serranoie.android.buybuddy.data.mapper.toEntity
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPrice
-import com.serranoie.android.buybuddy.data.persistance.entity.MonthlySum
 import com.serranoie.android.buybuddy.domain.model.Item
+import com.serranoie.android.buybuddy.domain.model.ItemPrice
+import com.serranoie.android.buybuddy.domain.model.MonthlySum
 import com.serranoie.android.buybuddy.domain.repository.ItemRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -40,13 +40,15 @@ class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) :
 
     override suspend fun getCurrentMonthSummaryWithStatusZero(month: String): Flow<List<ItemPrice>> =
         itemDao.getCurrentMonthSummaryWithStatusZero(month)
+            .map { entities -> entities.map { it.toDomain() } }
 
     override suspend fun getCurrentMonthSummaryWithStatusOne(month: String): Flow<List<ItemPrice>> =
         itemDao.getCurrentMonthSummaryWithStatusOne(month)
+            .map { entities -> entities.map { it.toDomain() } }
 
     override suspend fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySum>> =
-        itemDao.getMonthlySumForItemsWithStatusZero()
+        itemDao.getMonthlySumForItemsWithStatusZero().map { entities -> entities.map { it.toDomain() } }
 
     override suspend fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySum>> =
-        itemDao.getMonthlySumForItemsWithStatusOne()
+        itemDao.getMonthlySumForItemsWithStatusOne().map { entities -> entities.map { it.toDomain() } }
 }

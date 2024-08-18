@@ -1,8 +1,10 @@
 package com.serranoie.android.buybuddy.domain.repository
 
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPrice
-import com.serranoie.android.buybuddy.data.persistance.entity.MonthlySum
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntity
+import com.serranoie.android.buybuddy.data.persistance.entity.MonthlySumEntity
 import com.serranoie.android.buybuddy.domain.model.Item
+import com.serranoie.android.buybuddy.domain.model.ItemPrice
+import com.serranoie.android.buybuddy.domain.model.MonthlySum
 import kotlinx.coroutines.flow.Flow
 
 interface ItemRepository {

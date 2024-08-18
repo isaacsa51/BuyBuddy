@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPrice
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntity
 import com.serranoie.android.buybuddy.ui.common.CustomTabIndicator
 import com.serranoie.android.buybuddy.ui.common.noRippleClickable
 import com.serranoie.android.buybuddy.ui.summary.screens.incoming.IncomingScreen
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SummaryScreen(
     navController: NavController,
-    summaryItemsToBuy: List<ItemPrice>,
+    summaryItemsToBuy: List<ItemPriceEntity>,
     errorState: String?
 ) {
     val view = LocalView.current

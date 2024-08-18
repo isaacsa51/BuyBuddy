@@ -34,9 +34,9 @@ data class ItemEntity(
     @ColumnInfo(name = "status") val status: Boolean = false,
 )
 
-data class ItemPrice(val price: Double)
+data class ItemPriceEntity(val price: Double)
 
-data class MonthlySum(
+data class MonthlySumEntity(
     val month: String,
     val totalSum: Double
 )

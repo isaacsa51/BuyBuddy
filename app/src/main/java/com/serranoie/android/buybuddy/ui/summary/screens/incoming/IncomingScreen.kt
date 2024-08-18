@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPrice
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntity
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProviderIncoming
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
@@ -54,20 +54,20 @@ import kotlin.math.absoluteValue
 
 val monthSummaryChart = object : ChartProviderIncoming {
     @Composable
-    override fun GetChart(summaryItemsToBuy: List<ItemPrice>) {
+    override fun GetChart(summaryItemsToBuy: List<ItemPriceEntity>) {
         LineChartMonthSummary(summaryItemsToBuy)
     }
 }
 
 val yearSummaryChart = object : ChartProviderIncoming {
     @Composable
-    override fun GetChart(summaryItemsToBuy: List<ItemPrice>) {
+    override fun GetChart(summaryItemsToBuy: List<ItemPriceEntity>) {
         LineChartYearSummary()
     }
 }
 
 @Composable
-fun IncomingScreen(summaryItemsToBuy: List<ItemPrice>) {
+fun IncomingScreen(summaryItemsToBuy: List<ItemPriceEntity>) {
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -85,7 +85,7 @@ fun IncomingScreen(summaryItemsToBuy: List<ItemPrice>) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun HeaderInformation(summaryItemsToBuy: List<ItemPrice>) {
+private fun HeaderInformation(summaryItemsToBuy: List<ItemPriceEntity>) {
     val charts = listOf(
         monthSummaryChart, yearSummaryChart
     )
@@ -144,7 +144,7 @@ private fun HeaderInformation(summaryItemsToBuy: List<ItemPrice>) {
 }
 
 @Composable
-private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPrice>) {
+private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPriceEntity>) {
 
     val dataOfProducts: List<Double> = summaryItemsToBuy.map { it.price }
 
