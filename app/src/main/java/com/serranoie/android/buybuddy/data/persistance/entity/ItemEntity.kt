@@ -33,3 +33,10 @@ data class ItemEntity(
     @ColumnInfo(name = "reminderTime") val reminderTime: Date?,
     @ColumnInfo(name = "status") val status: Boolean = false,
 )
+
+data class ItemPrice(val price: Double)
+
+data class MonthlySum(
+    val month: String,
+    val totalSum: Double
+)

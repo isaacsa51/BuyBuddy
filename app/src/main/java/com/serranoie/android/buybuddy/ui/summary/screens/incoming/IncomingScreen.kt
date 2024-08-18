@@ -31,10 +31,10 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import com.serranoie.android.buybuddy.ui.summary.screens.ChartProvider
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemPrice
+import com.serranoie.android.buybuddy.ui.summary.screens.ChartProviderIncoming
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
@@ -52,22 +52,22 @@ import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import kotlin.math.absoluteValue
 
-val monthSummaryChart = object : ChartProvider {
+val monthSummaryChart = object : ChartProviderIncoming {
     @Composable
-    override fun GetChart() {
-        LineChartMonthSummary()
+    override fun GetChart(summaryItemsToBuy: List<ItemPrice>) {
+        LineChartMonthSummary(summaryItemsToBuy)
     }
 }
 
-val yearSummaryChart = object : ChartProvider {
+val yearSummaryChart = object : ChartProviderIncoming {
     @Composable
-    override fun GetChart() {
+    override fun GetChart(summaryItemsToBuy: List<ItemPrice>) {
         LineChartYearSummary()
     }
 }
 
 @Composable
-fun IncomingScreen() {
+fun IncomingScreen(summaryItemsToBuy: List<ItemPrice>) {
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -75,7 +75,7 @@ fun IncomingScreen() {
                 .fillMaxSize()
         ) {
             LazyColumn {
-                item { HeaderInformation() }
+                item { HeaderInformation(summaryItemsToBuy) }
 
                 item { CategoryListSummary() }
             }
@@ -85,7 +85,7 @@ fun IncomingScreen() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun HeaderInformation() {
+private fun HeaderInformation(summaryItemsToBuy: List<ItemPrice>) {
     val charts = listOf(
         monthSummaryChart, yearSummaryChart
     )
@@ -103,38 +103,51 @@ private fun HeaderInformation() {
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Soon to spend this month",
-            style = MaterialTheme.typography.headlineSmall
+            text = "Soon to spend this month", style = MaterialTheme.typography.headlineSmall
         )
 
         Text(text = "$ 1,201.50", style = MaterialTheme.typography.displayMedium)
     }
 
     Column(modifier = Modifier.padding(smallPadding)) {
-        HorizontalPager(
-            state = pagerState,
-            contentPadding = PaddingValues(end = 38.dp),
-            pageSize = PageSize.Fill
-        ) { page ->
+
+        if (summaryItemsToBuy.size == 1) {
             Card(
                 Modifier
                     .height(250.dp)
                     .padding(start = 0.dp, end = basePadding)
-                    .graphicsLayer {
-                        val pageOffset =
-                            ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
-                        alpha = lerp(
-                            start = 0.5f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                    }) {
-                charts[page].GetChart()
+            ) {
+                LineChartYearSummary()
+            }
+        } else {
+            HorizontalPager(
+                state = pagerState,
+                contentPadding = PaddingValues(end = 38.dp),
+                pageSize = PageSize.Fill
+            ) { page ->
+                Card(
+                    Modifier
+                        .height(250.dp)
+                        .padding(start = 0.dp, end = basePadding)
+                        .graphicsLayer {
+                            val pageOffset =
+                                ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+                            alpha = lerp(
+                                start = 0.5f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                            )
+                        }) {
+                    charts[page].GetChart(summaryItemsToBuy)
+                }
             }
         }
     }
 }
 
 @Composable
-private fun LineChartMonthSummary() {
+private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPrice>) {
+
+    val dataOfProducts: List<Double> = summaryItemsToBuy.map { it.price }
+
     Column {
         LineChart(
             modifier = Modifier
@@ -143,7 +156,7 @@ private fun LineChartMonthSummary() {
             data = listOf(
                 Line(
                     label = "Current month",
-                    values = listOf(28.0, 41.0, 5.0, 10.0, 35.0),
+                    values = dataOfProducts,
                     color = SolidColor(MaterialTheme.colorScheme.tertiary),
                     firstGradientFillColor = Color(MaterialTheme.colorScheme.tertiaryContainer.value).copy(
                         alpha = .5f
@@ -170,6 +183,10 @@ private fun LineChartMonthSummary() {
 
 @Composable
 private fun LineChartYearSummary() {
+    val labelHelperProperties = LabelHelperProperties(
+        enabled = true, textStyle = MaterialTheme.typography.labelMedium
+    )
+
     Column {
         ColumnChart(
             modifier = Modifier
@@ -261,6 +278,7 @@ private fun LineChartYearSummary() {
                     )
                 ),
             ),
+            labelHelperProperties = labelHelperProperties,
             barProperties = BarProperties(
                 spacing = 3.dp,
             ),
@@ -344,9 +362,7 @@ private fun CategoryListItem() {
             }
 
             Column(
-                modifier = Modifier
-                    .padding(start = 10.dp),
-                horizontalAlignment = Alignment.End
+                modifier = Modifier.padding(start = 10.dp), horizontalAlignment = Alignment.End
             ) {
                 Text(
                     text = "$12,321.50",
@@ -363,8 +379,8 @@ private fun CategoryListItem() {
     }
 }
 
-@Composable
-@Preview(showBackground = true)
-private fun IncomingScreenPreview() {
-    IncomingScreen()
-}
+//@Composable
+//@Preview(showBackground = true)
+//private fun IncomingScreenPreview() {
+//    IncomingScreen(summaryItemsToBuy)
+//}

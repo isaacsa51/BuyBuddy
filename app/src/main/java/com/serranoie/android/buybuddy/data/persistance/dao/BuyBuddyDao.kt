@@ -9,8 +9,9 @@ import androidx.room.Update
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryEntity
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
 import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemPrice
+import com.serranoie.android.buybuddy.data.persistance.entity.MonthlySum
 import com.serranoie.android.buybuddy.domain.model.Category
-import com.serranoie.android.buybuddy.domain.model.CategoryWithItems
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -64,8 +65,17 @@ interface BuyBuddyDao {
     @Query("SELECT SUM(price) FROM item WHERE status = 0")
     fun getTotalPriceOfItemsToBuy(): Flow<Double?>
 
-    @Query("SELECT price FROM item WHERE strftime('%m', reminderDate / 1000, 'unixepoch') = :currentMonth AND status = 0")
-    fun getSummaryToBuyPricesByMonth(currentMonth: String): Flow<List<ItemEntity>>
+    @Query("SELECT * FROM item WHERE strftime('%m', reminderDate / 1000, 'unixepoch') = :currentMonth AND status = 0")
+    fun getCurrentMonthSummaryWithStatusZero(currentMonth: String): Flow<List<ItemPrice>>
+
+    @Query("SELECT * FROM item WHERE strftime('%m', reminderDate / 1000, 'unixepoch') = :currentMonth AND status = 1")
+    fun getCurrentMonthSummaryWithStatusOne(currentMonth: String): Flow<List<ItemPrice>>
+
+    @Query("SELECT strftime('%Y-%m', reminderDate / 1000, 'unixepoch') AS month, SUM(price) AS totalSum FROM item WHERE status = 0 GROUP BY month")
+    fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySum>>
+
+    @Query("SELECT strftime('%Y-%m', reminderDate / 1000, 'unixepoch') AS month, SUM(price) AS totalSum FROM item WHERE status = 1 GROUP BY month")
+    fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySum>>
 
     @Query("SELECT SUM(price) FROM item WHERE status = 1")
     fun getTotalPriceOfItemsBought(): Flow<Double?>

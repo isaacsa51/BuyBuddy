@@ -1,7 +1,6 @@
 package com.serranoie.android.buybuddy.ui.navigation
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
@@ -14,11 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -26,7 +22,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
 import com.serranoie.android.buybuddy.ui.backup.BackupScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemViewModel
@@ -42,6 +37,9 @@ import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 import com.serranoie.android.buybuddy.ui.summary.SummaryScreen
 import com.serranoie.android.buybuddy.ui.summary.SummaryViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
@@ -167,7 +165,24 @@ fun NavGraph(
             ) {
                 val summaryViewModel = hiltViewModel<SummaryViewModel>()
 
-                SummaryScreen(navController = navController)
+                val summaryItemsToBuy by summaryViewModel.summaryItemsToBuy.collectAsState()
+                val errorState by summaryViewModel.errorState.collectAsState()
+
+                val currentMonth = remember {
+                    SimpleDateFormat("MM", Locale.getDefault()).format(
+                        Date()
+                    )
+                }
+
+                LaunchedEffect(Unit) {
+                    summaryViewModel.fetchSummaryItemsToBuy(month = currentMonth)
+                }
+
+                SummaryScreen(
+                    navController = navController,
+                    summaryItemsToBuy = summaryItemsToBuy,
+                    errorState = errorState
+                )
             }
 
             composable(
