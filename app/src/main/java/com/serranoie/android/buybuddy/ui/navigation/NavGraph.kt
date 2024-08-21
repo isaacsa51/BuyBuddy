@@ -1,6 +1,7 @@
 package com.serranoie.android.buybuddy.ui.navigation
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
@@ -16,6 +17,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -165,22 +167,30 @@ fun NavGraph(
             ) {
                 val summaryViewModel = hiltViewModel<SummaryViewModel>()
 
-                val summaryItemsToBuy by summaryViewModel.summaryItemsToBuy.collectAsState()
-                val errorState by summaryViewModel.errorState.collectAsState()
+                val summaryItemsToBuy by summaryViewModel.summaryItemsToBuy.collectAsStateWithLifecycle()
+                val summaryItemsBought by summaryViewModel.summaryItemsBought.collectAsStateWithLifecycle()
+                val yearlySummaryToBuy by summaryViewModel.yearlySummaryToBuy.collectAsStateWithLifecycle()
+                val yearlySummaryBought by summaryViewModel.yearlySummaryBought.collectAsStateWithLifecycle()
+                val errorState by summaryViewModel.errorState.collectAsStateWithLifecycle()
 
                 val currentMonth = remember {
-                    SimpleDateFormat("MM", Locale.getDefault()).format(
-                        Date()
-                    )
+                    SimpleDateFormat("MM", Locale.getDefault()).format(Date())
                 }
 
                 LaunchedEffect(Unit) {
+                    Log.d("DEBUG", "Current month: $currentMonth")
                     summaryViewModel.fetchSummaryItemsToBuy(month = currentMonth)
+                    summaryViewModel.fetchSummaryItemsBought(month = currentMonth)
+                    summaryViewModel.fetchYearlySummaryToBuy()
+                    summaryViewModel.fetchYearlySummaryBought()
                 }
 
                 SummaryScreen(
                     navController = navController,
                     summaryItemsToBuy = summaryItemsToBuy,
+                    summaryItemsBought = summaryItemsBought,
+                    yearlySummaryToBuy = yearlySummaryToBuy,
+                    yearlySummaryBought = yearlySummaryBought,
                     errorState = errorState
                 )
             }

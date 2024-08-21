@@ -143,4 +143,8 @@
     <string name="about_support_desc">If you think I deserve cookies for my work, you can buy me some by clicking here.</string>
     <string name="about_version_title">Version</string>
     <string name="about_version_desc">Version-%s</string>
+
+    <!-- Summary Screen -->
+    <string name="summary_screen_title">Summary</string>
+    <string name="empty_summary">There\'s no products added this month…</string>
 </resources>

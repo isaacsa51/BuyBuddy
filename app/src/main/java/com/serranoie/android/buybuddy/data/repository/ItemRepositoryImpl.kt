@@ -1,5 +1,6 @@
 package com.serranoie.android.buybuddy.data.repository
 
+import android.util.Log
 import com.serranoie.android.buybuddy.data.mapper.toDomain
 import com.serranoie.android.buybuddy.data.mapper.toEntity
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
@@ -38,17 +39,36 @@ class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) :
     override suspend fun getTotalPriceOfItemsBought(): Flow<Double?> =
         itemDao.getTotalPriceOfItemsBought()
 
-    override suspend fun getCurrentMonthSummaryWithStatusZero(month: String): Flow<List<ItemPrice>> =
-        itemDao.getCurrentMonthSummaryWithStatusZero(month)
-            .map { entities -> entities.map { it.toDomain() } }
+    override suspend fun getCurrentMonthSummaryWithStatusZero(month: String): Flow<List<ItemPrice>?> =
+        itemDao.getCurrentMonthSummaryWithStatusZero(month).map { entities ->
+            entities?.map {
+                Log.d("DEBUG", "Status Zero: $it")
+                it.toDomain()
+            }
+        }
 
-    override suspend fun getCurrentMonthSummaryWithStatusOne(month: String): Flow<List<ItemPrice>> =
-        itemDao.getCurrentMonthSummaryWithStatusOne(month)
-            .map { entities -> entities.map { it.toDomain() } }
+    override suspend fun getCurrentMonthSummaryWithStatusOne(month: String): Flow<List<ItemPrice>?> =
+        itemDao.getCurrentMonthSummaryWithStatusOne(month).map { entities ->
+            entities?.map {
+                Log.d("DEBUG", "Status One: $it")
+                it.toDomain()
+            }
+        }
 
-    override suspend fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySum>> =
-        itemDao.getMonthlySumForItemsWithStatusZero().map { entities -> entities.map { it.toDomain() } }
+    override suspend fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySum>?> =
+        itemDao.getMonthlySumForItemsWithStatusZero().map { entities ->
+            entities?.map {
+                Log.d("DEBUG", "Status Zero: $it")
 
-    override suspend fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySum>> =
-        itemDao.getMonthlySumForItemsWithStatusOne().map { entities -> entities.map { it.toDomain() } }
+                it.toDomain()
+            }
+        }
+
+    override suspend fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySum>?> =
+        itemDao.getMonthlySumForItemsWithStatusOne().map { entities ->
+            entities?.map {
+                Log.d("DEBUG", "Status One: $it")
+                it.toDomain()
+            }
+        }
 }

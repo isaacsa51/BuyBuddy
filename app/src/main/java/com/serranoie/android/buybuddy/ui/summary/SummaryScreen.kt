@@ -32,7 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntity
+import com.serranoie.android.buybuddy.domain.model.ItemPrice
+import com.serranoie.android.buybuddy.domain.model.MonthlySum
 import com.serranoie.android.buybuddy.ui.common.CustomTabIndicator
 import com.serranoie.android.buybuddy.ui.common.noRippleClickable
 import com.serranoie.android.buybuddy.ui.summary.screens.incoming.IncomingScreen
@@ -46,8 +47,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun SummaryScreen(
     navController: NavController,
-    summaryItemsToBuy: List<ItemPriceEntity>,
-    errorState: String?
+    summaryItemsToBuy: List<ItemPrice>?,
+    summaryItemsBought: List<ItemPrice>?,
+    yearlySummaryToBuy: List<MonthlySum>?,
+    yearlySummaryBought: List<MonthlySum>?,
+    errorState: String?,
 ) {
     val view = LocalView.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -55,11 +59,12 @@ fun SummaryScreen(
     val coroutineScope = rememberCoroutineScope()
 
     val tabRowItems = listOf(
-        SummaryItem(label = "Spent", screen = { SpentScreen() }),
-        SummaryItem(label = "Incoming", screen = { IncomingScreen(summaryItemsToBuy) }),
+        SummaryItem(label = "Spent", screen = { SpentScreen(summaryItemsBought, yearlySummaryBought) }),
+        SummaryItem(label = "Incoming", screen = { IncomingScreen(summaryItemsToBuy, yearlySummaryToBuy) }),
     )
 
-    Log.d("SummaryScreen", "SummaryItems: $summaryItemsToBuy")
+    Log.d("DEBUG", "Incoming Products Summary: $summaryItemsToBuy, $yearlySummaryToBuy")
+    Log.d("DEBUG", "Spent Products Summary: $summaryItemsBought, $yearlySummaryBought")
 
     Scaffold(
         topBar = {
@@ -119,7 +124,15 @@ fun SummaryScreen(
                 Column(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    tabRowItems[pagerState.currentPage].screen()
+
+                    if(errorState != null) {
+                        Log.d("DEBUG", "$errorState")
+
+                        Text(text = errorState)
+
+                    } else {
+                        tabRowItems[pagerState.currentPage].screen()
+                    }
                 }
             }
         }

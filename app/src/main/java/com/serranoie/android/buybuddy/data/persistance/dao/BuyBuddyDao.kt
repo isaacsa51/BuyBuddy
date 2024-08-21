@@ -66,16 +66,16 @@ interface BuyBuddyDao {
     fun getTotalPriceOfItemsToBuy(): Flow<Double?>
 
     @Query("SELECT * FROM item WHERE strftime('%m', reminderDate / 1000, 'unixepoch') = :currentMonth AND status = 0")
-    fun getCurrentMonthSummaryWithStatusZero(currentMonth: String): Flow<List<ItemPriceEntity>>
+    fun getCurrentMonthSummaryWithStatusZero(currentMonth: String): Flow<List<ItemPriceEntity>?>
 
     @Query("SELECT * FROM item WHERE strftime('%m', reminderDate / 1000, 'unixepoch') = :currentMonth AND status = 1")
-    fun getCurrentMonthSummaryWithStatusOne(currentMonth: String): Flow<List<ItemPriceEntity>>
+    fun getCurrentMonthSummaryWithStatusOne(currentMonth: String): Flow<List<ItemPriceEntity>?>
 
     @Query("SELECT strftime('%Y-%m', reminderDate / 1000, 'unixepoch') AS month, SUM(price) AS totalSum FROM item WHERE status = 0 GROUP BY month")
-    fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySumEntity>>
+    fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySumEntity>?>
 
     @Query("SELECT strftime('%Y-%m', reminderDate / 1000, 'unixepoch') AS month, SUM(price) AS totalSum FROM item WHERE status = 1 GROUP BY month")
-    fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySumEntity>>
+    fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySumEntity>?>
 
     @Query("SELECT SUM(price) FROM item WHERE status = 1")
     fun getTotalPriceOfItemsBought(): Flow<Double?>

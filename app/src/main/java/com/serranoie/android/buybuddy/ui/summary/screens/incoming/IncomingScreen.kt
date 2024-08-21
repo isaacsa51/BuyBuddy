@@ -20,24 +20,30 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntity
+import com.serranoie.android.buybuddy.domain.model.ItemPrice
+import com.serranoie.android.buybuddy.domain.model.MonthlySum
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProviderIncoming
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
+import com.serranoie.android.buybuddy.ui.util.Utils.formatPrice
 import ir.ehsannarmani.compose_charts.ColumnChart
 import ir.ehsannarmani.compose_charts.LineChart
 import ir.ehsannarmani.compose_charts.models.AnimationMode
@@ -49,33 +55,38 @@ import ir.ehsannarmani.compose_charts.models.DrawStyle
 import ir.ehsannarmani.compose_charts.models.GridProperties
 import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import kotlin.math.absoluteValue
 
 val monthSummaryChart = object : ChartProviderIncoming {
     @Composable
-    override fun GetChart(summaryItemsToBuy: List<ItemPriceEntity>) {
+    override fun GetChart(
+        summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?
+    ) {
         LineChartMonthSummary(summaryItemsToBuy)
     }
 }
 
 val yearSummaryChart = object : ChartProviderIncoming {
     @Composable
-    override fun GetChart(summaryItemsToBuy: List<ItemPriceEntity>) {
-        LineChartYearSummary()
+    override fun GetChart(
+        summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?
+    ) {
+        BarsChartYearlySummary(yearlySummaryToBuy)
     }
 }
 
 @Composable
-fun IncomingScreen(summaryItemsToBuy: List<ItemPriceEntity>) {
+fun IncomingScreen(summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?) {
     Scaffold { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
         ) {
-            LazyColumn {
-                item { HeaderInformation(summaryItemsToBuy) }
+            LazyColumn(modifier = Modifier.weight(1f)) {
+                item { HeaderInformation(summaryItemsToBuy, yearlySummaryToBuy) }
 
                 item { CategoryListSummary() }
             }
@@ -85,7 +96,9 @@ fun IncomingScreen(summaryItemsToBuy: List<ItemPriceEntity>) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun HeaderInformation(summaryItemsToBuy: List<ItemPriceEntity>) {
+private fun HeaderInformation(
+    summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?
+) {
     val charts = listOf(
         monthSummaryChart, yearSummaryChart
     )
@@ -94,6 +107,10 @@ private fun HeaderInformation(summaryItemsToBuy: List<ItemPriceEntity>) {
         charts.size
     })
 
+    var totalToBuy = 0.0
+    summaryItemsToBuy?.forEach { item ->
+        totalToBuy += item.price ?: 0.0
+    }
 
     Column(
         modifier = Modifier
@@ -106,18 +123,25 @@ private fun HeaderInformation(summaryItemsToBuy: List<ItemPriceEntity>) {
             text = "Soon to spend this month", style = MaterialTheme.typography.headlineSmall
         )
 
-        Text(text = "$ 1,201.50", style = MaterialTheme.typography.displayMedium)
+        Text(text = "$ " + formatPrice(totalToBuy), style = MaterialTheme.typography.displayMedium)
     }
 
     Column(modifier = Modifier.padding(smallPadding)) {
 
-        if (summaryItemsToBuy.size == 1) {
+        if (summaryItemsToBuy?.size!! <= 1) {
             Card(
-                Modifier
+                modifier = Modifier
                     .height(250.dp)
-                    .padding(start = 0.dp, end = basePadding)
+                    .fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor =
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        3.dp,
+                    ),
+                )
             ) {
-                LineChartYearSummary()
+                // TODO: Need to comment this too?
+                // BarsChartYearlySummary(yearlySummaryToBuy)
             }
         } else {
             HorizontalPager(
@@ -126,17 +150,26 @@ private fun HeaderInformation(summaryItemsToBuy: List<ItemPriceEntity>) {
                 pageSize = PageSize.Fill
             ) { page ->
                 Card(
-                    Modifier
+                    modifier = Modifier
                         .height(250.dp)
                         .padding(start = 0.dp, end = basePadding)
                         .graphicsLayer {
                             val pageOffset =
                                 ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
                             alpha = lerp(
-                                start = 0.5f, stop = 1f, fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                start = 0.5f,
+                                stop = 1f,
+                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
                             )
-                        }) {
-                    charts[page].GetChart(summaryItemsToBuy)
+                        },
+                    colors = CardDefaults.cardColors(
+                        containerColor =
+                        MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            3.dp,
+                        ),
+                    )
+                ) {
+                    charts[page].GetChart(summaryItemsToBuy, yearlySummaryToBuy)
                 }
             }
         }
@@ -144,19 +177,45 @@ private fun HeaderInformation(summaryItemsToBuy: List<ItemPriceEntity>) {
 }
 
 @Composable
-private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPriceEntity>) {
+private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPrice>?) {
 
-    val dataOfProducts: List<Double> = summaryItemsToBuy.map { it.price }
+    val dataOfProducts: List<Double>? = summaryItemsToBuy?.map { it.price ?: 0.0 }
 
-    Column {
+    Column(
+        Modifier.fillMaxSize()
+    ) {
         LineChart(
             modifier = Modifier
-                .padding(horizontal = mediumPadding, vertical = smallPadding)
+                .padding(mediumPadding)
                 .height(220.dp),
+            gridProperties = GridProperties(
+                xAxisProperties = GridProperties.AxisProperties(
+                    enabled = true,
+                    color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
+                ),
+                yAxisProperties = GridProperties.AxisProperties(
+                    enabled = true,
+                    color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
+                )
+            ),
+            labelHelperProperties = LabelHelperProperties(
+                enabled = false
+            ),
+            labelProperties = LabelProperties(
+                enabled = false,
+            ),
+            indicatorProperties = HorizontalIndicatorProperties(
+                enabled = true,
+                textStyle = TextStyle(
+                    fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize
+                )
+            ),
             data = listOf(
                 Line(
                     label = "Current month",
-                    values = dataOfProducts,
+                    values = dataOfProducts!!,
                     color = SolidColor(MaterialTheme.colorScheme.tertiary),
                     firstGradientFillColor = Color(MaterialTheme.colorScheme.tertiaryContainer.value).copy(
                         alpha = .5f
@@ -182,110 +241,67 @@ private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPriceEntity>) {
 }
 
 @Composable
-private fun LineChartYearSummary() {
-    val labelHelperProperties = LabelHelperProperties(
-        enabled = true, textStyle = MaterialTheme.typography.labelMedium
-    )
+private fun BarsChartYearlySummary(yearlySummaryToBuy: List<MonthlySum>?) {
+
+    val barsData = yearlySummaryToBuy?.map { monthlySum ->
+        Bars(
+            label = monthlySum.month ?: "Empty",
+            values = listOf(
+                Bars.Data(
+                    value = monthlySum.totalSum ?: 0.0,
+                    color = SolidColor(MaterialTheme.colorScheme.secondary),
+                    properties = BarProperties(spacing = 5.dp)
+                )
+            )
+        )
+    }
 
     Column {
-        ColumnChart(
-            modifier = Modifier
-                .padding(horizontal = mediumPadding, vertical = smallPadding)
-                .height(220.dp),
-            data = listOf(
-                Bars(
-                    label = "1", values = listOf(
-                        Bars.Data(
-                            value = 1.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
+        if (barsData != null) {
+            ColumnChart(
+                modifier = Modifier
+                    .padding(mediumPadding)
+                    .height(220.dp),
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
+                ),
+                gridProperties = GridProperties(
+                    xAxisProperties = GridProperties.AxisProperties(
+                        enabled = true,
+                        color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
+                    ),
+                    yAxisProperties = GridProperties.AxisProperties(
+                        enabled = true,
+                        color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
                     )
                 ),
-                Bars(
-                    label = "2", values = listOf(
-                        Bars.Data(
-                            value = 50.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
+                labelHelperProperties = LabelHelperProperties(
+                    enabled = false,
+                    textStyle = TextStyle(
+                        fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize
                     )
                 ),
-                Bars(
-                    label = "3", values = listOf(
-                        Bars.Data(
-                            value = 25.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
+                labelProperties = LabelProperties(
+                    enabled = true,
+                    textStyle = TextStyle(
+                        fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize
                     )
                 ),
-                Bars(
-                    label = "4", values = listOf(
-                        Bars.Data(
-                            value = 20.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
+                indicatorProperties = HorizontalIndicatorProperties(
+                    enabled = true,
+                    textStyle = TextStyle(
+                        fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize
                     )
                 ),
-                Bars(
-                    label = "5", values = listOf(
-                        Bars.Data(
-                            value = 100.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "6", values = listOf(
-                        Bars.Data(
-                            value = 8.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "7", values = listOf(
-                        Bars.Data(
-                            value = 10.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "8", values = listOf(
-                        Bars.Data(
-                            value = 10.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "9", values = listOf(
-                        Bars.Data(
-                            value = 25.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "10", values = listOf(
-                        Bars.Data(
-                            value = 32.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "11", values = listOf(
-                        Bars.Data(
-                            value = 15.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-                Bars(
-                    label = "12", values = listOf(
-                        Bars.Data(
-                            value = 152.0, color = SolidColor(MaterialTheme.colorScheme.secondary)
-                        )
-                    )
-                ),
-            ),
-            labelHelperProperties = labelHelperProperties,
-            barProperties = BarProperties(
-                spacing = 3.dp,
-            ),
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
-            ),
-        )
+                data = barsData
+            )
+        }
     }
 }
 
@@ -293,7 +309,7 @@ private fun LineChartYearSummary() {
 private fun CategoryListSummary() {
     Column {
         Text(
-            text = "Summary per month",
+            text = "Summary per category",
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(smallPadding)
         )
@@ -310,6 +326,12 @@ private fun CategoryListItem() {
             .wrapContentHeight()
             .fillMaxWidth()
             .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
+        colors = CardDefaults.cardColors(
+            containerColor =
+            MaterialTheme.colorScheme.surfaceColorAtElevation(
+                5.dp,
+            ),
+        )
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -325,15 +347,14 @@ private fun CategoryListItem() {
             ) {
                 Text(
                     text = "Category",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = Color.Black,
+                    style = MaterialTheme.typography.labelLarge,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
                 )
                 Text(
                     text = "Total value",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(.4f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(.5f)
                 )
             }
 
@@ -379,8 +400,23 @@ private fun CategoryListItem() {
     }
 }
 
-//@Composable
-//@Preview(showBackground = true)
-//private fun IncomingScreenPreview() {
-//    IncomingScreen(summaryItemsToBuy)
-//}
+@Composable
+@Preview(showBackground = true)
+private fun IncomingScreenPreview() {
+    val summaryItemsToBuy = listOf(
+        ItemPrice(10.0),
+        ItemPrice(120.0),
+        ItemPrice(150.0),
+        ItemPrice(110.0),
+        ItemPrice(80.0),
+        ItemPrice(20.0),
+    )
+
+    val yearlySummaryToBuy = listOf(
+        MonthlySum("January", 100.0),
+        MonthlySum("February", 120.0),
+        MonthlySum("March", 150.0),
+    )
+
+    IncomingScreen(summaryItemsToBuy, yearlySummaryToBuy)
+}
