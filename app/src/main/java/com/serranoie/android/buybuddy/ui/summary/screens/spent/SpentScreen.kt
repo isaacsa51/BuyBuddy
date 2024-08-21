@@ -23,7 +23,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -36,12 +35,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import com.serranoie.android.buybuddy.domain.model.ItemPrice
-import com.serranoie.android.buybuddy.domain.model.MonthlySum
+import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
+import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
 import com.serranoie.android.buybuddy.ui.common.EmptySummary
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProvider
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
@@ -66,8 +63,8 @@ import kotlin.math.absoluteValue
 val monthSummaryChart = object : ChartProvider {
     @Composable
     override fun GetChart(
-        summaryItemsBought: List<ItemPrice>?,
-        yearlySummaryBought: List<MonthlySum>?
+        summaryItemsBought: List<ItemPriceStatusOne>?,
+        yearlySummaryBought: List<MonthlySumStatusOne>?
     ) {
         LineChartMonthSummary(summaryItemsBought)
     }
@@ -76,15 +73,18 @@ val monthSummaryChart = object : ChartProvider {
 val yearSummaryChart = object : ChartProvider {
     @Composable
     override fun GetChart(
-        summaryItemsBought: List<ItemPrice>?,
-        yearlySummaryBought: List<MonthlySum>?
+        summaryItemsBought: List<ItemPriceStatusOne>?,
+        yearlySummaryBought: List<MonthlySumStatusOne>?
     ) {
         BarsChartYearlySummary(yearlySummaryBought)
     }
 }
 
 @Composable
-fun SpentScreen(summaryItemsBought: List<ItemPrice>?, yearlySummaryBought: List<MonthlySum>?) {
+fun SpentScreen(
+    summaryItemsBought: List<ItemPriceStatusOne>?,
+    yearlySummaryBought: List<MonthlySumStatusOne>?
+) {
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -106,8 +106,8 @@ fun SpentScreen(summaryItemsBought: List<ItemPrice>?, yearlySummaryBought: List<
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HeaderInformation(
-    summaryItemsBought: List<ItemPrice>?,
-    yearlySummaryBought: List<MonthlySum>?
+    summaryItemsBought: List<ItemPriceStatusOne>?,
+    yearlySummaryBought: List<MonthlySumStatusOne>?
 ) {
 
     if (summaryItemsBought?.isEmpty() == true || yearlySummaryBought?.isEmpty() == true) {
@@ -160,7 +160,7 @@ private fun HeaderInformation(
                         )
                     ) {
                         // TODO: Why is this crashing but showing correctly even commented?
-                        // BarsChartYearlySummary(yearlySummaryBought)
+                        BarsChartYearlySummary(yearlySummaryBought)
                     }
                 } else {
                     HorizontalPager(
@@ -195,14 +195,10 @@ private fun HeaderInformation(
             }
         }
     }
-
-
-
-
 }
 
 @Composable
-private fun LineChartMonthSummary(summaryItemsBought: List<ItemPrice>?) {
+private fun LineChartMonthSummary(summaryItemsBought: List<ItemPriceStatusOne>?) {
 
     val dataOfProducts: List<Double>? = summaryItemsBought?.map { it.price ?: 0.0 }
 
@@ -267,7 +263,8 @@ private fun LineChartMonthSummary(summaryItemsBought: List<ItemPrice>?) {
 }
 
 @Composable
-private fun BarsChartYearlySummary(yearlySummaryBought: List<MonthlySum>?) {
+private fun BarsChartYearlySummary(yearlySummaryBought: List<MonthlySumStatusOne>?) {
+
     val barsData = yearlySummaryBought?.map { monthlySum ->
         Bars(
             label = monthlySum.month ?: "Empty",
@@ -345,6 +342,7 @@ private fun CategoryListSummary() {
 
 @Composable
 private fun CategoryListItem() {
+
     Card(
         modifier = Modifier
             .wrapContentHeight()
@@ -407,9 +405,7 @@ private fun CategoryListItem() {
             }
 
             Column(
-                modifier = Modifier
-                    .padding(start = 10.dp),
-                horizontalAlignment = Alignment.End
+                modifier = Modifier.padding(start = 10.dp), horizontalAlignment = Alignment.End
             ) {
                 Text(
                     text = "$12,321.50",
@@ -430,22 +426,38 @@ private fun CategoryListItem() {
 @Preview(showBackground = true)
 private fun SpentScreenPreview() {
     val summaryItemsBought = listOf(
-        ItemPrice(10.0),
-        ItemPrice(120.0),
-        ItemPrice(150.0),
-        ItemPrice(110.0),
-        ItemPrice(80.0),
-        ItemPrice(20.0),
+        ItemPriceStatusOne(10.0),
+        ItemPriceStatusOne(120.0),
+        ItemPriceStatusOne(150.0),
+        ItemPriceStatusOne(110.0),
+        ItemPriceStatusOne(80.0),
+        ItemPriceStatusOne(20.0),
     )
 
     val yearlySummaryBought = listOf(
-        MonthlySum("January", 100.0),
-        MonthlySum("February", 120.0),
-        MonthlySum("March", 150.0),
+        MonthlySumStatusOne("January", 100.0),
+        MonthlySumStatusOne("February", 120.0),
+        MonthlySumStatusOne("March", 150.0),
     )
 
     Scaffold {
-        Column(Modifier.padding(it)){
+        Column(Modifier.padding(it)) {
+            HeaderInformation(summaryItemsBought, yearlySummaryBought)
+
+            CategoryListItem()
+        }
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun EmptySummaryPreview() {
+    val summaryItemsBought = listOf<ItemPriceStatusOne>()
+
+    val yearlySummaryBought = listOf<MonthlySumStatusOne>()
+
+    Scaffold {
+        Column(Modifier.padding(it)) {
             HeaderInformation(summaryItemsBought, yearlySummaryBought)
 
             CategoryListItem()

@@ -37,8 +37,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
-import com.serranoie.android.buybuddy.domain.model.ItemPrice
-import com.serranoie.android.buybuddy.domain.model.MonthlySum
+import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
+import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
+import com.serranoie.android.buybuddy.ui.common.EmptySummary
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProviderIncoming
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
@@ -62,7 +63,8 @@ import kotlin.math.absoluteValue
 val monthSummaryChart = object : ChartProviderIncoming {
     @Composable
     override fun GetChart(
-        summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?
+        summaryItemsToBuy: List<ItemPriceStatusZero>?,
+        yearlySummaryToBuy: List<MonthlySumStatusZero>?
     ) {
         LineChartMonthSummary(summaryItemsToBuy)
     }
@@ -71,14 +73,18 @@ val monthSummaryChart = object : ChartProviderIncoming {
 val yearSummaryChart = object : ChartProviderIncoming {
     @Composable
     override fun GetChart(
-        summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?
+        summaryItemsToBuy: List<ItemPriceStatusZero>?,
+        yearlySummaryToBuy: List<MonthlySumStatusZero>?
     ) {
         BarsChartYearlySummary(yearlySummaryToBuy)
     }
 }
 
 @Composable
-fun IncomingScreen(summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?) {
+fun IncomingScreen(
+    summaryItemsToBuy: List<ItemPriceStatusZero>?,
+    yearlySummaryToBuy: List<MonthlySumStatusZero>?
+) {
     Scaffold { padding ->
         Column(
             modifier = Modifier
@@ -97,71 +103,49 @@ fun IncomingScreen(summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HeaderInformation(
-    summaryItemsToBuy: List<ItemPrice>?, yearlySummaryToBuy: List<MonthlySum>?
+    summaryItemsToBuy: List<ItemPriceStatusZero>?, yearlySummaryToBuy: List<MonthlySumStatusZero>?
 ) {
-    val charts = listOf(
-        monthSummaryChart, yearSummaryChart
-    )
 
-    val pagerState = rememberPagerState(pageCount = {
-        charts.size
-    })
-
-    var totalToBuy = 0.0
-    summaryItemsToBuy?.forEach { item ->
-        totalToBuy += item.price ?: 0.0
-    }
-
-    Column(
-        modifier = Modifier
-            .padding(vertical = mediumPadding, horizontal = basePadding)
-            .fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Soon to spend this month", style = MaterialTheme.typography.headlineSmall
+    if (summaryItemsToBuy?.isEmpty() == true || yearlySummaryToBuy?.isEmpty() == true) {
+        EmptySummary()
+    } else {
+        val charts = listOf(
+            monthSummaryChart, yearSummaryChart
         )
 
-        Text(text = "$ " + formatPrice(totalToBuy), style = MaterialTheme.typography.displayMedium)
-    }
+        val pagerState = rememberPagerState(pageCount = {
+            charts.size
+        })
 
-    Column(modifier = Modifier.padding(smallPadding)) {
+        var totalToBuy = 0.0
+        summaryItemsToBuy?.forEach { item ->
+            totalToBuy += item.price ?: 0.0
+        }
 
-        if (summaryItemsToBuy?.size!! <= 1) {
-            Card(
-                modifier = Modifier
-                    .height(250.dp)
-                    .fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor =
-                    MaterialTheme.colorScheme.surfaceColorAtElevation(
-                        3.dp,
-                    ),
-                )
-            ) {
-                // TODO: Need to comment this too?
-                // BarsChartYearlySummary(yearlySummaryToBuy)
-            }
-        } else {
-            HorizontalPager(
-                state = pagerState,
-                contentPadding = PaddingValues(end = 38.dp),
-                pageSize = PageSize.Fill
-            ) { page ->
+        Column(
+            modifier = Modifier
+                .padding(vertical = mediumPadding, horizontal = basePadding)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Soon to spend this month", style = MaterialTheme.typography.headlineSmall
+            )
+
+            Text(
+                text = "$ " + formatPrice(totalToBuy),
+                style = MaterialTheme.typography.displayMedium
+            )
+        }
+
+        Column(modifier = Modifier.padding(smallPadding)) {
+
+            if (summaryItemsToBuy?.size!! <= 1) {
                 Card(
                     modifier = Modifier
                         .height(250.dp)
-                        .padding(start = 0.dp, end = basePadding)
-                        .graphicsLayer {
-                            val pageOffset =
-                                ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
-                            alpha = lerp(
-                                start = 0.5f,
-                                stop = 1f,
-                                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                            )
-                        },
+                        .fillMaxWidth(),
                     colors = CardDefaults.cardColors(
                         containerColor =
                         MaterialTheme.colorScheme.surfaceColorAtElevation(
@@ -169,7 +153,37 @@ private fun HeaderInformation(
                         ),
                     )
                 ) {
-                    charts[page].GetChart(summaryItemsToBuy, yearlySummaryToBuy)
+                    // TODO: Need to comment this too?
+                    BarsChartYearlySummary(yearlySummaryToBuy)
+                }
+            } else {
+                HorizontalPager(
+                    state = pagerState,
+                    contentPadding = PaddingValues(end = 38.dp),
+                    pageSize = PageSize.Fill
+                ) { page ->
+                    Card(
+                        modifier = Modifier
+                            .height(250.dp)
+                            .padding(start = 0.dp, end = basePadding)
+                            .graphicsLayer {
+                                val pageOffset =
+                                    ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+                                alpha = lerp(
+                                    start = 0.5f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                )
+                            },
+                        colors = CardDefaults.cardColors(
+                            containerColor =
+                            MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                3.dp,
+                            ),
+                        )
+                    ) {
+                        charts[page].GetChart(summaryItemsToBuy, yearlySummaryToBuy)
+                    }
                 }
             }
         }
@@ -177,7 +191,7 @@ private fun HeaderInformation(
 }
 
 @Composable
-private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPrice>?) {
+private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPriceStatusZero>?) {
 
     val dataOfProducts: List<Double>? = summaryItemsToBuy?.map { it.price ?: 0.0 }
 
@@ -241,7 +255,7 @@ private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPrice>?) {
 }
 
 @Composable
-private fun BarsChartYearlySummary(yearlySummaryToBuy: List<MonthlySum>?) {
+private fun BarsChartYearlySummary(yearlySummaryToBuy: List<MonthlySumStatusZero>?) {
 
     val barsData = yearlySummaryToBuy?.map { monthlySum ->
         Bars(
@@ -404,18 +418,18 @@ private fun CategoryListItem() {
 @Preview(showBackground = true)
 private fun IncomingScreenPreview() {
     val summaryItemsToBuy = listOf(
-        ItemPrice(10.0),
-        ItemPrice(120.0),
-        ItemPrice(150.0),
-        ItemPrice(110.0),
-        ItemPrice(80.0),
-        ItemPrice(20.0),
+        ItemPriceStatusZero(10.0),
+        ItemPriceStatusZero(120.0),
+        ItemPriceStatusZero(150.0),
+        ItemPriceStatusZero(110.0),
+        ItemPriceStatusZero(80.0),
+        ItemPriceStatusZero(20.0),
     )
 
     val yearlySummaryToBuy = listOf(
-        MonthlySum("January", 100.0),
-        MonthlySum("February", 120.0),
-        MonthlySum("March", 150.0),
+        MonthlySumStatusZero("January", 100.0),
+        MonthlySumStatusZero("February", 120.0),
+        MonthlySumStatusZero("March", 150.0),
     )
 
     IncomingScreen(summaryItemsToBuy, yearlySummaryToBuy)

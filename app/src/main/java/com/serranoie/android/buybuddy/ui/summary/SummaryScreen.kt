@@ -32,8 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.domain.model.ItemPrice
-import com.serranoie.android.buybuddy.domain.model.MonthlySum
+import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
+import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
+import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
+import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
 import com.serranoie.android.buybuddy.ui.common.CustomTabIndicator
 import com.serranoie.android.buybuddy.ui.common.noRippleClickable
 import com.serranoie.android.buybuddy.ui.summary.screens.incoming.IncomingScreen
@@ -47,10 +49,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun SummaryScreen(
     navController: NavController,
-    summaryItemsToBuy: List<ItemPrice>?,
-    summaryItemsBought: List<ItemPrice>?,
-    yearlySummaryToBuy: List<MonthlySum>?,
-    yearlySummaryBought: List<MonthlySum>?,
+    summaryItemsToBuy: List<ItemPriceStatusZero>?,
+    summaryItemsBought: List<ItemPriceStatusOne>?,
+    yearlySummaryToBuy: List<MonthlySumStatusZero>?,
+    yearlySummaryBought: List<MonthlySumStatusOne>?,
     errorState: String?,
 ) {
     val view = LocalView.current

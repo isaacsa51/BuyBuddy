@@ -1,11 +1,15 @@
 package com.serranoie.android.buybuddy.data.mapper
 
 import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntity
-import com.serranoie.android.buybuddy.data.persistance.entity.MonthlySumEntity
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntityStatusOne
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntityStatusZero
+import com.serranoie.android.buybuddy.data.persistance.entity.MonthlySumEntityStatusOne
+import com.serranoie.android.buybuddy.data.persistance.entity.MonthlySumEntityStatusZero
 import com.serranoie.android.buybuddy.domain.model.Item
-import com.serranoie.android.buybuddy.domain.model.ItemPrice
-import com.serranoie.android.buybuddy.domain.model.MonthlySum
+import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
+import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
+import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
+import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
 
 fun ItemEntity.toDomain(): Item {
     return Item(
@@ -39,18 +43,26 @@ fun Item.toEntity(categoryId: Int): ItemEntity {
     )
 }
 
-fun ItemEntity.toItemPrice(): ItemPriceEntity {
-    return ItemPriceEntity(price = this.price)
+fun ItemEntity.toItemPrice(): ItemPriceEntityStatusZero {
+    return ItemPriceEntityStatusZero(price = this.price)
 }
 
-fun ItemPriceEntity.toDomain(): ItemPrice {
-    return ItemPrice(price = this.price)
+fun ItemPriceEntityStatusZero.toDomain(): ItemPriceStatusZero {
+    return ItemPriceStatusZero(price = this.price)
 }
 
-fun ItemEntity.toMonthlySum(): MonthlySumEntity {
-    return MonthlySumEntity(month = this.reminderDate.toString(), totalSum = this.price)
+fun ItemPriceEntityStatusOne.toDomain(): ItemPriceStatusOne {
+    return ItemPriceStatusOne(price = this.price)
 }
 
-fun MonthlySumEntity.toDomain(): MonthlySum {
-    return MonthlySum(month = this.month, totalSum = this.totalSum)
+fun ItemEntity.toMonthlySum(): MonthlySumEntityStatusZero {
+    return MonthlySumEntityStatusZero(month = this.reminderDate.toString(), totalSum = this.price)
+}
+
+fun MonthlySumEntityStatusZero.toDomain(): MonthlySumStatusZero {
+    return MonthlySumStatusZero(month = this.month, totalSum = this.totalSum)
+}
+
+fun MonthlySumEntityStatusOne.toDomain(): MonthlySumStatusOne {
+    return MonthlySumStatusOne(month = this.month, totalSum = this.totalSum)
 }

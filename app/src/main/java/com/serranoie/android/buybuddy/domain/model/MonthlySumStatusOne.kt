@@ -1,6 +1,6 @@
 package com.serranoie.android.buybuddy.domain.model
 
-data class MonthlySum (
+data class MonthlySumStatusOne(
     val month: String?,
     val totalSum: Double?
 )

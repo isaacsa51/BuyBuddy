@@ -1,5 +1,5 @@
 package com.serranoie.android.buybuddy.domain.model
 
-data class ItemPrice(
+data class ItemPriceStatusZero(
     val price: Double?
 )
