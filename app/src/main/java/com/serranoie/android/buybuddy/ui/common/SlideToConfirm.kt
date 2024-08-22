@@ -72,7 +72,7 @@ fun SlideToConfirm(
     val hapticFeedback = LocalHapticFeedback.current
     val swipeState =
         rememberSwipeableState(
-            initialValue = if (isLoading) Anchor.End else Anchor.Start,
+            initialValue = Anchor.Start,
             confirmStateChange = { anchor ->
                 if (anchor == Anchor.End) {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -168,36 +168,45 @@ fun Track(
         }
     }
 
-    Box(
-        modifier =
-        modifier
-            .onSizeChanged { fullWidth = it.width }
-            .height(56.dp)
-            .fillMaxWidth()
-            .swipeable(
-                enabled = enabled,
-                state = swipeState,
-                orientation = Orientation.Horizontal,
-                anchors =
-                mapOf(
-                    startOfTrackPx to Anchor.Start,
-                    endOfTrackPx to Anchor.End, // Use the calculated value
+    if (endOfTrackPx > 0) {
+        Box(
+            modifier =
+            modifier
+                .onSizeChanged { fullWidth = it.width }
+                .height(56.dp)
+                .fillMaxWidth()
+                .swipeable(
+                    enabled = enabled,
+                    state = swipeState,
+                    orientation = Orientation.Horizontal,
+                    anchors =
+                    mapOf(
+                        startOfTrackPx to Anchor.Start,
+                        endOfTrackPx to Anchor.End,
+                    ),
+                    thresholds = thresholds,velocityThreshold = Track.VelocityThreshold,
+                )
+                .background(
+                    color = MaterialTheme.colorScheme.tertiary,
+                    shape = RoundedCornerShape(percent = 10),
+                )
+                .padding(
+                    PaddingValues(
+                        horizontal = horizontalPadding,
+                        vertical = 8.dp,
+                    ),
                 ),
-                thresholds = thresholds,
-                velocityThreshold = Track.VelocityThreshold,
-            )
-            .background(
-                color = MaterialTheme.colorScheme.tertiary,
-                shape = RoundedCornerShape(percent = 10),
-            )
-            .padding(
-                PaddingValues(
-                    horizontal = horizontalPadding,
-                    vertical = 8.dp,
-                ),
-            ),
-        content = content,
-    )
+            content = content,
+        )
+    } else {
+        // Placeholder or loading state while endOfTrackPx is being calculated
+        Box(
+            modifier = modifier
+                .onSizeChanged { fullWidth = it.width }
+                .height(56.dp)
+                .fillMaxWidth()
+        )
+    }
 }
 
 @Composable
