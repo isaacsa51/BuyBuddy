@@ -11,12 +11,12 @@ data class CategoryEntity(
     @ColumnInfo(name = "name") val name: String,
 )
 
-data class MonthySumCategoryEntityStatusZero(
-    val category_name: String?,
-    val total_price: Double?
+data class MonthlySumCategoryEntityStatusZero(
+    val categoryName: String?,
+    val totalPrice: Double?
 )
 
-data class MonthySumCategoryEntityStatusOne(
-    val category_name: String?,
-    val total_price: Double?
+data class MonthlySumCategoryEntityStatusOne(
+    val categoryName: String?,
+    val totalPrice: Double?
 )
