@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetMonthlySumCategoryStatusOneUseCase @Inject constructor(private val categoryRepository: CategoryRepositoryImpl) {
-    suspend operator fun invoke(): Flow<UseCaseResult<List<MonthlySumCategoryStatusOne>?>> = flow {
+    suspend operator fun invoke(month: String): Flow<UseCaseResult<List<MonthlySumCategoryStatusOne>?>> = flow {
         try {
-            categoryRepository.getCategorySummaryWithStatusOne().collect {
+            categoryRepository.getCategorySummaryWithStatusOne(month).collect {
                 emit(UseCaseResult.Success(it))
             }
         } catch (e: Exception) {

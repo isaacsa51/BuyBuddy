@@ -10,6 +10,6 @@ import kotlinx.coroutines.flow.Flow
 interface CategoryRepository {
     fun getCategoriesWithItems(): Flow<List<CategoryWithItemsEntity>>
     suspend fun getCategoryById(categoryId: Int): Flow<Category>
-    suspend fun getCategorySummaryWithStatusZero(): Flow<List<MonthlySumCategoryStatusZero>?>
-    suspend fun getCategorySummaryWithStatusOne(): Flow<List<MonthlySumCategoryStatusOne>?>
+    suspend fun getCategorySummaryWithStatusZero(month: String): Flow<List<MonthlySumCategoryStatusZero>?>
+    suspend fun getCategorySummaryWithStatusOne(month: String): Flow<List<MonthlySumCategoryStatusOne>?>
 }

@@ -1,14 +1,17 @@
 package com.serranoie.android.buybuddy.ui.summary.screens.spent
 
+import android.util.Log
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
+import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
 import com.serranoie.android.buybuddy.ui.common.EmptySummary
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProvider
@@ -83,21 +87,23 @@ val yearSummaryChart = object : ChartProvider {
 @Composable
 fun SpentScreen(
     summaryItemsBought: List<ItemPriceStatusOne>?,
-    yearlySummaryBought: List<MonthlySumStatusOne>?
+    yearlySummaryBought: List<MonthlySumStatusOne>?,
+    monthlyCategorySumBought: List<MonthlySumCategoryStatusOne>?
 ) {
     Scaffold { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize()
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-            ) {
-                item { HeaderInformation(summaryItemsBought, yearlySummaryBought) }
+            item {
+                HeaderInformation(
+                    summaryItemsBought = summaryItemsBought,
+                    yearlySummaryBought = yearlySummaryBought
+                )
+            }
 
-                item { CategoryListSummary() }
+            if (monthlyCategorySumBought?.isNotEmpty() == true) {
+                item { CategoryListSummary(monthlyCategorySumBought) }
             }
         }
     }
@@ -106,8 +112,7 @@ fun SpentScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun HeaderInformation(
-    summaryItemsBought: List<ItemPriceStatusOne>?,
-    yearlySummaryBought: List<MonthlySumStatusOne>?
+    summaryItemsBought: List<ItemPriceStatusOne>?, yearlySummaryBought: List<MonthlySumStatusOne>?
 ) {
 
     if (summaryItemsBought?.isEmpty() == true || yearlySummaryBought?.isEmpty() == true) {
@@ -126,70 +131,63 @@ private fun HeaderInformation(
             totalSpent += item.price ?: 0.0
         }
 
-        Column {
-            Column(
-                modifier = Modifier
-                    .padding(vertical = mediumPadding, horizontal = basePadding)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    text = "Total spent this month",
-                    style = MaterialTheme.typography.headlineSmall
-                )
+        Column(
+            modifier = Modifier
+                .padding(vertical = smallPadding, horizontal = basePadding)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Total spent this month", style = MaterialTheme.typography.headlineSmall
+            )
 
-                Text(
-                    text = "$ " + formatPrice(totalSpent),
-                    style = MaterialTheme.typography.displayMedium
-                )
-            }
+            Text(
+                text = "$ " + formatPrice(totalSpent),
+                style = MaterialTheme.typography.displayMedium
+            )
+        }
 
-            Column(modifier = Modifier.padding(smallPadding)) {
+        Column(modifier = Modifier.padding(smallPadding)) {
 
-                if (summaryItemsBought?.size!! <= 1) {
+            if (summaryItemsBought?.size!! <= 1) {
+                Card(
+                    modifier = Modifier
+                        .height(250.dp)
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            3.dp,
+                        ),
+                    )
+                ) {
+                    BarsChartYearlySummary(yearlySummaryBought)
+                }
+            } else {
+                HorizontalPager(
+                    state = pagerState,
+                    contentPadding = PaddingValues(end = 38.dp),
+                    pageSize = PageSize.Fill
+                ) { page ->
                     Card(
                         modifier = Modifier
                             .height(250.dp)
-                            .fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor =
-                            MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            .padding(start = 0.dp, end = basePadding)
+                            .graphicsLayer {
+                                val pageOffset =
+                                    ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
+                                alpha = lerp(
+                                    start = 0.5f,
+                                    stop = 1f,
+                                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                                )
+                            }, colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                                 3.dp,
                             ),
                         )
                     ) {
-                        // TODO: Why is this crashing but showing correctly even commented?
-                        BarsChartYearlySummary(yearlySummaryBought)
-                    }
-                } else {
-                    HorizontalPager(
-                        state = pagerState,
-                        contentPadding = PaddingValues(end = 38.dp),
-                        pageSize = PageSize.Fill
-                    ) { page ->
-                        Card(
-                            modifier = Modifier
-                                .height(250.dp)
-                                .padding(start = 0.dp, end = basePadding)
-                                .graphicsLayer {
-                                    val pageOffset =
-                                        ((pagerState.currentPage - page) + pagerState.currentPageOffsetFraction).absoluteValue
-                                    alpha = lerp(
-                                        start = 0.5f,
-                                        stop = 1f,
-                                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                                    )
-                                },
-                            colors = CardDefaults.cardColors(
-                                containerColor =
-                                MaterialTheme.colorScheme.surfaceColorAtElevation(
-                                    3.dp,
-                                ),
-                            )
-                        ) {
-                            charts[page].GetChart(summaryItemsBought, yearlySummaryBought)
-                        }
+                        charts[page].GetChart(summaryItemsBought, yearlySummaryBought)
                     }
                 }
             }
@@ -211,12 +209,9 @@ private fun LineChartMonthSummary(summaryItemsBought: List<ItemPriceStatusOne>?)
                 .height(220.dp),
             gridProperties = GridProperties(
                 xAxisProperties = GridProperties.AxisProperties(
-                    enabled = true,
-                    color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
-                ),
-                yAxisProperties = GridProperties.AxisProperties(
-                    enabled = true,
-                    color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
+                    enabled = true, color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
+                ), yAxisProperties = GridProperties.AxisProperties(
+                    enabled = true, color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
                 )
             ),
             labelHelperProperties = LabelHelperProperties(
@@ -226,8 +221,7 @@ private fun LineChartMonthSummary(summaryItemsBought: List<ItemPriceStatusOne>?)
                 enabled = false,
             ),
             indicatorProperties = HorizontalIndicatorProperties(
-                enabled = true,
-                textStyle = TextStyle(
+                enabled = true, textStyle = TextStyle(
                     fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = MaterialTheme.typography.labelSmall.fontSize
@@ -267,8 +261,7 @@ private fun BarsChartYearlySummary(yearlySummaryBought: List<MonthlySumStatusOne
 
     val barsData = yearlySummaryBought?.map { monthlySum ->
         Bars(
-            label = monthlySum.month ?: "Empty",
-            values = listOf(
+            label = monthlySum.month ?: "Empty", values = listOf(
                 Bars.Data(
                     value = monthlySum.totalSum ?: 0.0,
                     color = SolidColor(MaterialTheme.colorScheme.secondary),
@@ -283,52 +276,50 @@ private fun BarsChartYearlySummary(yearlySummaryBought: List<MonthlySumStatusOne
             ColumnChart(
                 modifier = Modifier
                     .padding(mediumPadding)
-                    .height(220.dp),
-                animationSpec = spring(
+                    .height(220.dp), animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
-                ),
-                gridProperties = GridProperties(
+                ), gridProperties = GridProperties(
                     xAxisProperties = GridProperties.AxisProperties(
                         enabled = true,
                         color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
-                    ),
-                    yAxisProperties = GridProperties.AxisProperties(
+                    ), yAxisProperties = GridProperties.AxisProperties(
                         enabled = true,
                         color = SolidColor(MaterialTheme.colorScheme.outline.copy(0.2f))
                     )
-                ),
-                labelHelperProperties = LabelHelperProperties(
-                    enabled = false,
-                    textStyle = TextStyle(
+                ), labelHelperProperties = LabelHelperProperties(
+                    enabled = false, textStyle = TextStyle(
                         fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = MaterialTheme.typography.labelSmall.fontSize
                     )
-                ),
-                labelProperties = LabelProperties(
-                    enabled = true,
-                    textStyle = TextStyle(
+                ), labelProperties = LabelProperties(
+                    enabled = true, textStyle = TextStyle(
                         fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = MaterialTheme.typography.labelSmall.fontSize
                     )
-                ),
-                indicatorProperties = HorizontalIndicatorProperties(
-                    enabled = true,
-                    textStyle = TextStyle(
+                ), indicatorProperties = HorizontalIndicatorProperties(
+                    enabled = true, textStyle = TextStyle(
                         fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = MaterialTheme.typography.labelSmall.fontSize
                     )
-                ),
-                data = barsData
+                ), data = barsData
             )
         }
     }
 }
 
 @Composable
-private fun CategoryListSummary() {
+private fun CategoryListSummary(monthlyCategorySumBought: List<MonthlySumCategoryStatusOne>?) {
+    val groupedData = monthlyCategorySumBought?.groupBy { it.categoryName }
+        ?.mapValues { (categoryName, categoryList) ->
+            MonthlySumCategoryStatusOne(
+                categoryName = categoryName,
+                totalPrice = categoryList.flatMap { it.totalPrice ?: emptyList() }
+            )
+        }
+
     Column {
         Text(
             text = "Summary per category",
@@ -336,87 +327,106 @@ private fun CategoryListSummary() {
             modifier = Modifier.padding(smallPadding)
         )
 
-        CategoryListItem()
+        groupedData?.entries?.forEach { entry ->
+            val categoryName = entry.key
+            val categoryDataList = entry.value
+
+            Log.d("DEBUG", "grouped: ${entry.value.totalPrice}")
+
+            CategoryListItem(categoryName, listOf(categoryDataList))
+        }
     }
 }
 
 @Composable
-private fun CategoryListItem() {
+private fun CategoryListItem(
+    categoryName: String?, categoryDataList: List<MonthlySumCategoryStatusOne>
+) {
+
+    Log.d("DEBUG", "CategoryListItem: $categoryDataList")
 
     Card(
         modifier = Modifier
             .wrapContentHeight()
             .fillMaxWidth()
-            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp),
-        colors = CardDefaults.cardColors(
-            containerColor =
-            MaterialTheme.colorScheme.surfaceColorAtElevation(
-                5.dp,
+            .padding(start = 5.dp, end = 5.dp, bottom = 5.dp), colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                3.dp,
             ),
         )
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(15.dp)
-                .fillMaxWidth()
-        ) {
-            Column(
+        Column {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(start = 10.dp)
-                    .width(80.dp)
+                    .padding(15.dp)
+                    .fillMaxWidth()
             ) {
-                Text(
-                    text = "Category",
-                    style = MaterialTheme.typography.labelLarge,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 2
-                )
-                Text(
-                    text = "Total value",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(.5f)
-                )
-            }
-
-            Column {
-                LineChart(
+                Column(
                     modifier = Modifier
-                        .width(150.dp)
-                        .height(40.dp),
-                    data = listOf(
-                        Line(
-                            label = "Art",
-                            values = listOf(28.0, 41.0, 5.0, 10.0, 35.0),
-                            color = SolidColor(MaterialTheme.colorScheme.inverseSurface),
-                            strokeAnimationSpec = tween(1250, easing = EaseInOutCubic),
-                            drawStyle = DrawStyle.Stroke(width = 2.dp),
-                        )
-                    ),
-                    dividerProperties = DividerProperties(enabled = false),
-                    gridProperties = GridProperties(enabled = false),
-                    labelHelperProperties = LabelHelperProperties(enabled = false),
-                    indicatorProperties = HorizontalIndicatorProperties(enabled = false),
-                    animationMode = AnimationMode.Together(delayBuilder = {
-                        it * 500L
-                    }),
-                )
-            }
+                        .padding(start = 10.dp)
+                        .width(80.dp)
+                ) {
+                    Text(
+                        text = categoryName ?: "",
+                        style = MaterialTheme.typography.labelLarge,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = "Total value",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(.7f)
+                    )
+                }
 
-            Column(
-                modifier = Modifier.padding(start = 10.dp), horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = "$12,321.50",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = "Transactions: 12",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(.4f)
-                )
+                Column {
+                    if (categoryDataList.isNotEmpty()) {
+                        Box(modifier = Modifier.height(40.dp)) {
+                            LineChart(
+                                modifier = Modifier
+                                    .width(150.dp)
+                                    .fillMaxHeight(),
+                                data = categoryDataList.map { monthlyCategorySumBought ->
+                                    Line(
+                                        label = categoryName ?: "Empty",
+                                        values = monthlyCategorySumBought.totalPrice ?: emptyList(),
+                                        color = SolidColor(MaterialTheme.colorScheme.inverseSurface),
+                                        strokeAnimationSpec = tween(1250, easing = EaseInOutCubic),
+                                        drawStyle = DrawStyle.Stroke(width = 2.dp),
+                                    )
+                                },
+                                dividerProperties = DividerProperties(enabled = false),
+                                gridProperties = GridProperties(enabled = false),
+                                labelHelperProperties = LabelHelperProperties(enabled = false),
+                                indicatorProperties = HorizontalIndicatorProperties(enabled = false),
+                                animationMode = AnimationMode.Together(delayBuilder = {
+                                    it * 500L
+                                }),
+                            )
+                        }
+                    } else if (categoryDataList.size == 1) {
+                        Column {}
+                    }
+                }
+
+                Column(
+                    modifier = Modifier.padding(start = 10.dp), horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        text = "$ " + formatPrice(categoryDataList.sumOf {
+                            it.totalPrice?.sum() ?: 0.0
+                        }),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "Transactions: ${categoryDataList[0].totalPrice?.size ?: 0}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(.7f)
+                    )
+                }
             }
         }
     }
@@ -440,11 +450,14 @@ private fun SpentScreenPreview() {
         MonthlySumStatusOne("March", 150.0),
     )
 
+    val monthlyCategorySumBought =
+        listOf(MonthlySumCategoryStatusOne("Art", listOf(100.0, 50.0, 20.0)))
+
     Scaffold {
         Column(Modifier.padding(it)) {
             HeaderInformation(summaryItemsBought, yearlySummaryBought)
 
-            CategoryListItem()
+            CategoryListItem("CategoryName", monthlyCategorySumBought)
         }
     }
 }
@@ -456,11 +469,17 @@ private fun EmptySummaryPreview() {
 
     val yearlySummaryBought = listOf<MonthlySumStatusOne>()
 
+    val monthlyCategorySumBought = listOf<MonthlySumStatusOne>(
+        MonthlySumStatusOne("Art", 100.0),
+        MonthlySumStatusOne("Food", 120.0),
+        MonthlySumStatusOne("Clothes", 150.0),
+    )
+
     Scaffold {
         Column(Modifier.padding(it)) {
             HeaderInformation(summaryItemsBought, yearlySummaryBought)
 
-            CategoryListItem()
+//            CategoryListItem(null)
         }
     }
 }

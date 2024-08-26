@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
+import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusZero
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
 import com.serranoie.android.buybuddy.ui.common.EmptySummary
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProviderIncoming
@@ -83,7 +84,8 @@ val yearSummaryChart = object : ChartProviderIncoming {
 @Composable
 fun IncomingScreen(
     summaryItemsToBuy: List<ItemPriceStatusZero>?,
-    yearlySummaryToBuy: List<MonthlySumStatusZero>?
+    yearlySummaryToBuy: List<MonthlySumStatusZero>?,
+    monthlyCategorySumToBuy: List<MonthlySumCategoryStatusZero>?
 ) {
     Scaffold { padding ->
         Column(
@@ -230,6 +232,7 @@ private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPriceStatusZero>?)
                 Line(
                     label = "Current month",
                     values = dataOfProducts!!,
+                    curvedEdges = false,
                     color = SolidColor(MaterialTheme.colorScheme.tertiary),
                     firstGradientFillColor = Color(MaterialTheme.colorScheme.tertiaryContainer.value).copy(
                         alpha = .5f
@@ -432,5 +435,9 @@ private fun IncomingScreenPreview() {
         MonthlySumStatusZero("March", 150.0),
     )
 
-    IncomingScreen(summaryItemsToBuy, yearlySummaryToBuy)
+    val monthlyCategorySumToBuy = listOf<MonthlySumCategoryStatusZero>(
+        MonthlySumCategoryStatusZero("Art", listOf(100.0)),
+    )
+
+    IncomingScreen(summaryItemsToBuy, yearlySummaryToBuy, monthlyCategorySumToBuy)
 }

@@ -5,9 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
+import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusOne
+import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusZero
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
 import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
+import com.serranoie.android.buybuddy.domain.usecase.category.GetMonthlySumCategoryStatusOneUseCase
+import com.serranoie.android.buybuddy.domain.usecase.category.GetMonthlySumCategoryStatusZeroUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetCurrentMonthSummaryItemsBoughtUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetCurrentMonthSummaryItemsToBuyUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetYearlySummaryBoughtUseCase
@@ -27,6 +31,8 @@ class SummaryViewModel @Inject constructor(
     private val getCurrentMonthSummaryItemsBoughtUseCase: GetCurrentMonthSummaryItemsBoughtUseCase,
     private val getYearlySummaryToBuyUseCase: GetYearlySummaryToBuyUseCase,
     private val getYearlySummaryBoughtUseCase: GetYearlySummaryBoughtUseCase,
+    private val getMonthlySumCategoryStatusZero: GetMonthlySumCategoryStatusZeroUseCase,
+    private val getMonthlySumCategoryStatusOne: GetMonthlySumCategoryStatusOneUseCase,
 ) : ViewModel() {
 
     // Response states
@@ -37,10 +43,22 @@ class SummaryViewModel @Inject constructor(
     val summaryItemsBought: StateFlow<List<ItemPriceStatusOne>?> = _summaryItemsBought.asStateFlow()
 
     private val _yearlySummaryToBuy = MutableStateFlow<List<MonthlySumStatusZero>?>(emptyList())
-    val yearlySummaryToBuy: StateFlow<List<MonthlySumStatusZero>?> = _yearlySummaryToBuy.asStateFlow()
+    val yearlySummaryToBuy: StateFlow<List<MonthlySumStatusZero>?> =
+        _yearlySummaryToBuy.asStateFlow()
 
     private val _yearlySummaryBought = MutableStateFlow<List<MonthlySumStatusOne>?>(emptyList())
-    val yearlySummaryBought: StateFlow<List<MonthlySumStatusOne>?> = _yearlySummaryBought.asStateFlow()
+    val yearlySummaryBought: StateFlow<List<MonthlySumStatusOne>?> =
+        _yearlySummaryBought.asStateFlow()
+
+    private val _monthlyCategorySumToBuy =
+        MutableStateFlow<List<MonthlySumCategoryStatusZero>?>(emptyList())
+    val monthlyCategorySumToBuy: StateFlow<List<MonthlySumCategoryStatusZero>?> =
+        _monthlyCategorySumToBuy.asStateFlow()
+
+    private val _monthlyCategorySumBought =
+        MutableStateFlow<List<MonthlySumCategoryStatusOne>?>(emptyList())
+    val monthlyCategorySumBought: StateFlow<List<MonthlySumCategoryStatusOne>?> =
+        _monthlyCategorySumBought.asStateFlow()
 
     private val _errorState = MutableStateFlow<String?>(null)
     val errorState: StateFlow<String?> = _errorState.asStateFlow()
@@ -138,6 +156,57 @@ class SummaryViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun fetchMonthlyCategorySumToBuy(month: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            getMonthlySumCategoryStatusZero(month).collect { result ->
+                when (result) {
+                    is UseCaseResult.Success<*> -> {
+                        withContext(Dispatchers.Main) {
+                            _monthlyCategorySumToBuy.value =
+                                result.data as List<MonthlySumCategoryStatusZero>
+                            _errorState.value = null
+                        }
+                    }
+
+                    is UseCaseResult.Error -> {
+                        _errorState.value = result.exception.message ?: "An error occurred"
+                    }
+
+                    null -> {
+                        _errorState.value = "No data found"
+                    }
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun fetchMonthlyCategorySumBought(month: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            getMonthlySumCategoryStatusOne(month).collect { result ->
+                when (result) {
+                    is UseCaseResult.Success<*> -> {
+                        withContext(Dispatchers.Main) {
+                            _monthlyCategorySumBought.value =
+                                result.data as List<MonthlySumCategoryStatusOne>
+                            _errorState.value = null
+                        }
+                    }
+
+                    is UseCaseResult.Error -> {
+                        _errorState.value = result.exception.message ?: "An error occurred"
+                    }
+
+                    null -> {
+                        _errorState.value = "No data found"
+                    }
+                }
+            }
+
         }
     }
 }

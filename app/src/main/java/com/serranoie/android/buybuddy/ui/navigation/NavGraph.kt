@@ -171,6 +171,8 @@ fun NavGraph(
                 val summaryItemsBought by summaryViewModel.summaryItemsBought.collectAsStateWithLifecycle()
                 val yearlySummaryToBuy by summaryViewModel.yearlySummaryToBuy.collectAsStateWithLifecycle()
                 val yearlySummaryBought by summaryViewModel.yearlySummaryBought.collectAsStateWithLifecycle()
+                val monthlyCategorySumToBuy by summaryViewModel.monthlyCategorySumToBuy.collectAsStateWithLifecycle()
+                val monthlyCategorySumBought by summaryViewModel.monthlyCategorySumBought.collectAsStateWithLifecycle()
                 val errorState by summaryViewModel.errorState.collectAsStateWithLifecycle()
 
                 val currentMonth = remember {
@@ -178,11 +180,12 @@ fun NavGraph(
                 }
 
                 LaunchedEffect(Unit) {
-                    Log.d("DEBUG", "Current month: $currentMonth")
                     summaryViewModel.fetchSummaryItemsToBuy(month = currentMonth)
                     summaryViewModel.fetchSummaryItemsBought(month = currentMonth)
                     summaryViewModel.fetchYearlySummaryToBuy()
                     summaryViewModel.fetchYearlySummaryBought()
+                    summaryViewModel.fetchMonthlyCategorySumToBuy(month = currentMonth)
+                    summaryViewModel.fetchMonthlyCategorySumBought(month = currentMonth)
                 }
 
                 SummaryScreen(
@@ -191,6 +194,8 @@ fun NavGraph(
                     summaryItemsBought = summaryItemsBought,
                     yearlySummaryToBuy = yearlySummaryToBuy,
                     yearlySummaryBought = yearlySummaryBought,
+                    monthlyCategorySumToBuy = monthlyCategorySumToBuy,
+                    monthlyCategorySumBought = monthlyCategorySumBought,
                     errorState = errorState
                 )
             }

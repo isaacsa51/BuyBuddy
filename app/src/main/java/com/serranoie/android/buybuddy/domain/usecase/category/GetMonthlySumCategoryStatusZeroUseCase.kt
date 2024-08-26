@@ -9,9 +9,9 @@ import javax.inject.Inject
 
 class GetMonthlySumCategoryStatusZeroUseCase @Inject constructor(private val categoryRepository: CategoryRepositoryImpl) {
 
-    suspend operator fun invoke(): Flow<UseCaseResult<List<MonthlySumCategoryStatusZero>?>> = flow {
+    suspend operator fun invoke(month: String): Flow<UseCaseResult<List<MonthlySumCategoryStatusZero>?>> = flow {
         try {
-            categoryRepository.getCategorySummaryWithStatusZero().collect {
+            categoryRepository.getCategorySummaryWithStatusZero(month).collect {
                 emit(UseCaseResult.Success(it))
             }
         } catch (e: Exception) {

@@ -43,20 +43,12 @@ fun Item.toEntity(categoryId: Int): ItemEntity {
     )
 }
 
-fun ItemEntity.toItemPrice(): ItemPriceEntityStatusZero {
-    return ItemPriceEntityStatusZero(price = this.price)
-}
-
 fun ItemPriceEntityStatusZero.toDomain(): ItemPriceStatusZero {
     return ItemPriceStatusZero(price = this.price)
 }
 
 fun ItemPriceEntityStatusOne.toDomain(): ItemPriceStatusOne {
     return ItemPriceStatusOne(price = this.price)
-}
-
-fun ItemEntity.toMonthlySum(): MonthlySumEntityStatusZero {
-    return MonthlySumEntityStatusZero(month = this.reminderDate.toString(), totalSum = this.price)
 }
 
 fun MonthlySumEntityStatusZero.toDomain(): MonthlySumStatusZero {

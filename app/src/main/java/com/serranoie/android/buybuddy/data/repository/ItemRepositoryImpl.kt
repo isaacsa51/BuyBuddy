@@ -1,10 +1,8 @@
 package com.serranoie.android.buybuddy.data.repository
 
-import android.util.Log
 import com.serranoie.android.buybuddy.data.mapper.toDomain
 import com.serranoie.android.buybuddy.data.mapper.toEntity
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemPriceEntityStatusOne
 import com.serranoie.android.buybuddy.domain.model.Item
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
@@ -17,9 +15,8 @@ import javax.inject.Inject
 
 class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) : ItemRepository {
 
-    override suspend fun insertItemWithCategory(item: Item, categoryName: String) {
+    override suspend fun insertItemWithCategory(item: Item, categoryName: String) =
         itemDao.insertItemWithCategory(item.toEntity(0), categoryName)
-    }
 
     override suspend fun insertItem(item: Item) = itemDao.insertItem(item.toEntity(item.categoryId))
 
@@ -59,8 +56,6 @@ class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) :
     override suspend fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySumStatusZero>?> =
         itemDao.getMonthlySumForItemsWithStatusZero().map { entities ->
             entities?.map {
-                Log.d("DEBUG", "Status Zero: $it")
-
                 it.toDomain()
             }
         }
@@ -68,7 +63,6 @@ class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) :
     override suspend fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySumStatusOne>?> =
         itemDao.getMonthlySumForItemsWithStatusOne().map { entities ->
             entities?.map {
-                Log.d("DEBUG", "Status One: $it")
                 it.toDomain()
             }
         }

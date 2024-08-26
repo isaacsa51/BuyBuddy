@@ -22,5 +22,4 @@ interface ItemRepository {
     suspend fun getCurrentMonthSummaryWithStatusOne(month: String): Flow<List<ItemPriceStatusOne>?>
     suspend fun getMonthlySumForItemsWithStatusZero(): Flow<List<MonthlySumStatusZero>?>
     suspend fun getMonthlySumForItemsWithStatusOne(): Flow<List<MonthlySumStatusOne>?>
-
 }
