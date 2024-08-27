@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.settings
 
-import android.os.Build
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,12 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -42,7 +39,7 @@ sealed class AboutLinks(val url: String) {
     data object ReadMe : AboutLinks("https://github.com/isaacsa51/BuyBuddy")
     data object Website : AboutLinks("https://github.com/isaacsa51")
     data object PrivacyPolicy :
-        AboutLinks("https://github.com/Pool-Of-Tears/GreenStash/blob/main/legal/PRIVACY-POLICY.md")
+        AboutLinks("https://github.com/isaacsa51/BuyBuddy/blob/master/PRIVACY-POLICY.md")
 
     data object GithubIssues : AboutLinks("https://github.com/isaacsa51/BuyBuddy/issues")
     data object Sponsor : AboutLinks("https://github.com/sponsors/isaacsa51")
@@ -125,7 +122,7 @@ fun AboutScreen(navController: NavController) {
                 SettingsItem(title = stringResource(id = R.string.about_version_title),
                     description = "alpha-1.0",
                     icon = Icons.Filled.Info,
-                    onClick = {  }
+                    onClick = { }
                 )
             }
         }

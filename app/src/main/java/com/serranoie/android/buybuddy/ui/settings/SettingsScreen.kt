@@ -63,7 +63,7 @@ fun SettingsScreen(navController: NavController) {
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = "Settings",
+                        text = stringResource(id = R.string.settings_title),
                     )
                 },
                 navigationIcon = {
@@ -180,8 +180,8 @@ fun BehaviourSettings(viewModel: SettingsViewModel) {
         SettingsCategory(title = "Behaviour")
 
         SettingsItemSwitch(
-            title = "Show Empty Categories",
-            description = "Be able to see empty categories in home screen",
+            title = stringResource(R.string.show_empty_categories_label),
+            description = stringResource(R.string.empty_categories_desc),
             icon = Icons.Rounded.RemoveCircleOutline,
             switchState = categoryVisibilityValue,
             onCheckChange = { newValue ->

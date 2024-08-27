@@ -90,21 +90,23 @@
     <!--  General values  -->
 
     <!--  Settings values  -->
+    <string name="settings_title">Ajustes</string>
     <string name="theme_dialog_option1">Claro</string>
     <string name="theme_dialog_option2">Oscuro</string>
     <string name="theme_dialog_option3">Predeterminado del Sistema</string>
-
     <string name="display_settings_title">Tema</string>
-    <string name="theme_setting">Default Theme</string>
-    <string name="theme_setting_desc">Change the theme of the app</string>
+    <string name="theme_setting">Tema predeterminado</string>
+    <string name="theme_setting_desc">Cambia el tema de la app</string>
     <string name="material_you_setting">Material You</string>
-    <string name="material_you_setting_desc">Switch theme according to your wallpaper (A12+ Only)</string>
-    <string name="material_you_error">This feature is only for devices running Android 12 or above.</string>
-    <string name="theme_dialog_title">Change Theme</string>
-    <string name="theme_dialog_apply_button">Apply</string>
+    <string name="material_you_setting_desc">Cambia el tema según tu fondo de pantalla (Solo A12+)</string>
+    <string name="material_you_error">Esta función solo está disponible en versiones Android 12+</string>
+    <string name="theme_dialog_title">Cambiar tema</string>
+    <string name="theme_dialog_apply_button">Aceptar</string>
+    <string name="show_empty_categories_label">Mostrar categorías vacías</string>
+    <string name="empty_categories_desc">Ser capaz de ver categorías vacías en la pantalla de inicio.</string>
 
     <!-- App lock -->
-    <string name="app_lock_screen_title">GreenStash is locked</string>
+    <string name="app_lock_screen_title">BuyBuddy está bloqueado</string>
     <string name="app_lock_screen_subtitle">Click the button below to authenticate.</string>
     <string name="app_lock_button_text">Authorize</string>
     <string name="app_lock_button_icon_desc">Unlock App</string>

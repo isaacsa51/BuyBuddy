@@ -91,6 +91,7 @@
     <string name="quiz_topbar_count">" of %1$s"</string>
 
     <!--  Settings values  -->
+    <string name="settings_title">Settings</string>
     <string name="theme_dialog_option1">Light</string>
     <string name="theme_dialog_option2">Dark</string>
     <string name="theme_dialog_option3">System Default</string>
@@ -102,6 +103,8 @@
     <string name="material_you_error">This feature is only for devices running Android 12 or above.</string>
     <string name="theme_dialog_title">Change Theme</string>
     <string name="theme_dialog_apply_button">Apply</string>
+    <string name="show_empty_categories_label">Show Empty Categories</string>
+    <string name="empty_categories_desc">Be able to see empty categories in home screen</string>
     <string name="dynamic_theme_notice">Material You design was launched with Android 12+. On devices running Android 12 and later, the “dynamic colors” feature allows to see a theme generated from the wallpaper the user currently has, providing a more personal and cohesive experience.</string>
 
     <!-- App lock -->
