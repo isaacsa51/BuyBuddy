@@ -38,6 +38,7 @@
     <string name="loading">Cargando…</string>
     <string name="back">Atrás</string>
     <string name="close">Cerrar</string>
+    <string name="empty">Vacio</string>
     <string name="delete_current_item">Borrar producto actual</string>
     <string name="loading_category">Cargando categoría…</string>
     <string name="current_item_information">Información actual del producto</string>
@@ -146,4 +147,11 @@
     <!-- Summary Screen -->
     <string name="summary_screen_title">Resumen</string>
     <string name="empty_summary">No hay registros de productos en este mes…</string>
+    <string name="spent_title">Comprado</string>
+    <string name="incoming_title">Por comprar</string>
+    <string name="total_title_spent">Total a gastar en este mes</string>
+    <string name="total_title_incoming">Gastos a hacer en este mes</string>
+    <string name="current_month">Mes actual</string>
+    <string name="summary_label">Resumen por categoría</string>
+    <string name="transactions_category_label">Transacciones: %1$s</string>
 </resources>

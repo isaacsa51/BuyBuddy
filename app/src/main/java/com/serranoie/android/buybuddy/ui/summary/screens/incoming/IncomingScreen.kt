@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -62,6 +63,7 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
+import ir.ehsannarmani.compose_charts.models.PopupProperties
 import kotlin.math.absoluteValue
 
 val monthSummaryChart = object : ChartProviderIncoming {
@@ -128,13 +130,15 @@ private fun HeaderInformation(
 
         Column(
             modifier = Modifier
-                .padding(vertical = mediumPadding, horizontal = basePadding)
+                .padding(vertical = smallPadding, horizontal = basePadding)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(id = R.string.total_title_incoming), style = MaterialTheme.typography.headlineSmall
+                text = stringResource(id = R.string.total_title_incoming), style = MaterialTheme.typography.headlineSmall.copy(
+                    textAlign = TextAlign.Center
+                ),
             )
 
             Text(
@@ -355,6 +359,11 @@ private fun CategoryListItem(
     categoryName: String?,
     categoryDataList: List<MonthlySumCategoryStatusZero>
 ) {
+
+    val disableChartPopUp = PopupProperties(
+        enabled = false
+    )
+
     Card(
         modifier = Modifier
             .wrapContentHeight()
@@ -408,6 +417,7 @@ private fun CategoryListItem(
                                     drawStyle = DrawStyle.Stroke(width = 2.dp),
                                 )
                             },
+                            popupProperties = disableChartPopUp,
                             dividerProperties = DividerProperties(enabled = false),
                             gridProperties = GridProperties(enabled = false),
                             labelHelperProperties = LabelHelperProperties(enabled = false),

@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -64,6 +65,7 @@ import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
 import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
+import ir.ehsannarmani.compose_charts.models.PopupProperties
 import kotlin.math.absoluteValue
 
 val monthSummaryChart = object : ChartProvider {
@@ -141,7 +143,9 @@ private fun HeaderInformation(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(id = R.string.total_title_spent), style = MaterialTheme.typography.headlineSmall
+                text = stringResource(id = R.string.total_title_spent), style = MaterialTheme.typography.headlineSmall.copy(
+                    textAlign = TextAlign.Center
+                ),
             )
 
             Text(
@@ -341,6 +345,11 @@ private fun CategoryListSummary(monthlyCategorySumBought: List<MonthlySumCategor
 private fun CategoryListItem(
     categoryName: String?, categoryDataList: List<MonthlySumCategoryStatusOne>
 ) {
+
+    val disableChartPopUp = PopupProperties(
+        enabled = false
+    )
+
     Card(
         modifier = Modifier
             .wrapContentHeight()
@@ -393,6 +402,7 @@ private fun CategoryListItem(
                                         drawStyle = DrawStyle.Stroke(width = 2.dp),
                                     )
                                 },
+                                popupProperties = disableChartPopUp,
                                 dividerProperties = DividerProperties(enabled = false),
                                 gridProperties = GridProperties(enabled = false),
                                 labelHelperProperties = LabelHelperProperties(enabled = false),
@@ -418,7 +428,10 @@ private fun CategoryListItem(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "Transactions: ${categoryDataList[0].totalPrice?.size ?: 0}",
+                        text = stringResource(
+                            R.string.transactions_category_label,
+                            categoryDataList[0].totalPrice?.size ?: 0
+                        ),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface.copy(.7f)
                     )

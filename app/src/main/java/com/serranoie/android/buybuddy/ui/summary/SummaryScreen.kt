@@ -66,15 +66,13 @@ fun SummaryScreen(
     val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
 
-    Log.d("DEBUG", "SummaryScreen: $monthlyCategorySumBought")
-
     val tabRowItems = listOf(
-        SummaryItem(label = "Spent", screen = {
+        SummaryItem(label = stringResource(id = R.string.spent_title), screen = {
             SpentScreen(
                 summaryItemsBought, yearlySummaryBought, monthlyCategorySumBought
             )
         }),
-        SummaryItem(label = "Incoming", screen = {
+        SummaryItem(label = stringResource(id = R.string.incoming_title), screen = {
             IncomingScreen(
                 summaryItemsToBuy, yearlySummaryToBuy, monthlyCategorySumToBuy
             )
@@ -87,7 +85,7 @@ fun SummaryScreen(
                 LargeTopAppBar(
                     title = {
                         Text(
-                            text = "Summary",
+                            text = stringResource(id = R.string.summary_screen_title),
                         )
                     },
                     navigationIcon = {
