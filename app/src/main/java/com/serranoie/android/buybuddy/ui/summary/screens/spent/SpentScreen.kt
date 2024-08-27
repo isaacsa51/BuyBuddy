@@ -34,12 +34,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
@@ -139,7 +141,7 @@ private fun HeaderInformation(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Total spent this month", style = MaterialTheme.typography.headlineSmall
+                text = stringResource(id = R.string.total_title_spent), style = MaterialTheme.typography.headlineSmall
             )
 
             Text(
@@ -229,7 +231,7 @@ private fun LineChartMonthSummary(summaryItemsBought: List<ItemPriceStatusOne>?)
             ),
             data = listOf(
                 Line(
-                    label = "Current month",
+                    label = stringResource(id = R.string.current_month),
                     values = dataOfProducts!!,
                     curvedEdges = false,
                     color = SolidColor(MaterialTheme.colorScheme.tertiary),
@@ -261,7 +263,7 @@ private fun BarsChartYearlySummary(yearlySummaryBought: List<MonthlySumStatusOne
 
     val barsData = yearlySummaryBought?.map { monthlySum ->
         Bars(
-            label = monthlySum.month ?: "Empty", values = listOf(
+            label = monthlySum.month ?: stringResource(id = R.string.empty), values = listOf(
                 Bars.Data(
                     value = monthlySum.totalSum ?: 0.0,
                     color = SolidColor(MaterialTheme.colorScheme.secondary),
@@ -322,7 +324,7 @@ private fun CategoryListSummary(monthlyCategorySumBought: List<MonthlySumCategor
 
     Column {
         Text(
-            text = "Summary per category",
+            text = stringResource(id = R.string.summary_label),
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(smallPadding)
         )
@@ -330,9 +332,6 @@ private fun CategoryListSummary(monthlyCategorySumBought: List<MonthlySumCategor
         groupedData?.entries?.forEach { entry ->
             val categoryName = entry.key
             val categoryDataList = entry.value
-
-            Log.d("DEBUG", "grouped: ${entry.value.totalPrice}")
-
             CategoryListItem(categoryName, listOf(categoryDataList))
         }
     }
@@ -342,9 +341,6 @@ private fun CategoryListSummary(monthlyCategorySumBought: List<MonthlySumCategor
 private fun CategoryListItem(
     categoryName: String?, categoryDataList: List<MonthlySumCategoryStatusOne>
 ) {
-
-    Log.d("DEBUG", "CategoryListItem: $categoryDataList")
-
     Card(
         modifier = Modifier
             .wrapContentHeight()
@@ -390,7 +386,7 @@ private fun CategoryListItem(
                                     .fillMaxHeight(),
                                 data = categoryDataList.map { monthlyCategorySumBought ->
                                     Line(
-                                        label = categoryName ?: "Empty",
+                                        label = categoryName ?: stringResource(id = R.string.empty),
                                         values = monthlyCategorySumBought.totalPrice ?: emptyList(),
                                         color = SolidColor(MaterialTheme.colorScheme.inverseSurface),
                                         strokeAnimationSpec = tween(1250, easing = EaseInOutCubic),

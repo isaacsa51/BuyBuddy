@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -31,12 +32,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
 import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusZero
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
@@ -88,15 +91,14 @@ fun IncomingScreen(
     monthlyCategorySumToBuy: List<MonthlySumCategoryStatusZero>?
 ) {
     Scaffold { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .padding(padding)
-                .fillMaxSize()
         ) {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                item { HeaderInformation(summaryItemsToBuy, yearlySummaryToBuy) }
+            item { HeaderInformation(summaryItemsToBuy, yearlySummaryToBuy) }
 
-                item { CategoryListSummary() }
+            if (monthlyCategorySumToBuy?.isNotEmpty() == true) {
+                item { CategoryListSummary(monthlyCategorySumToBuy) }
             }
         }
     }
@@ -132,7 +134,7 @@ private fun HeaderInformation(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Soon to spend this month", style = MaterialTheme.typography.headlineSmall
+                text = stringResource(id = R.string.total_title_incoming), style = MaterialTheme.typography.headlineSmall
             )
 
             Text(
@@ -155,7 +157,6 @@ private fun HeaderInformation(
                         ),
                     )
                 ) {
-                    // TODO: Need to comment this too?
                     BarsChartYearlySummary(yearlySummaryToBuy)
                 }
             } else {
@@ -230,7 +231,7 @@ private fun LineChartMonthSummary(summaryItemsToBuy: List<ItemPriceStatusZero>?)
             ),
             data = listOf(
                 Line(
-                    label = "Current month",
+                    label = stringResource(id = R.string.current_month),
                     values = dataOfProducts!!,
                     curvedEdges = false,
                     color = SolidColor(MaterialTheme.colorScheme.tertiary),
@@ -262,7 +263,7 @@ private fun BarsChartYearlySummary(yearlySummaryToBuy: List<MonthlySumStatusZero
 
     val barsData = yearlySummaryToBuy?.map { monthlySum ->
         Bars(
-            label = monthlySum.month ?: "Empty",
+            label = monthlySum.month ?: stringResource(id = R.string.empty),
             values = listOf(
                 Bars.Data(
                     value = monthlySum.totalSum ?: 0.0,
@@ -323,21 +324,37 @@ private fun BarsChartYearlySummary(yearlySummaryToBuy: List<MonthlySumStatusZero
 }
 
 @Composable
-private fun CategoryListSummary() {
+private fun CategoryListSummary(monthlyCategorySumToBuy: List<MonthlySumCategoryStatusZero>?) {
+
+    val groupedData = monthlyCategorySumToBuy?.groupBy { it.categoryName }
+        ?.mapValues { (categoryName, categoryList) ->
+            MonthlySumCategoryStatusZero(
+                categoryName = categoryName,
+                totalPrice = categoryList.flatMap { it.totalPrice ?: emptyList() }
+            )
+        }
+
     Column {
         Text(
-            text = "Summary per category",
+            text = stringResource(id = R.string.summary_label),
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(smallPadding)
         )
 
-        CategoryListItem()
+        groupedData?.entries?.forEach { entry ->
+            val categoryName = entry.key
+            val categoryDataList = entry.value
+
+            CategoryListItem(categoryName, listOf(categoryDataList))
+        }
     }
 }
 
 @Composable
-private fun CategoryListItem() {
-
+private fun CategoryListItem(
+    categoryName: String?,
+    categoryDataList: List<MonthlySumCategoryStatusZero>
+) {
     Card(
         modifier = Modifier
             .wrapContentHeight()
@@ -363,7 +380,7 @@ private fun CategoryListItem() {
                     .width(80.dp)
             ) {
                 Text(
-                    text = "Category",
+                    text = categoryName ?: "",
                     style = MaterialTheme.typography.labelLarge,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2
@@ -376,39 +393,47 @@ private fun CategoryListItem() {
             }
 
             Column {
-                LineChart(
-                    modifier = Modifier
-                        .width(150.dp)
-                        .height(40.dp),
-                    data = listOf(
-                        Line(
-                            label = "Art",
-                            values = listOf(28.0, 41.0, 5.0, 10.0, 35.0),
-                            color = SolidColor(MaterialTheme.colorScheme.inverseSurface),
-                            strokeAnimationSpec = tween(1250, easing = EaseInOutCubic),
-                            drawStyle = DrawStyle.Stroke(width = 2.dp),
+                if (categoryDataList.isNotEmpty()) {
+                    Box(modifier = Modifier.height(40.dp)) {
+                        LineChart(
+                            modifier = Modifier
+                                .width(150.dp)
+                                .height(40.dp),
+                            data = categoryDataList.map { monthlyCategorySumToBuy ->
+                                Line(
+                                    label = categoryName ?: stringResource(id = R.string.empty),
+                                    values = monthlyCategorySumToBuy.totalPrice ?: emptyList(),
+                                    color = SolidColor(MaterialTheme.colorScheme.inverseSurface),
+                                    strokeAnimationSpec = tween(1250, easing = EaseInOutCubic),
+                                    drawStyle = DrawStyle.Stroke(width = 2.dp),
+                                )
+                            },
+                            dividerProperties = DividerProperties(enabled = false),
+                            gridProperties = GridProperties(enabled = false),
+                            labelHelperProperties = LabelHelperProperties(enabled = false),
+                            indicatorProperties = HorizontalIndicatorProperties(enabled = false),
+                            animationMode = AnimationMode.Together(delayBuilder = {
+                                it * 500L
+                            }),
                         )
-                    ),
-                    dividerProperties = DividerProperties(enabled = false),
-                    gridProperties = GridProperties(enabled = false),
-                    labelHelperProperties = LabelHelperProperties(enabled = false),
-                    indicatorProperties = HorizontalIndicatorProperties(enabled = false),
-                    animationMode = AnimationMode.Together(delayBuilder = {
-                        it * 500L
-                    }),
-                )
+                    }
+                } else if (categoryDataList.size == 1) {
+                    Column {}
+                }
             }
 
             Column(
                 modifier = Modifier.padding(start = 10.dp), horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = "$12,321.50",
+                    text = "$ " + formatPrice(categoryDataList.sumOf {
+                        it.totalPrice?.sum() ?: 0.0
+                    }),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                 )
                 Text(
-                    text = "Transactions: 12",
+                    text = "Transactions: ${categoryDataList[0].totalPrice?.size ?: 0}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(.4f)
                 )
