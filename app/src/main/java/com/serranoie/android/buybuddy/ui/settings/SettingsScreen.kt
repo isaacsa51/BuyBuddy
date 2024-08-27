@@ -87,20 +87,9 @@ fun SettingsScreen(navController: NavController) {
         ) {
             item { DisplaySettings(viewModel = viewModel) }
 
-            item { InfoSettings(navController = navController) }
-
             item { BehaviourSettings(viewModel = viewModel) }
-            
-            item {
-                SettingsContainer {
-                    Button(
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.error),
-                        onClick = { throw RuntimeException("Firebase Crash log!") },
-                    ) {
-                        Text("CRASH")
-                    }
-                }
-            }
+
+            item { InfoSettings(navController = navController) }
         }
     }
 }
