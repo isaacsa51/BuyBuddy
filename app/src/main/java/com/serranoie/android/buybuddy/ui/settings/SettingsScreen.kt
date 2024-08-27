@@ -177,7 +177,7 @@ fun BehaviourSettings(viewModel: SettingsViewModel) {
     val categoryVisibilityValue = remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
 
     SettingsContainer {
-        SettingsCategory(title = "Behaviour")
+        SettingsCategory(title = stringResource(id = R.string.behaviour_label))
 
         SettingsItemSwitch(
             title = stringResource(R.string.show_empty_categories_label),
