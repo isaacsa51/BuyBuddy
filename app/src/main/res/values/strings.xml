@@ -21,6 +21,7 @@
     <string name="done">Done</string>
     <string name="error_selected_date">Selected date should be after today, please select again</string>
     <string name="select_time">Select Time</string>
+    <string name="empty">Empty</string>
 
     <!-- Onboarding screen -->
     <string name="onboarding_image_label">OnBoarding image</string>
@@ -143,4 +144,15 @@
     <string name="about_support_desc">If you think I deserve cookies for my work, you can buy me some by clicking here.</string>
     <string name="about_version_title">Version</string>
     <string name="about_version_desc">Version-%s</string>
+
+    <!-- Summary Screen -->
+    <string name="summary_screen_title">Summary</string>
+    <string name="empty_summary">There\'s no products added this month…</string>
+    <string name="spent_title">Spent</string>
+    <string name="incoming_title">Incoming</string>
+    <string name="total_title_spent">Total spent this month</string>
+    <string name="total_title_incoming">Expenses to be made this month</string>
+    <string name="current_month">Current month</string>
+    <string name="summary_label">Summary per category</string>
+    <string name="transactions_category_label">Transactions: %1$s</string>
 </resources>

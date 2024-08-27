@@ -15,8 +15,7 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 fun SettingsContainer(content: @Composable () -> Unit) {
     Card(
         modifier = Modifier.padding(smallPadding),
-        colors =
-        CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor =
             MaterialTheme.colorScheme.surfaceColorAtElevation(
                 3.dp,

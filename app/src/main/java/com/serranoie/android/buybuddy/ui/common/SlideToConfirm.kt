@@ -72,7 +72,7 @@ fun SlideToConfirm(
     val hapticFeedback = LocalHapticFeedback.current
     val swipeState =
         rememberSwipeableState(
-            initialValue = if (isLoading) Anchor.End else Anchor.Start,
+            initialValue = Anchor.Start,
             confirmStateChange = { anchor ->
                 if (anchor == Anchor.End) {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -104,18 +104,18 @@ fun SlideToConfirm(
             isLoading = isLoading,
             onCancelPressed = onCancelPressed,
             modifier =
-                Modifier
-                    .align(Alignment.Center)
-                    .padding(PaddingValues(horizontal = Thumb.Size + 8.dp))
-                    .fillMaxWidth(),
+            Modifier
+                .align(Alignment.Center)
+                .padding(PaddingValues(horizontal = Thumb.Size + 8.dp))
+                .fillMaxWidth(),
         )
 
         Thumb(
             isLoading = isLoading,
             modifier =
-                Modifier.offset {
-                    IntOffset(swipeState.offset.value.roundToInt(), 0)
-                },
+            Modifier.offset {
+                IntOffset(swipeState.offset.value.roundToInt(), 0)
+            },
             onCancelPressed = onCancelPressed,
         )
     }
@@ -147,14 +147,11 @@ fun Track(
 ) {
     val density = LocalDensity.current
     var fullWidth by remember { mutableIntStateOf(0) }
+    var endOfTrackPx by remember { mutableStateOf(0f) } // Store endOfTrackPx as state
 
     val horizontalPadding = 10.dp
 
     val startOfTrackPx = 0f
-    val endOfTrackPx =
-        remember(fullWidth) {
-            with(density) { fullWidth - (2 * horizontalPadding + Thumb.Size).toPx() }
-        }
 
     val snapThreshold = 0.8f
     val thresholds = { from: Anchor, _: Anchor ->
@@ -165,8 +162,15 @@ fun Track(
         }
     }
 
-    Box(
-        modifier =
+    LaunchedEffect(fullWidth) {
+        if (fullWidth > 0) {
+            endOfTrackPx = with(density) { fullWidth - (2 * horizontalPadding + Thumb.Size).toPx() }
+        }
+    }
+
+    if (endOfTrackPx > 0) {
+        Box(
+            modifier =
             modifier
                 .onSizeChanged { fullWidth = it.width }
                 .height(56.dp)
@@ -176,23 +180,33 @@ fun Track(
                     state = swipeState,
                     orientation = Orientation.Horizontal,
                     anchors =
-                        mapOf(
-                            startOfTrackPx to Anchor.Start,
-                            endOfTrackPx to Anchor.End,
-                        ),
-                    thresholds = thresholds,
-                    velocityThreshold = Track.VelocityThreshold,
-                ).background(
+                    mapOf(
+                        startOfTrackPx to Anchor.Start,
+                        endOfTrackPx to Anchor.End,
+                    ),
+                    thresholds = thresholds,velocityThreshold = Track.VelocityThreshold,
+                )
+                .background(
                     color = MaterialTheme.colorScheme.tertiary,
                     shape = RoundedCornerShape(percent = 10),
-                ).padding(
+                )
+                .padding(
                     PaddingValues(
                         horizontal = horizontalPadding,
                         vertical = 8.dp,
                     ),
                 ),
-        content = content,
-    )
+            content = content,
+        )
+    } else {
+        // Placeholder or loading state while endOfTrackPx is being calculated
+        Box(
+            modifier = modifier
+                .onSizeChanged { fullWidth = it.width }
+                .height(56.dp)
+                .fillMaxWidth()
+        )
+    }
 }
 
 @Composable
@@ -203,13 +217,14 @@ fun Thumb(
 ) {
     Box(
         modifier =
-            modifier
-                .size(Thumb.Size)
-                .clickable { if (isLoading) onCancelPressed() }
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = RoundedCornerShape(5.dp),
-                ).padding(8.dp),
+        modifier
+            .size(Thumb.Size)
+            .clickable { if (isLoading) onCancelPressed() }
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = RoundedCornerShape(5.dp),
+            )
+            .padding(8.dp),
     ) {
         if (isLoading) {
             Icon(imageVector = Icons.Rounded.Done, contentDescription = "Mark it purchased")
@@ -236,10 +251,10 @@ fun Hint(
         color = hintColor,
         style = MaterialTheme.typography.titleSmall,
         modifier =
-            modifier
-                .clickable { if (isLoading) onCancelPressed() }
-                .fillMaxWidth()
-                .wrapContentSize(Alignment.Center),
+        modifier
+            .clickable { if (isLoading) onCancelPressed() }
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.Center),
     )
 }
 

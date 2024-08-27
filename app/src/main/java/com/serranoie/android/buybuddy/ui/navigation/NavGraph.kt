@@ -14,19 +14,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
 import com.serranoie.android.buybuddy.ui.backup.BackupScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemViewModel
@@ -40,7 +37,11 @@ import com.serranoie.android.buybuddy.ui.settings.AboutScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsScreen
 import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 import com.serranoie.android.buybuddy.ui.summary.SummaryScreen
+import com.serranoie.android.buybuddy.ui.summary.SummaryViewModel
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @RequiresApi(Build.VERSION_CODES.P)
 @Composable
@@ -104,7 +105,6 @@ fun NavGraph(
                 val totalPrice by homeViewModel.totalPrice.collectAsState()
                 val totalBoughtPrice by homeViewModel.totalBoughtPrice.collectAsState()
                 val categoryVisibility by settingsViewModel.categoryVisibility.collectAsState()
-                val isLoading by homeViewModel.isLoading.collectAsState()
 
                 LaunchedEffect(Unit) {
                     homeViewModel.triggerDataFetch()
@@ -165,7 +165,39 @@ fun NavGraph(
                     )
                 }
             ) {
-                SummaryScreen(navController = navController)
+                val summaryViewModel = hiltViewModel<SummaryViewModel>()
+
+                val summaryItemsToBuy by summaryViewModel.summaryItemsToBuy.collectAsStateWithLifecycle()
+                val summaryItemsBought by summaryViewModel.summaryItemsBought.collectAsStateWithLifecycle()
+                val yearlySummaryToBuy by summaryViewModel.yearlySummaryToBuy.collectAsStateWithLifecycle()
+                val yearlySummaryBought by summaryViewModel.yearlySummaryBought.collectAsStateWithLifecycle()
+                val monthlyCategorySumToBuy by summaryViewModel.monthlyCategorySumToBuy.collectAsStateWithLifecycle()
+                val monthlyCategorySumBought by summaryViewModel.monthlyCategorySumBought.collectAsStateWithLifecycle()
+                val errorState by summaryViewModel.errorState.collectAsStateWithLifecycle()
+
+                val currentMonth = remember {
+                    SimpleDateFormat("MM", Locale.getDefault()).format(Date())
+                }
+
+                LaunchedEffect(Unit) {
+                    summaryViewModel.fetchSummaryItemsToBuy(month = currentMonth)
+                    summaryViewModel.fetchSummaryItemsBought(month = currentMonth)
+                    summaryViewModel.fetchYearlySummaryToBuy()
+                    summaryViewModel.fetchYearlySummaryBought()
+                    summaryViewModel.fetchMonthlyCategorySumToBuy(month = currentMonth)
+                    summaryViewModel.fetchMonthlyCategorySumBought(month = currentMonth)
+                }
+
+                SummaryScreen(
+                    navController = navController,
+                    summaryItemsToBuy = summaryItemsToBuy,
+                    summaryItemsBought = summaryItemsBought,
+                    yearlySummaryToBuy = yearlySummaryToBuy,
+                    yearlySummaryBought = yearlySummaryBought,
+                    monthlyCategorySumToBuy = monthlyCategorySumToBuy,
+                    monthlyCategorySumBought = monthlyCategorySumBought,
+                    errorState = errorState
+                )
             }
 
             composable(

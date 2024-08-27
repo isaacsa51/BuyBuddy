@@ -91,7 +91,7 @@ fun HomeScreen(
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-    var selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
+    val selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
     Surface {
         ModalNavigationDrawer(
