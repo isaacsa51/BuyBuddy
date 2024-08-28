@@ -2,6 +2,7 @@ package com.serranoie.android.buybuddy.ui.core
 
 import android.Manifest
 import android.app.Activity
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,6 +27,17 @@ class ReminderReceiver : BroadcastReceiver() {
         val title = intent.getStringExtra(RMNDR_NOTI_TITLE_KEY)
         val message = intent.getStringExtra(RMNDR_NOTI_MESSAGE_KEY)
         val itemId = intent.getIntExtra(RMNDR_NOTI_ITEM_ID_KEY, -1)
+        val itemIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            putExtra("nav_route", "edit/$itemId")
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            itemId,
+            itemIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val notificationBuilder =
             NotificationCompat
@@ -34,6 +46,8 @@ class ReminderReceiver : BroadcastReceiver() {
                 .setContentTitle(title)
                 .setContentText(message)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
 
         val notificationManager = NotificationManagerCompat.from(context)
         if (ActivityCompat.checkSelfPermission(

@@ -5,7 +5,7 @@ import com.serranoie.android.buybuddy.domain.model.Item
 import javax.inject.Inject
 
 class InsertItemWithCategoryUseCase @Inject constructor(private val itemRepository: ItemRepositoryImpl) {
-    suspend operator fun invoke(item: Item, categoryName: String) {
-        itemRepository.insertItemWithCategory(item, categoryName)
+    suspend operator fun invoke(item: Item, categoryName: String): Int {
+        return itemRepository.insertItemAndReturnId(item, categoryName)
     }
 }

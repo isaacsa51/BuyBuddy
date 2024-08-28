@@ -18,6 +18,11 @@ class ItemRepositoryImpl @Inject constructor(private val itemDao: BuyBuddyDao) :
     override suspend fun insertItemWithCategory(item: Item, categoryName: String) =
         itemDao.insertItemWithCategory(item.toEntity(0), categoryName)
 
+    override suspend fun insertItemAndReturnId(item: Item, categoryName: String): Int {
+        val itemId = itemDao.insertItemWithCategoryAndReturnId(item.toEntity(0), categoryName)
+        return itemId.toInt()
+    }
+
     override suspend fun insertItem(item: Item) = itemDao.insertItem(item.toEntity(item.categoryId))
 
     override suspend fun updateItem(item: Item) = itemDao.updateItem(item.toEntity(item.categoryId))

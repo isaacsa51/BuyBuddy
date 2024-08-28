@@ -168,15 +168,14 @@ class QuizViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-
             try {
-                insertItemWithCategoryUseCase(itemData, selectedCategoryName)
+                val itemId = insertItemWithCategoryUseCase(itemData, selectedCategoryName)
+                Log.d("DEBUG", "item id generated: $itemId")
 
                 reminderResponse?.let {
                     scheduleNotification.scheduleNotification(
                         context = getApplication<Application>().applicationContext,
-                        // Using hashcode() in the name to create a more specific ID for the notification since the ID is generated automatically in Room DB
-                        itemId = itemData.name.hashCode(),
+                        itemId = itemId,
                         itemName = itemData.name,
                         reminderDate = reminderResponse,
                         reminderTime = reminderResponse

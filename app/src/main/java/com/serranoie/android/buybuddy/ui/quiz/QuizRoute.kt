@@ -8,9 +8,9 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.Questions
@@ -21,27 +21,38 @@ import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateNameQuestion
 import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateReminderQuestion
 import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateUsageQuestion
 import com.serranoie.android.buybuddy.ui.util.UiConstants.CONTENT_ANIMATION_DURATION
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
+import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 
 @Composable
 fun QuizRoute(
     onQuizComplete: () -> Unit,
     onNavUp: () -> Unit,
 ) {
+    val view = LocalView.current
     val viewModel: QuizViewModel = hiltViewModel()
     val quizScreenData = viewModel.quizScreenData
     val isNextEnabled = viewModel.isNextEnabled
 
     QuizContentScreen(quizScreenData = quizScreenData,
         isNextEnabled = isNextEnabled,
-        onPreviousPressed = { viewModel.onPreviousPressed() },
-        onNextPressed = { viewModel.onNextPressed() },
+        onPreviousPressed = {
+            viewModel.onPreviousPressed()
+            view.weakHapticFeedback()
+        },
+        onNextPressed = {
+            viewModel.onNextPressed()
+            view.weakHapticFeedback()
+        },
         onClosePressed = {
+            view.strongHapticFeedback()
             onNavUp()
         },
         onDonePressed = {
             viewModel.onDonePressed(
                 onQuizComplete
             )
+            view.strongHapticFeedback()
         }) { paddingValues ->
 
         val modifier = Modifier
@@ -120,14 +131,8 @@ private fun getTransitionDirection(
     targetIndex: Int,
 ): AnimatedContentTransitionScope.SlideDirection {
     return if (targetIndex > initialIndex) {
-        // Going forwards in the survey: Set the initial offset to start
-        // at the size of the content so it slides in from right to left, and
-        // slides out from the left of the screen to -fullWidth
         AnimatedContentTransitionScope.SlideDirection.Left
     } else {
-        // Going back to the previous question in the set, we do the same
-        // transition as above, but with different offsets - the inverse of
-        // above, negative fullWidth to enter, and fullWidth to exit.
         AnimatedContentTransitionScope.SlideDirection.Right
     }
 }

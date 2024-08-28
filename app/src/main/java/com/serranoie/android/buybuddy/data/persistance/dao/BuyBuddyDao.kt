@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 interface BuyBuddyDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertItem(item: ItemEntity)
+    suspend fun insertItem(item: ItemEntity): Long
 
     @Transaction
     suspend fun insertItemWithCategory(item: ItemEntity, categoryName: String) {
@@ -46,6 +46,32 @@ interface BuyBuddyDao {
             status = item.status
         )
         insertItem(itemWithCategory)
+    }
+
+    @Transaction
+    suspend fun insertItemWithCategoryAndReturnId(item: ItemEntity, categoryName: String): Long {
+        val existingCategory = getCategoryByName(categoryName)
+        val categoryId = existingCategory?.categoryId ?: insertCategory(
+            CategoryEntity(
+                null, categoryName
+            )
+        ).toInt()
+        val itemWithCategory = ItemEntity(
+            itemId = item.itemId,
+            name = item.name,
+            categoryId = categoryId,
+            description = item.description,
+            usage = item.usage,
+            benefits = item.benefits,
+            disadvantages = item.disadvantages,
+            price = item.price,
+            reminderDate = item.reminderDate,
+            reminderTime = item.reminderTime,
+            status = item.status
+        )
+        val insertedItemId = insertItem(itemWithCategory)
+
+        return insertedItemId
     }
 
     @Update

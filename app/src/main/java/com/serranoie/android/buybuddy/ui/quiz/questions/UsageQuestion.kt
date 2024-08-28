@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.quiz.QuizViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import kotlin.math.roundToInt
 
 @Composable
@@ -46,6 +48,7 @@ fun UsageQuestion(
             R.string.usage_almost_everyday,
         )
 
+    val view = LocalView.current
     val sliderRange = 0f..(steps.size - 1).toFloat()
     var sliderPosition by remember { mutableFloatStateOf(value.toFloat()) }
     val selectedIndex = sliderPosition.roundToInt()
@@ -76,6 +79,7 @@ fun UsageQuestion(
                     onValueChange = { newValue ->
                         sliderPosition = newValue
                         onValueChange(steps[newValue.roundToInt()])
+                        view.strongHapticFeedback()
                     },
                 )
             }

@@ -24,7 +24,7 @@
     <string name="reminder_question">¿Cuándo deberíamos comunicarnos con usted sobre este artículo?</string>
     <string name="select_date">Seleccione una fecha</string>
     <string name="usage_almost_everyday">Casi todos los días</string>
-    <string name="usage_often">Seguidos</string>
+    <string name="usage_often">Seguido</string>
     <string name="usage_sometimes">Algunas veces</string>
     <string name="usage_ocasionally">Ocasionalmente</string>
     <string name="usage_rarely">Rara vez</string>

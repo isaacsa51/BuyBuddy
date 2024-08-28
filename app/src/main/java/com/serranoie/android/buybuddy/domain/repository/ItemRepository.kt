@@ -10,7 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface ItemRepository {
 
     suspend fun insertItemWithCategory(item: Item, categoryName: String)
-    suspend fun insertItem(item: Item)
+    suspend fun insertItemAndReturnId(item: Item, categoryName: String): Int
+    suspend fun insertItem(item: Item): Long
     suspend fun updateItem(item: Item)
     suspend fun updateItemStatus(itemId: Int, status: Boolean)
     suspend fun deleteItem(itemId: Int)

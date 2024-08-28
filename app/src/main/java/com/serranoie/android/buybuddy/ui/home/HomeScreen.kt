@@ -56,6 +56,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -77,6 +78,8 @@ import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
 import com.serranoie.android.buybuddy.ui.settings.ThemeMode
 import com.serranoie.android.buybuddy.ui.util.getActivity
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
+import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -126,6 +129,7 @@ fun HomeScreen(
         ),
     )
 
+    val view = LocalView.current
     val context = LocalContext.current
     val settingsViewModel = (context.getActivity() as MainActivity).settingsViewModel
 
@@ -156,6 +160,7 @@ fun HomeScreen(
                             label = { Text(item.title) },
                             selected = selectedItemIndex == index,
                             onClick = {
+                                view.weakHapticFeedback()
                                 navController.navigate(item.route)
                                 scope.launch {
                                     drawerState.close()
@@ -190,6 +195,7 @@ fun HomeScreen(
                             IconButton(
                                 onClick = {
                                     scope.launch {
+                                        view.weakHapticFeedback()
                                         drawerState.open()
                                     }
                                 }
@@ -201,7 +207,9 @@ fun HomeScreen(
                 },
                 floatingActionButton = {
                     FloatingActionButton(
-                        onClick = { navController.navigate(Route.Quiz.route) },
+                        onClick = {
+                            view.strongHapticFeedback()
+                            navController.navigate(Route.Quiz.route) },
                         containerColor = MaterialTheme.colorScheme.tertiary,
                     ) {
                         Icon(

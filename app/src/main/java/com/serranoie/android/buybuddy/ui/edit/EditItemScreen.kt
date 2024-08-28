@@ -1,6 +1,7 @@
 package com.serranoie.android.buybuddy.ui.edit
 
 import android.util.Log
+import android.view.View
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -62,6 +63,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -86,6 +88,8 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.Utils.dateToString
 import com.serranoie.android.buybuddy.ui.util.Utils.formatPrice
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
+import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -120,6 +124,7 @@ fun EditItemScreen(
     onUpdateItemEvent: (Int) -> Job,
     onDeleteItemEvent: (Int) -> Job,
 ) {
+    val view = LocalView.current
     val openDialog = remember { mutableStateOf<DialogType?>(null) }
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior =
@@ -137,7 +142,10 @@ fun EditItemScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.navigateUp() }) {
+                    IconButton(onClick = {
+                        view.strongHapticFeedback()
+                        navController.navigateUp()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.back),
@@ -145,7 +153,10 @@ fun EditItemScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { openDialog.value = DialogType.DELETE }) {
+                    IconButton(onClick = {
+                        view.strongHapticFeedback()
+                        openDialog.value = DialogType.DELETE
+                    }) {
                         Icon(
                             imageVector = Icons.Outlined.Delete,
                             contentDescription = stringResource(R.string.delete_current_item),
@@ -185,6 +196,7 @@ fun EditItemScreen(
                     onItemPriceResponse,
                     itemUsage,
                     onItemUsageResponse,
+                    view
                 )
             }
 
@@ -211,7 +223,7 @@ fun EditItemScreen(
                     enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    DateHolder(selectedDateTime, onSelectedDateTimeResponse)
+                    DateHolder(selectedDateTime, onSelectedDateTimeResponse, view)
                 }
 
                 AnimatedVisibility(
@@ -224,7 +236,8 @@ fun EditItemScreen(
                         onItemStatusResponse,
                         navController,
                         productInfo?.itemId!!,
-                        onUpdateItemEvent
+                        onUpdateItemEvent,
+                        view
                     )
                 }
 
@@ -297,6 +310,7 @@ private fun BasicInfoHolder(
     onItemPriceResponse: (Double) -> Unit,
     itemUsage: Int,
     onItemUsageResponse: (Int) -> Unit,
+    view: View,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var isValidPrice by remember { mutableStateOf(true) }
@@ -357,8 +371,7 @@ private fun BasicInfoHolder(
         if (isItemNameEmpty) ErrorLabelTxtFld(text = stringResource(id = R.string.field_required))
 
         OutlinedTextField(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             value = itemDescription,
             label = { Text(stringResource(id = R.string.description)) },
             onValueChange = {
@@ -379,7 +392,7 @@ private fun BasicInfoHolder(
             modifier = Modifier.fillMaxWidth(),
             label = { Text(stringResource(id = R.string.price)) },
             value = if (priceText.isBlank()) {
-                formatPrice(0.0) // Use the formatting function here
+                formatPrice(0.0)
             } else {
                 formatPrice(priceText.toDoubleOrNull() ?: 0.0)
             },
@@ -389,7 +402,7 @@ private fun BasicInfoHolder(
                 isValidPrice = newValue.matches(Regex("^\\d+(\\.\\d{0,2})?$"))
 
                 if (isValidPrice) {
-                    onItemPriceResponse(newValue.toDoubleOrNull() ?: 0.0) // Handle null case
+                    onItemPriceResponse(newValue.toDoubleOrNull() ?: 0.0)
                 }
             },
             isError = !isValidPrice,
@@ -397,7 +410,7 @@ private fun BasicInfoHolder(
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Number,
             ),
-            singleLine = true, // Use singleLine instead of maxLines = 1
+            singleLine = true,
             textStyle = MaterialTheme.typography.titleLarge,
             shape = RoundedCornerShape(7.dp),
         )
@@ -423,7 +436,10 @@ private fun BasicInfoHolder(
                         easing = LinearOutSlowInEasing,
                     ),
                 )
-                .clickable { expanded = !expanded },
+                .clickable {
+                    view.weakHapticFeedback()
+                    expanded = !expanded
+                },
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface,
             ),
@@ -455,6 +471,7 @@ private fun BasicInfoHolder(
                         valueRange = sliderRange,
                         steps = steps.size - 2,
                         onValueChange = { newValue ->
+                            view.strongHapticFeedback()
                             sliderPosition = newValue
                             onItemUsageResponse(newValue.roundToInt())
                         },
@@ -524,7 +541,9 @@ private fun ReasonsHolder(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DateHolder(selectedDateTime: Date?, onSelectedDateTimeResponse: (Date) -> Unit) {
+private fun DateHolder(
+    selectedDateTime: Date?, onSelectedDateTimeResponse: (Date) -> Unit, view: View
+) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateTime?.time,
     )
@@ -546,6 +565,7 @@ private fun DateHolder(selectedDateTime: Date?, onSelectedDateTimeResponse: (Dat
             .padding(vertical = basePadding)
             .fillMaxWidth()
             .clickable {
+                view.weakHapticFeedback()
                 showDatePicker = true
             },
         colors = CardDefaults.cardColors(
@@ -567,6 +587,7 @@ private fun DateHolder(selectedDateTime: Date?, onSelectedDateTimeResponse: (Dat
             confirmButton = {
                 TextButton(
                     onClick = {
+                        view.weakHapticFeedback()
                         val selectedDateMillis = datePickerState.selectedDateMillis
                         if (selectedDateMillis != null) {
                             val calendar = Calendar.getInstance(TimeZone.getDefault())
@@ -585,7 +606,10 @@ private fun DateHolder(selectedDateTime: Date?, onSelectedDateTimeResponse: (Dat
                 ) { Text(stringResource(R.string.ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
+                TextButton(onClick = {
+                    view.weakHapticFeedback()
+                    showDatePicker = false
+                }) {
                     Text(
                         stringResource(
                             id = R.string.cancel,
@@ -621,10 +645,14 @@ private fun DateHolder(selectedDateTime: Date?, onSelectedDateTimeResponse: (Dat
                             formattedDate = dateToString(selectedDateTime)
                         }
                     }
+                    view.weakHapticFeedback()
                 }) { Text("OK") }
             },
             dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) {
+                TextButton(onClick = {
+                    view.weakHapticFeedback()
+                    showTimePicker = false
+                }) {
                     Text(
                         stringResource(
                             id = R.string.cancel,
@@ -645,6 +673,7 @@ private fun ActionsHolder(
     navController: NavController,
     itemId: Int,
     onUpdateItemEvent: (Int) -> Job,
+    view: View,
 ) {
     var isSlideToConfirmLoading by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -663,6 +692,7 @@ private fun ActionsHolder(
                         onItemStatusResponse(true)
                     }
                 }
+                view.strongHapticFeedback()
             },
             onCancelPressed = {
                 if (currentItemStatus!!) {
@@ -673,6 +703,7 @@ private fun ActionsHolder(
                         }
                     }
                 }
+                view.strongHapticFeedback()
             },
         )
 
@@ -686,7 +717,10 @@ private fun ActionsHolder(
                     .weight(1f)
                     .height(48.dp)
                     .padding(horizontal = extraSmallPadding),
-                onClick = { navController.navigateUp() },
+                onClick = {
+                    view.strongHapticFeedback()
+                    navController.navigateUp()
+                },
             ) {
                 Text(text = stringResource(R.string.cancel))
             }
@@ -697,6 +731,7 @@ private fun ActionsHolder(
                     .height(48.dp)
                     .padding(horizontal = extraSmallPadding),
                 onClick = {
+                    view.strongHapticFeedback()
                     coroutineScope.launch {
                         onUpdateItemEvent(itemId)
                     }

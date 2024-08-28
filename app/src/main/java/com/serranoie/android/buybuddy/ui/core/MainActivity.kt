@@ -84,6 +84,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val startDestination = onBoardViewModel.startDestination
                     NavGraph(navController, startDestination)
+
+                    intent?.getStringExtra("nav_route")?.let { navRoute ->
+                        navController.navigate(navRoute)
+                    }
                 }
             }
         }

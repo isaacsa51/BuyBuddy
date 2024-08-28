@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -19,6 +20,7 @@ import com.serranoie.android.buybuddy.ui.quiz.QuizViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.quiz.common.RadioButtonOption
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
+import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 
 data class Category(
     val categoryId: Int,
@@ -34,6 +36,7 @@ fun CategoryQuestion(
     onOptionSelected: (Category) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val view = LocalView.current
     var selectedCategory by remember { mutableStateOf<Category?>(null) }
     val viewModel: QuizViewModel = hiltViewModel()
 
@@ -51,6 +54,7 @@ fun CategoryQuestion(
                     selectedCategory = category
                     viewModel.onCategoryResponse(category)
                     onOptionSelected(category)
+                    view.weakHapticFeedback()
                 },
                 category = category,
             )
