@@ -80,6 +80,11 @@
     <string name="reminder_saved">Producto guardado!</string>
     <string name="invalid_price_format">Por favor ingresa un valor de precio válido</string>
     <string name="product_info">Información del producto</string>
+    <string name="drawer_home">Inicio</string>
+    <string name="summary_home">Resumen</string>
+    <string name="backup_home">Respaldo</string>
+    <string name="settings_home">Ajustes</string>
+    <string name="rate_us_home">Calificanos</string>
 
     <!--  Settings values  -->
     <string name="settings_title">Ajustes</string>

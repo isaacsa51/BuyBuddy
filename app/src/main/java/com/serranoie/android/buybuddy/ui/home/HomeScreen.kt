@@ -19,9 +19,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.BarChart
+import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.ThumbUp
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -46,7 +53,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,7 +61,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -67,9 +72,9 @@ import com.serranoie.android.buybuddy.ui.common.CategoryCard
 import com.serranoie.android.buybuddy.ui.common.EmptyListScreen
 import com.serranoie.android.buybuddy.ui.common.TotalAmountCard
 import com.serranoie.android.buybuddy.ui.core.MainActivity
+import com.serranoie.android.buybuddy.ui.navigation.NavigationItem
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
-import com.serranoie.android.buybuddy.ui.navigation.items
 import com.serranoie.android.buybuddy.ui.settings.ThemeMode
 import com.serranoie.android.buybuddy.ui.util.getActivity
 import kotlinx.coroutines.delay
@@ -85,6 +90,41 @@ fun HomeScreen(
     totalBoughtPrice: Double,
     categoryVisibility: Boolean,
 ) {
+
+    val items = listOf(
+        NavigationItem(
+            title = stringResource(id = R.string.drawer_home),
+            selectedIcon = Icons.Rounded.Home,
+            unselectedIcon = Icons.Outlined.Home,
+            route = Screen.HOME.name
+        ),
+        NavigationItem(
+            title = stringResource(id = R.string.summary_home),
+            selectedIcon = Icons.Rounded.BarChart,
+            unselectedIcon = Icons.Outlined.BarChart,
+            route = Screen.SUMMARY.name
+        ),
+
+        // TODO: Implement backup functionality to the app
+        /*NavigationItem(
+            title = stringResource(id = R.string.backup_home),
+            selectedIcon = Icons.Rounded.Backup,
+            unselectedIcon = Icons.Outlined.Backup,
+            route = Screen.BACKUP.name
+        ),*/
+        NavigationItem(
+            title = stringResource(id = R.string.settings_home),
+            selectedIcon = Icons.Rounded.Settings,
+            unselectedIcon = Icons.Outlined.Settings,
+            route = Screen.SETTINGS.name
+        ),
+        NavigationItem(
+            title = stringResource(id = R.string.rate_us_home),
+            selectedIcon = Icons.Rounded.ThumbUp,
+            unselectedIcon = Icons.Outlined.ThumbUp,
+            route = Screen.HOME.name
+        ),
+    )
 
     val context = LocalContext.current
     val settingsViewModel = (context.getActivity() as MainActivity).settingsViewModel

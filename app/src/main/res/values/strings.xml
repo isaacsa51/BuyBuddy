@@ -35,6 +35,11 @@
     <string name="total_spent">Total spent</string>
     <string name="empty_items_title">There are no items to show</string>
     <string name="empty_items_info">If you want to add any item, press the button that is in the bottom right corner…</string>
+    <string name="drawer_home">Home</string>
+    <string name="summary_home">Summary</string>
+    <string name="backup_home">Backup</string>
+    <string name="settings_home">Settings</string>
+    <string name="rate_us_home">Rate Us</string>
 
     <!-- Usage values -->
     <string name="usage_almost_everyday">Almost everyday</string>
