@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.serranoie.android.buybuddy.domain.model.Item
+import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategoryUseCase
 import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
 import com.serranoie.android.buybuddy.ui.quiz.common.Questions
@@ -16,7 +17,6 @@ import com.serranoie.android.buybuddy.ui.quiz.questions.Category
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date
-import java.util.concurrent.Executor
 import javax.inject.Inject
 
 @HiltViewModel
@@ -168,23 +168,26 @@ class QuizViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            try {
-                val itemId = insertItemWithCategoryUseCase(itemData, selectedCategoryName)
-                Log.d("DEBUG", "item id generated: $itemId")
+            when (val result = insertItemWithCategoryUseCase(itemData, selectedCategoryName)) {
+                is UseCaseResult.Success -> {
+                    val itemId = result.data
+                    Log.d("DEBUG", "item id generated: $itemId")
 
-                reminderResponse?.let {
-                    scheduleNotification.scheduleNotification(
-                        context = getApplication<Application>().applicationContext,
-                        itemId = itemId,
-                        itemName = itemData.name,
-                        reminderDate = reminderResponse,
-                        reminderTime = reminderResponse
-                    )
+                    reminderResponse?.let {
+                        scheduleNotification.scheduleNotification(
+                            context = getApplication<Application>().applicationContext,
+                            itemId = itemId,
+                            itemName = itemData.name,
+                            reminderDate = reminderResponse,
+                            reminderTime = reminderResponse
+                        )
+                    }
+                    onSurveyComplete()
                 }
 
-                onSurveyComplete()
-            } catch (e: Exception) {
-                Log.e("DEBUG", e.message.toString())
+                is UseCaseResult.Error -> {
+                    Log.e("DEBUG", "Error inserting item: ${result.exception.message}")
+                }
             }
         }
     }
