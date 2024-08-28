@@ -20,13 +20,9 @@ class LocalUserManagerImpl(private val context: Context) : LocalUserManager {
         }
     }
 
-    override fun readAppEntry(): Flow<UseCaseResult<Boolean>> {
+    override fun readAppEntry(): Flow<Boolean> {
         return context.dataStore.data.map { preferences ->
-            try{
-                UseCaseResult.Success(preferences[PreferenceKeys.APP_ENTRY] ?: false)
-            } catch (e: Exception) {
-                UseCaseResult.Error(e)
-            }
+            preferences[PreferenceKeys.APP_ENTRY] ?: false
         }
     }
 

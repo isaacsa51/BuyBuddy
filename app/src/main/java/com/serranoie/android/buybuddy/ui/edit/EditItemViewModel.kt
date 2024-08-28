@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.Category
 import com.serranoie.android.buybuddy.domain.model.Item
+import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import com.serranoie.android.buybuddy.domain.usecase.category.GetCategoryByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.DeleteItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
@@ -17,7 +18,11 @@ import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCas
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
 import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
@@ -87,6 +92,9 @@ class EditItemViewModel
     val itemUsage: Int
         get() = _itemUsage.intValue
 
+    private val _errorState = MutableStateFlow<String?>(null)
+    val errorState: StateFlow<String?> = _errorState.asStateFlow()
+
     // Exposing states to UI
     fun onItemNameResponse(name: String) {
         _itemName.value = name
@@ -148,9 +156,19 @@ class EditItemViewModel
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     suspend fun getCategory(id: Int) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getCategoryByIdUseCase.getCategoryById(id).collect { category ->
-                _categoryInfo.value = category
+                when(category) {
+                    is UseCaseResult.Success -> {
+                        _isLoading.value = true
+                        _categoryInfo.value = category.data
+                        _errorState.value = null
+                    }
+                    is UseCaseResult.Error -> {
+                        _isLoading.value = true
+                        _errorState.value = category.exception.message ?: "An error occurred"
+                    }
+                }
             }
         }
 
@@ -198,7 +216,15 @@ class EditItemViewModel
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     suspend fun deleteItem(id: Int) {
-        deleteItemUseCase.deleteItem(id)
+        when(val result = deleteItemUseCase(id)) {
+            is UseCaseResult.Success -> {
+                Log.d("DEBUG", "Item deleted successfully")
+            }
+
+            is UseCaseResult.Error -> {
+                Log.e("DEBUG", "Error deleting item: ${result.exception.message}")
+            }
+        }
     }
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)

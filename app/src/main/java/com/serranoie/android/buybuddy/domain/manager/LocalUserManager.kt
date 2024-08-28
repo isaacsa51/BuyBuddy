@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface LocalUserManager {
     suspend fun saveAppEntry()
-    fun readAppEntry(): Flow<UseCaseResult<Boolean>>
+    fun readAppEntry(): Flow<Boolean>
     fun checkTheme(): Flow<UseCaseResult<Boolean>>
     suspend fun saveTheme(enabled: Boolean)
 }
