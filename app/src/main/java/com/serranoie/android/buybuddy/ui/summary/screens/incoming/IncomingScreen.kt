@@ -392,7 +392,7 @@ private fun CategoryListItem(
                     text = categoryName ?: "",
                     style = MaterialTheme.typography.labelLarge,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 2
+                    maxLines = 1
                 )
                 Text(
                     text = "Total value",
