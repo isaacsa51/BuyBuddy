@@ -218,11 +218,9 @@ class EditItemViewModel
     suspend fun deleteItem(id: Int) {
         when(val result = deleteItemUseCase(id)) {
             is UseCaseResult.Success -> {
-                Log.d("DEBUG", "Item deleted successfully")
             }
 
             is UseCaseResult.Error -> {
-                Log.e("DEBUG", "Error deleting item: ${result.exception.message}")
             }
         }
     }

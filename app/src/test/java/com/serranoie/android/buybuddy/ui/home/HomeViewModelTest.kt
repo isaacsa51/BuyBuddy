@@ -19,10 +19,10 @@ import org.junit.Before
 import org.junit.Test
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryEntity
 import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
+import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
@@ -64,7 +64,7 @@ class HomeViewModelTest {
                 items = emptyList()
             )
         )
-        coEvery { getCategoriesWithItemsUseCase.invoke() } returns flowOf(categoriesWithItems)
+        coEvery { getCategoriesWithItemsUseCase.invoke() } returns flowOf(UseCaseResult.Success(categoriesWithItems))
 
         // When
         viewModel.fetchGetCategoriesWithItems()
@@ -83,8 +83,8 @@ class HomeViewModelTest {
         // Given
         val totalPrice = 100.0
         val totalBoughtPrice = 50.0
-        coEvery { getTotalPriceOfItemsToBuyUseCase() } returns flowOf(totalPrice)
-        coEvery { getTotalPriceOfItemsBoughtUseCase() } returns flowOf(totalBoughtPrice)
+        coEvery { getTotalPriceOfItemsToBuyUseCase() } returns flowOf(UseCaseResult.Success(totalPrice))
+        coEvery { getTotalPriceOfItemsBoughtUseCase() } returns flowOf(UseCaseResult.Success(totalBoughtPrice))
 
         // When
         viewModel.fetchTotalPrices()
@@ -114,9 +114,9 @@ class HomeViewModelTest {
                 items = emptyList()
             )
         )
-        coEvery { getCategoriesWithItemsUseCase.invoke() } returns flowOf(categoriesWithItems)
-        coEvery { getTotalPriceOfItemsToBuyUseCase() } returns flowOf(100.0)
-        coEvery { getTotalPriceOfItemsBoughtUseCase() } returns flowOf(50.0)
+        coEvery { getCategoriesWithItemsUseCase.invoke() } returns flowOf(UseCaseResult.Success(categoriesWithItems))
+        coEvery { getTotalPriceOfItemsToBuyUseCase() } returns flowOf(UseCaseResult.Success(100.0))
+        coEvery { getTotalPriceOfItemsBoughtUseCase() } returns flowOf(UseCaseResult.Success(50.0))
 
         // When
         viewModel.triggerDataFetch()

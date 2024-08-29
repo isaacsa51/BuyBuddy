@@ -12,12 +12,16 @@ android {
     namespace = "com.serranoie.android.buybuddy"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.serranoie.android.buybuddy"
         minSdk = 25
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 110
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -28,10 +32,22 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+
+            applicationVariants.all {
+                outputs
+                    .map {
+                        it as com.android.build.gradle.internal.api.ApkVariantOutputImpl
+                    }
+                    .all { output ->
+                        output.outputFileName = "BuyBuddy-v${versionName}.apk"
+                        false
+                    }
+            }
         }
         debug {
             isMinifyEnabled = false
@@ -183,7 +199,7 @@ dependencies {
     // Coil image loader
     implementation("io.coil-kt:coil-compose:2.6.0")
 
-    implementation ("io.github.ehsannarmani:compose-charts:0.0.13")
+    implementation("io.github.ehsannarmani:compose-charts:0.0.13")
 }
 
 kapt {

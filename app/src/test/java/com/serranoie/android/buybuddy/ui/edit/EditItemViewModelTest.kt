@@ -3,6 +3,7 @@ package com.serranoie.android.buybuddy.ui.edit
 import android.app.Application
 import com.serranoie.android.buybuddy.domain.model.Category
 import com.serranoie.android.buybuddy.domain.model.Item
+import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import com.serranoie.android.buybuddy.domain.usecase.category.GetCategoryByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.DeleteItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
@@ -94,7 +95,9 @@ class EditItemViewModelTest {
         val category = Category(categoryId = 1, name = "Test Category")
 
         coEvery { getItemByIdUseCase.invoke(itemId) } returns flowOf(item)
-        coEvery { getCategoryByIdUseCase.getCategoryById(item.categoryId) } returns flowOf(category)
+        coEvery { getCategoryByIdUseCase.getCategoryById(item.categoryId) } returns flowOf(
+            UseCaseResult.Success(category)
+        )
         every { application.applicationContext } returns application
 
         // When
@@ -173,7 +176,15 @@ class EditItemViewModelTest {
         coEvery { updateItemUseCase.invoke(any()) } just runs
 
         every { application.applicationContext } returns application
-        every { scheduleNotificationMock.scheduleNotification(any(), any(), any(), any(), any()) } just runs
+        every {
+            scheduleNotificationMock.scheduleNotification(
+                any(),
+                any(),
+                any(),
+                any(),
+                any()
+            )
+        } just runs
 
         // When
         viewModelWithMock.updateItem(itemId)
@@ -211,13 +222,13 @@ class EditItemViewModelTest {
         // Given
         val itemId = 1
 
-        coEvery { deleteItemUseCase.deleteItem(itemId) } just runs
+        coEvery { deleteItemUseCase(itemId) } returns UseCaseResult.Success(Unit)
 
         // When
         viewModel.deleteItem(itemId)
 
         // Then
-        coVerify { deleteItemUseCase.deleteItem(itemId) }
+        coVerify { deleteItemUseCase(itemId) }
     }
 
     @Test

@@ -27,6 +27,7 @@ fun View.strongHapticFeedback() {
     this.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 }
 
-fun String.toToast(context: Context, length: Int = Toast.LENGTH_SHORT) {
+fun String.
+        toToast(context: Context, length: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(context, this, length).show()
 }
