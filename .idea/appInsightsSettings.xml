@@ -23,7 +23,7 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.serranoie.android.buybuddy.debug" />
+                  <option name="appId" value="com.serranoie.android.buybuddy.beta" />
                   <option name="mobileSdkAppId" value="1:429681609246:android:32b894a362f8017e8cfc0f" />
                   <option name="projectId" value="buybuddy-4ndroid" />
                   <option name="projectNumber" value="429681609246" />

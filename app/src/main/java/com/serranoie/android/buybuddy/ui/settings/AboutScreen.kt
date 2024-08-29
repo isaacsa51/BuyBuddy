@@ -1,5 +1,6 @@
 package com.serranoie.android.buybuddy.ui.settings
 
+import android.os.Build
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,14 +23,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.serranoie.android.buybuddy.BuildConfig
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsItem
 import com.serranoie.android.buybuddy.ui.util.Utils
@@ -51,6 +55,7 @@ sealed class AboutLinks(val url: String) {
 fun AboutScreen(navController: NavController) {
     val view = LocalView.current
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(modifier = Modifier
@@ -120,13 +125,29 @@ fun AboutScreen(navController: NavController) {
             }
             item {
                 SettingsItem(title = stringResource(id = R.string.about_version_title),
-                    description = "alpha-1.0",
+                    description = stringResource(id = R.string.about_version_desc).format(BuildConfig.VERSION_NAME),
                     icon = Icons.Filled.Info,
-                    onClick = { }
+                    onClick = { clipboardManager.setText(AnnotatedString(getVersionReport())) }
                 )
             }
         }
     }
+}
+
+private fun getVersionReport(): String {
+    val versionName = BuildConfig.VERSION_NAME
+    val versionCode = BuildConfig.VERSION_CODE
+    val release = if (Build.VERSION.SDK_INT >= 30) {
+        Build.VERSION.RELEASE_OR_CODENAME
+    } else {
+        Build.VERSION.RELEASE
+    }
+
+    return StringBuilder().append("App version: $versionName ($versionCode)\n")
+        .append("Android Version: Android $release (API ${Build.VERSION.SDK_INT})\n")
+        .append("Device information: ${Build.MANUFACTURER} ${Build.MODEL} (${Build.DEVICE})\n")
+        .append("Supported ABIs: ${Build.SUPPORTED_ABIS.contentToString()}\n")
+        .toString()
 }
 
 @Preview

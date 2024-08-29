@@ -68,6 +68,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -239,6 +240,18 @@ fun EditItemScreen(
                         onUpdateItemEvent,
                         view
                     )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (productInfo?.name?.lowercase() == "dubai") {
+                        Text(
+                            text = stringResource(id = R.string.congrats_finding_this),
+                            style = MaterialTheme.typography.labelSmall.copy(textAlign = TextAlign.Center)
+                        )
+                    }
                 }
 
                 when (openDialog.value) {

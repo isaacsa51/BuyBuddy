@@ -162,4 +162,6 @@
     <string name="current_month">Current month</string>
     <string name="summary_label">Summary per category</string>
     <string name="transactions_category_label">Transactions: %1$s</string>
+
+    <string name="congrats_finding_this">You look very intimidating in your 2024 Honda Civic Sport...</string>
 </resources>
