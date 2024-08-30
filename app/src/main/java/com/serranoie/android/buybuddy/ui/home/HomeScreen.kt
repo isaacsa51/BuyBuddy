@@ -213,7 +213,7 @@ fun HomeScreen(
                     FloatingActionButton(
                         onClick = {
                             view.strongHapticFeedback()
-                            userEventsTracker.logButtonAction("new_product")
+                            userEventsTracker.logImportantAction("new_product")
                             navController.navigate(Route.Quiz.route)
                         },
                         containerColor = MaterialTheme.colorScheme.tertiary,

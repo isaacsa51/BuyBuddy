@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +47,7 @@ import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
 import com.serranoie.android.buybuddy.ui.common.EmptySummary
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProvider
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
@@ -65,6 +67,7 @@ import ir.ehsannarmani.compose_charts.models.LabelHelperProperties
 import ir.ehsannarmani.compose_charts.models.LabelProperties
 import ir.ehsannarmani.compose_charts.models.Line
 import ir.ehsannarmani.compose_charts.models.PopupProperties
+import timber.log.Timber
 import kotlin.math.absoluteValue
 
 val monthSummaryChart = object : ChartProvider {
@@ -91,8 +94,15 @@ val yearSummaryChart = object : ChartProvider {
 fun SpentScreen(
     summaryItemsBought: List<ItemPriceStatusOne>?,
     yearlySummaryBought: List<MonthlySumStatusOne>?,
-    monthlyCategorySumBought: List<MonthlySumCategoryStatusOne>?
+    monthlyCategorySumBought: List<MonthlySumCategoryStatusOne>?,
+    userEventsTracker: UserEventsTracker
 ) {
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("spent_screen")
+    }
+
+    userEventsTracker.logAdditionalInfo("Total products in Spent section: ${summaryItemsBought?.size}")
+
     Scaffold { padding ->
         LazyColumn(
             modifier = Modifier
@@ -117,7 +127,6 @@ fun SpentScreen(
 private fun HeaderInformation(
     summaryItemsBought: List<ItemPriceStatusOne>?, yearlySummaryBought: List<MonthlySumStatusOne>?
 ) {
-
     if (summaryItemsBought?.isEmpty() == true || yearlySummaryBought?.isEmpty() == true) {
         EmptySummary()
     } else {

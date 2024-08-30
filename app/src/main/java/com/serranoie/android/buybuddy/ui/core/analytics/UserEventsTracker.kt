@@ -49,4 +49,8 @@ class UserEventsTracker @Inject constructor(private val crashlytics: FirebaseCra
         }
         crashlytics.setCustomKey("network_type", networkType)
     }
+
+    fun logAdditionalInfo(value: String) {
+        crashlytics.log(value)
+    }
 }
