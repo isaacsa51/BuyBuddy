@@ -1,5 +1,5 @@
 [![License: SSPL](https://img.shields.io/badge/License-SSPL-blue)]([https://www.gnu.org/licenses/gpl-3.0](https://www.mongodb.com/legal/licensing/server-side-public-license))
-[![PRs welcome!](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](https://github.com/Ivy-Apps/ivy-wallet/blob/main/CONTRIBUTING.md)
+[![PRs welcome!](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](https://github.com/isaacsa51/BuyBuddy/blob/master/CONTRIBUTING.md)
 ![GitHub Repo Stars](https://img.shields.io/github/stars/isaacsa51/BuyBuddy)
 [![Fork BuyBuddy](https://img.shields.io/github/forks/isaacsa51/BuyBuddy)](https://github.com/isaacsa51/BuyBuddy/fork)
 
