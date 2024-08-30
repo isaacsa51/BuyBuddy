@@ -42,7 +42,7 @@ For submitting bug reports, feature requests, questions, or any other ideas to i
 
 ### Testing
 - [JUnit4](https://github.com/junit-team/junit4) (test framework, compatible with Android)
-- [MockK]([https://kotest.io/](https://mockk.io/)) (unit test assertions)
+- [MockK](https://mockk.io/) (unit test assertions)
 
 ### Local Persistence
 - [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) (key-value storage)
