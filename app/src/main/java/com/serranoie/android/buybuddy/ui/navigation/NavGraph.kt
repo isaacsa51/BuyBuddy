@@ -349,7 +349,7 @@ fun NavGraph(
                         towards = AnimatedContentTransitionScope.SlideDirection.End
                     )
                 }) {
-                    SettingsScreen(navController = navController)
+                    SettingsScreen(navController = navController, userEventsTracker = userEventsTracker)
                 }
 
                 composable(route = Route.About.route, enterTransition = {
