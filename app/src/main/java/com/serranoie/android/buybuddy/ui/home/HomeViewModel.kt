@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.home
 
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -109,10 +108,7 @@ class HomeViewModel @Inject constructor(
 
                         is UseCaseResult.Error -> {
                             _totalBoughtPrice.value = 0.0
-                            Log.e(
-                                "DEBUG",
-                                "Error fetching total bought price: ${result.exception.message}"
-                            )
+
                         }
                     }
                 }
@@ -126,10 +122,6 @@ class HomeViewModel @Inject constructor(
 
                         is UseCaseResult.Error -> {
                             _totalPrice.value = 0.0
-                            Log.e(
-                                "DEBUG",
-                                "Error fetching total price: ${result.exception.message}"
-                            )
                         }
 
                         null -> TODO()

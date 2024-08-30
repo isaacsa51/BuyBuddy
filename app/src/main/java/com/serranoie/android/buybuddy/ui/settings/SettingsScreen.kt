@@ -48,6 +48,7 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.getActivity
 import com.serranoie.android.buybuddy.ui.util.toToast
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
+import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +91,25 @@ fun SettingsScreen(navController: NavController) {
             item { BehaviourSettings(viewModel = viewModel) }
 
             item { InfoSettings(navController = navController) }
+
+            item {
+                Button(
+                    onClick = {
+                        simulateError()
+                    }
+                ) {
+                    Text(text = "Throw Error")
+                }
+            }
         }
+    }
+}
+
+private fun simulateError() {
+    try {
+        throw RuntimeException("Simulated error for demonstration purposes.")
+    } catch (e: Exception) {
+        Timber.e(e, "An error occurred in the SettingsScreen FROM RELEASE!")
     }
 }
 

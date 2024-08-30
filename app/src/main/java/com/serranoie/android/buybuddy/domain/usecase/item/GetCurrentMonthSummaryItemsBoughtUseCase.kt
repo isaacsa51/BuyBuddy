@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.domain.usecase.item
 
-import android.util.Log
 import com.serranoie.android.buybuddy.data.repository.ItemRepositoryImpl
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
 import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
@@ -17,7 +16,6 @@ class GetCurrentMonthSummaryItemsBoughtUseCase @Inject constructor(private val i
                         emit(UseCaseResult.Success(data))
                     }
             } catch (e: Exception) {
-                Log.e("DEBUG", "UseCase Exception: $e")
                 emit(UseCaseResult.Error(e))
             }
         }

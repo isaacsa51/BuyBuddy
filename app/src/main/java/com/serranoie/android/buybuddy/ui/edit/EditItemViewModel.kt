@@ -1,7 +1,6 @@
 package com.serranoie.android.buybuddy.ui.edit
 
 import android.app.Application
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -158,12 +157,13 @@ class EditItemViewModel
     suspend fun getCategory(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             getCategoryByIdUseCase.getCategoryById(id).collect { category ->
-                when(category) {
+                when (category) {
                     is UseCaseResult.Success -> {
                         _isLoading.value = true
                         _categoryInfo.value = category.data
                         _errorState.value = null
                     }
+
                     is UseCaseResult.Error -> {
                         _isLoading.value = true
                         _errorState.value = category.exception.message ?: "An error occurred"
@@ -216,7 +216,7 @@ class EditItemViewModel
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     suspend fun deleteItem(id: Int) {
-        when(val result = deleteItemUseCase(id)) {
+        when (val result = deleteItemUseCase(id)) {
             is UseCaseResult.Success -> {
             }
 

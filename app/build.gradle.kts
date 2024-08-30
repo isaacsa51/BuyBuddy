@@ -1,3 +1,5 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -33,10 +35,15 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = true
+            }
 
             applicationVariants.all {
                 outputs
@@ -54,6 +61,9 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
             signingConfig = signingConfigs.getByName("debug")
         }
         create("beta") {
@@ -101,6 +111,7 @@ dependencies {
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.material)
+    implementation(libs.play.services.base)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -199,7 +210,11 @@ dependencies {
     // Coil image loader
     implementation("io.coil-kt:coil-compose:2.6.0")
 
+    // Compose charts
     implementation("io.github.ehsannarmani:compose-charts:0.0.13")
+
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
 
 kapt {

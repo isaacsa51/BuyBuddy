@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.edit
 
-import android.util.Log
 import android.view.View
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -93,6 +92,7 @@ import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
@@ -263,7 +263,7 @@ fun EditItemScreen(
                                 openDialog.value = null
 
                                 coroutineScope.launch {
-                                    Log.d("DEBUG", "onDeleteItemEvent: ${productInfo?.itemId!!}")
+                                    Timber.v("onDeleteItemEvent: " + productInfo?.itemId!!)
                                     onDeleteItemEvent(productInfo.itemId)
                                 }
                             },

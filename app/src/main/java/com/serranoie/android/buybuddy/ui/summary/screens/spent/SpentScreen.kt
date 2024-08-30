@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.summary.screens.spent
 
-import android.util.Log
 import androidx.compose.animation.core.EaseInOutCubic
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -143,7 +142,8 @@ private fun HeaderInformation(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = stringResource(id = R.string.total_title_spent), style = MaterialTheme.typography.headlineSmall.copy(
+                text = stringResource(id = R.string.total_title_spent),
+                style = MaterialTheme.typography.headlineSmall.copy(
                     textAlign = TextAlign.Center
                 ),
             )

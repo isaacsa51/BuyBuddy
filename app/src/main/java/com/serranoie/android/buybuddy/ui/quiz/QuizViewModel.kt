@@ -1,7 +1,6 @@
 package com.serranoie.android.buybuddy.ui.quiz
 
 import android.app.Application
-import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -171,7 +170,6 @@ class QuizViewModel @Inject constructor(
             when (val result = insertItemWithCategoryUseCase(itemData, selectedCategoryName)) {
                 is UseCaseResult.Success -> {
                     val itemId = result.data
-                    Log.d("DEBUG", "item id generated: $itemId")
 
                     reminderResponse?.let {
                         scheduleNotification.scheduleNotification(
@@ -186,7 +184,6 @@ class QuizViewModel @Inject constructor(
                 }
 
                 is UseCaseResult.Error -> {
-                    Log.e("DEBUG", "Error inserting item: ${result.exception.message}")
                 }
             }
         }

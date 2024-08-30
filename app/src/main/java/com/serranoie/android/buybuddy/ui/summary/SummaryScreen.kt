@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.summary
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -48,6 +47,7 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -139,7 +139,7 @@ fun SummaryScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     if (errorState != null) {
-                        Log.e("DEBUG", "$errorState")
+                        Timber.e(errorState)
                         Text(text = errorState)
                     } else {
                         tabRowItems[pagerState.currentPage].screen()
