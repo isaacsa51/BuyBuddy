@@ -52,6 +52,11 @@ object DependenciesProvider {
     }
 
     @Provides
+    fun provideFirebaseCrashlytics(): FirebaseCrashlytics {
+        return FirebaseCrashlytics.getInstance()
+    }
+
+    @Provides
     @Singleton
     fun provideBuyBuddyDatabase(@ApplicationContext appContext: Context): BuyBuddyDatabase {
         return Room.databaseBuilder(

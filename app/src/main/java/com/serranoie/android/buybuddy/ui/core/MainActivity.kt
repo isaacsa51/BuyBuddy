@@ -24,11 +24,14 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.home.HomeViewModel
 import com.serranoie.android.buybuddy.ui.navigation.NavGraph
 import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,6 +41,9 @@ class MainActivity : ComponentActivity() {
 
     lateinit var settingsViewModel: SettingsViewModel
     lateinit var homeViewModel: HomeViewModel
+
+    @Inject
+    lateinit var userEventsTracker: UserEventsTracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,9 +89,10 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     val startDestination = onBoardViewModel.startDestination
-                    NavGraph(navController, startDestination)
+                    NavGraph(navController, startDestination, userEventsTracker)
 
                     intent?.getStringExtra("nav_route")?.let { navRoute ->
+                        Timber.i("User navigated via Notification to product: $navRoute")
                         navController.navigate(navRoute)
                     }
                 }
@@ -116,7 +123,7 @@ class MainActivity : ComponentActivity() {
         when (requestCode) {
             ReminderReceiver.REQUEST_POST_NOTIFICATIONS_PERMISSION -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    // Permission granted, proceed with showing the notification
+                    Timber.i("Permission granted, proceed with showing the notification")
                 } else {
                     // Permission denied, handle the denial
                     Toast
@@ -125,6 +132,7 @@ class MainActivity : ComponentActivity() {
                             "Permission denied to post notifications",
                             Toast.LENGTH_SHORT,
                         ).show()
+                    Timber.e("Permission Denied to post notifications!")
                 }
                 return
             }

@@ -8,19 +8,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LocalPolice
 import androidx.compose.material.icons.rounded.BrightnessMedium
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -48,7 +44,6 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.getActivity
 import com.serranoie.android.buybuddy.ui.util.toToast
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
-import timber.log.Timber
 
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -106,11 +101,7 @@ fun SettingsScreen(navController: NavController) {
 }
 
 private fun simulateError() {
-    try {
-        throw RuntimeException("Simulated error for demonstration purposes.")
-    } catch (e: Exception) {
-        Timber.e(e, "An error occurred in the SettingsScreen FROM RELEASE!")
-    }
+    throw RuntimeException("Simulated error for demonstration purposes.")
 }
 
 @Composable
@@ -193,7 +184,8 @@ fun InfoSettings(navController: NavController) {
 @Composable
 fun BehaviourSettings(viewModel: SettingsViewModel) {
 
-    val categoryVisibilityValue = remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
+    val categoryVisibilityValue =
+        remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
 
     SettingsContainer {
         SettingsCategory(title = stringResource(id = R.string.behaviour_label))

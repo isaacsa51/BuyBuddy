@@ -1,7 +1,6 @@
 package com.serranoie.android.buybuddy.ui.navigation
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
@@ -25,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.serranoie.android.buybuddy.ui.backup.BackupScreen
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.edit.EditItemScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemViewModel
 import com.serranoie.android.buybuddy.ui.home.HomeScreen
@@ -48,6 +48,7 @@ import java.util.Locale
 fun NavGraph(
     navController: NavHostController,
     startDestination: String,
+    userEventsTracker: UserEventsTracker,
 ) {
     NavHost(
         navController = navController,
@@ -116,6 +117,7 @@ fun NavGraph(
                     totalPrice = totalPrice,
                     totalBoughtPrice = totalBoughtPrice,
                     categoryVisibility = categoryVisibility,
+                    userEventsTracker = userEventsTracker
                 )
             }
 
@@ -196,6 +198,7 @@ fun NavGraph(
                     yearlySummaryBought = yearlySummaryBought,
                     monthlyCategorySumToBuy = monthlyCategorySumToBuy,
                     monthlyCategorySumBought = monthlyCategorySumBought,
+                    userEventsTracker = userEventsTracker,
                     errorState = errorState
                 )
             }
