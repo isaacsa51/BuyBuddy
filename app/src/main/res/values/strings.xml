@@ -19,7 +19,7 @@
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="done">Done</string>
-    <string name="error_selected_date">Selected date should be after today, please select again</string>
+    <string name="error_selected_date">Selected date should be after today, try selecting a different date</string>
     <string name="select_time">Select Time</string>
     <string name="empty">Empty</string>
 
@@ -94,6 +94,7 @@
     <string name="select_date">Select date</string>
     <string name="reminder_saved">Product saved!</string>
     <string name="quiz_topbar_count">" of %1$s"</string>
+    <string name="error_saving_data">Error saving product, try again later…</string>
 
     <!--  Settings values  -->
     <string name="settings_title">Settings</string>

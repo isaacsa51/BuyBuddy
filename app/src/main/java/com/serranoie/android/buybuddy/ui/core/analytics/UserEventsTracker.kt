@@ -23,6 +23,14 @@ class UserEventsTracker @Inject constructor(private val crashlytics: FirebaseCra
         crashlytics.setCustomKey("action_name", actionName)
     }
 
+    fun logAdditionalInfo(additionalInfo: String) {
+        crashlytics.log("Additional info: $additionalInfo")
+    }
+
+    fun logQuizInfo(s: String, inputInfo: Map<String, String>) {
+        crashlytics.log("Quiz info: $s, $inputInfo")
+    }
+
     fun logException(exception: Throwable, screenName: String? = null, additionalInfo: Map<String, String>? = null) {
         crashlytics.recordException(exception)
         screenName?.let { crashlytics.setCustomKey("screen_name", it) }
@@ -51,6 +59,7 @@ class UserEventsTracker @Inject constructor(private val crashlytics: FirebaseCra
     }
 
     fun logLoadedSettingsInfo(key: String, app_settings_info: Map<String, String>) {
-
+        crashlytics.log("Loaded settings info: $key")
+        app_settings_info.forEach { (key, value) -> crashlytics.setCustomKey(key, value) }
     }
 }

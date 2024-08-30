@@ -62,6 +62,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,6 +90,7 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.Utils.dateToString
 import com.serranoie.android.buybuddy.ui.util.Utils.formatPrice
 import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
+import com.serranoie.android.buybuddy.ui.util.toToast
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -557,6 +559,8 @@ private fun ReasonsHolder(
 private fun DateHolder(
     selectedDateTime: Date?, onSelectedDateTimeResponse: (Date) -> Unit, view: View
 ) {
+    val context = LocalContext.current
+
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDateTime?.time,
     )
@@ -651,11 +655,15 @@ private fun DateHolder(
                         calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
                         calendar.set(Calendar.MINUTE, timePickerState.minute)
                         onSelectedDateTimeResponse(calendar.time)
+                        calendar.timeZone = TimeZone.getDefault()
+
 
                         if (calendar.after(Calendar.getInstance())) {
                             onSelectedDateTimeResponse(selectedDateTime)
                             showTimePicker = false
                             formattedDate = dateToString(selectedDateTime)
+                        } else {
+                            context.getString(R.string.error_selected_date).toToast(context)
                         }
                     }
                     view.weakHapticFeedback()

@@ -135,8 +135,10 @@ fun NavGraph(
                 )
             }) {
                 QuizRoute(
+                    userEventsTracker,
                     onNavUp = navController::navigateUp,
                     onQuizComplete = {
+                        userEventsTracker.logImportantAction("Quiz completed")
                         navController.navigate(Route.FinishedQuiz.route) {
                             popUpTo(Route.Quiz.route) { inclusive = true }
                         }
@@ -249,6 +251,7 @@ fun NavGraph(
                 )
             }) {
                 QuizFinishedScreen(
+                    userEventsTracker = userEventsTracker,
                     onDonePressed = {
                         navController.navigate(Route.Home.route) {
                             popUpTo(Route.Home.route) { inclusive = true }

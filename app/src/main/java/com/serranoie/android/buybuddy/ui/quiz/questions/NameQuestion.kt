@@ -1,8 +1,5 @@
 package com.serranoie.android.buybuddy.ui.quiz.questions
 
-import android.content.res.Configuration
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,9 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,15 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 
 @Composable
 fun NameQuestion(
+    userEventsTracker: UserEventsTracker,
     @StringRes titleResourceId: Int,
     @StringRes directionsResourceId: Int,
     onInputResponse: (String) -> Unit,
@@ -43,6 +41,17 @@ fun NameQuestion(
 ) {
     var priceText by remember { mutableStateOf(priceResponse) }
     val isValidPrice = remember { mutableStateOf(true) }
+
+    LaunchedEffect(key1 = nameItemResponse, key2 = descriptionResponse, key3 = priceResponse) {
+        if (nameItemResponse.isNotBlank() && descriptionResponse.isNotBlank() && priceResponse.isNotBlank()) {
+            val inputInfo = mapOf(
+                "itemName" to nameItemResponse,
+                "itemDescription" to descriptionResponse,
+                "itemPrice" to priceResponse
+            )
+            userEventsTracker.logQuizInfo("Product details: ", inputInfo)
+        }
+    }
 
     QuestionWrapper(
         titleResourceId = titleResourceId,
@@ -117,6 +126,7 @@ fun NameQuestion(
 
 @Composable
 fun PopulateNameQuestion(
+    userEventsTracker: UserEventsTracker,
     onInputResponse: (String) -> Unit,
     onDescriptionResponse: (String) -> Unit,
     onPriceResponse: (String) -> Unit,
@@ -126,6 +136,7 @@ fun PopulateNameQuestion(
     modifier: Modifier,
 ) {
     NameQuestion(
+        userEventsTracker = userEventsTracker,
         titleResourceId = R.string.name_question,
         directionsResourceId = R.string.name_helper,
         onInputResponse = onInputResponse,
@@ -136,23 +147,4 @@ fun PopulateNameQuestion(
         priceResponse = priceResponse,
         modifier = modifier,
     )
-}
-
-@RequiresApi(Build.VERSION_CODES.Q)
-@Preview(name = "Light", uiMode = Configuration.UI_MODE_NIGHT_NO)
-@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun NameItemQuestionPreview() {
-    Surface {
-        NameQuestion(
-            titleResourceId = R.string.name_question,
-            directionsResourceId = R.string.name_helper,
-            onInputResponse = { },
-            nameItemResponse = "",
-            descriptionResponse = "",
-            onDescriptionResponse = { },
-            onPriceResponse = { },
-            priceResponse = "",
-        )
-    }
 }

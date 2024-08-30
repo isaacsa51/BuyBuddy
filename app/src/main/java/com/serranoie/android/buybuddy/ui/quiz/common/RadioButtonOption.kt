@@ -64,7 +64,7 @@ fun RadioButtonOption(
             Text(text, Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
 
             Box(Modifier.padding(8.dp)) {
-                RadioButton(selected, onClick = { onOptionSelected(category) }) // Pass the whole category
+                RadioButton(selected, onClick = { onOptionSelected(category) })
             }
         }
     }

@@ -7,12 +7,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.Item
 import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategoryUseCase
 import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.Questions
 import com.serranoie.android.buybuddy.ui.quiz.questions.Category
+import com.serranoie.android.buybuddy.ui.util.toToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -21,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val insertItemWithCategoryUseCase: InsertItemWithCategoryUseCase,
-    application: Application
+    application: Application,
+    private val userEventsTracker: UserEventsTracker,
 ) : AndroidViewModel(application) {
 
     private val scheduleNotification by lazy { ScheduleNotification() }
@@ -184,6 +188,10 @@ class QuizViewModel @Inject constructor(
                 }
 
                 is UseCaseResult.Error -> {
+                    result.exception.printStackTrace()
+                    userEventsTracker.logException(result.exception)
+                    val context = getApplication<Application>().applicationContext
+                    context.getString(R.string.error_saving_data).toToast(context)
                 }
             }
         }
