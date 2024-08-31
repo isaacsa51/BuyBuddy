@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.summary
 
-import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -15,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,10 +30,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusOne
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
@@ -42,12 +45,14 @@ import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
 import com.serranoie.android.buybuddy.ui.common.CustomTabIndicator
 import com.serranoie.android.buybuddy.ui.common.noRippleClickable
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.summary.screens.incoming.IncomingScreen
 import com.serranoie.android.buybuddy.ui.summary.screens.spent.SpentScreen
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -60,6 +65,7 @@ fun SummaryScreen(
     monthlyCategorySumToBuy: List<MonthlySumCategoryStatusZero>?,
     monthlyCategorySumBought: List<MonthlySumCategoryStatusOne>?,
     errorState: String?,
+    userEventsTracker: UserEventsTracker,
 ) {
     val view = LocalView.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
@@ -69,15 +75,19 @@ fun SummaryScreen(
     val tabRowItems = listOf(
         SummaryItem(label = stringResource(id = R.string.spent_title), screen = {
             SpentScreen(
-                summaryItemsBought, yearlySummaryBought, monthlyCategorySumBought
+                summaryItemsBought, yearlySummaryBought, monthlyCategorySumBought, userEventsTracker
             )
         }),
         SummaryItem(label = stringResource(id = R.string.incoming_title), screen = {
             IncomingScreen(
-                summaryItemsToBuy, yearlySummaryToBuy, monthlyCategorySumToBuy
+                summaryItemsToBuy, yearlySummaryToBuy, monthlyCategorySumToBuy, userEventsTracker
             )
         }),
     )
+
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("summary_screen")
+    }
 
     Scaffold(
         topBar = {
@@ -91,6 +101,7 @@ fun SummaryScreen(
                     navigationIcon = {
                         IconButton(onClick = {
                             view.weakHapticFeedback()
+                            userEventsTracker.logButtonAction("back_button")
                             navController.navigateUp()
                         }) {
                             Icon(
@@ -119,7 +130,14 @@ fun SummaryScreen(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                             .noRippleClickable { },
                             selected = pagerState.currentPage == index,
-                            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(index) } }) {
+                            onClick = {
+
+                                userEventsTracker.logButtonAction("tab_button")
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(index)
+                                }
+                            }
+                        ) {
                             Text(text = item.label)
                         }
                     }
@@ -139,8 +157,11 @@ fun SummaryScreen(
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     if (errorState != null) {
-                        Log.e("DEBUG", "$errorState")
-                        Text(text = errorState)
+                        Timber.e(errorState)
+                        Text(
+                            text = errorState,
+                            style = MaterialTheme.typography.displaySmall.copy(textAlign = TextAlign.Center)
+                        )
                     } else {
                         tabRowItems[pagerState.currentPage].screen()
                     }
@@ -154,6 +175,8 @@ fun SummaryScreen(
 @Composable
 private fun SummaryScreenPreview() {
     val navController = rememberNavController()
+    val crashlytics = FirebaseCrashlytics.getInstance()
+    val userEventsTracker = UserEventsTracker(crashlytics)
 
     val summaryItemsToBuy = listOf(
         ItemPriceStatusZero(50.0),
@@ -194,6 +217,7 @@ private fun SummaryScreenPreview() {
         yearlySummaryBought,
         null,
         null,
-        null
+        null,
+        userEventsTracker
     )
 }

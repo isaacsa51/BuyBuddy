@@ -2,6 +2,7 @@ package com.serranoie.android.buybuddy.ui.quiz
 
 import android.app.Application
 import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategoryUseCase
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.Questions
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -27,13 +28,16 @@ class QuizViewModelTest {
     @MockK
     private lateinit var application: Application
 
+    @MockK
+    private lateinit var userEventsTracker: UserEventsTracker
+
     private lateinit var viewModel: QuizViewModel
 
     @Before
     fun setup() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = QuizViewModel(insertItemWithCategoryUseCase, application)
+        viewModel = QuizViewModel(insertItemWithCategoryUseCase, application, userEventsTracker)
 
         every { application.getString(any<Int>()) } returns ""
     }

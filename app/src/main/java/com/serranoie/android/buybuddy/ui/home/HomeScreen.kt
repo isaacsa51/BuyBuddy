@@ -60,19 +60,16 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.data.persistance.entity.CategoryEntity
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
-import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
 import com.serranoie.android.buybuddy.ui.common.CategoryCard
 import com.serranoie.android.buybuddy.ui.common.EmptyListScreen
 import com.serranoie.android.buybuddy.ui.common.TotalAmountCard
 import com.serranoie.android.buybuddy.ui.core.MainActivity
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.navigation.NavigationItem
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
@@ -82,7 +79,6 @@ import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,6 +88,7 @@ fun HomeScreen(
     totalPrice: Double,
     totalBoughtPrice: Double,
     categoryVisibility: Boolean,
+    userEventsTracker: UserEventsTracker
 ) {
 
     val items = listOf(
@@ -137,6 +134,10 @@ fun HomeScreen(
     val scope = rememberCoroutineScope()
     val selectedItemIndex by rememberSaveable { mutableIntStateOf(0) }
 
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("HomeScreen")
+    }
+
     Surface {
         ModalNavigationDrawer(
             drawerState = drawerState,
@@ -161,6 +162,9 @@ fun HomeScreen(
                             selected = selectedItemIndex == index,
                             onClick = {
                                 view.weakHapticFeedback()
+
+                                userEventsTracker.logButtonAction("drawer_button: ${item.title}")
+
                                 navController.navigate(item.route)
                                 scope.launch {
                                     drawerState.close()
@@ -209,7 +213,9 @@ fun HomeScreen(
                     FloatingActionButton(
                         onClick = {
                             view.strongHapticFeedback()
-                            navController.navigate(Route.Quiz.route) },
+                            userEventsTracker.logImportantAction("new_product")
+                            navController.navigate(Route.Quiz.route)
+                        },
                         containerColor = MaterialTheme.colorScheme.tertiary,
                     ) {
                         Icon(
@@ -290,87 +296,6 @@ private fun DrawerHeader(themeMode: ThemeMode) {
             text = stringResource(id = R.string.app_name),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    val n = rememberNavController()
-    val categoriesWithItems = listOf(
-        CategoryWithItemsEntity(
-            category = CategoryEntity(
-                categoryId = 1,
-                name = "Category 1",
-            ), items = listOf(
-                ItemEntity(
-                    itemId = 1,
-                    name = "Item 1",
-                    categoryId = 1,
-                    description = "Description",
-                    usage = "Usage",
-                    benefits = "Benefits",
-                    disadvantages = "Disadvantages",
-                    price = 100.0,
-                    reminderDate = Date(),
-                    reminderTime = Date(),
-                    status = false
-                ), ItemEntity(
-                    itemId = 2,
-                    name = "Item 2",
-                    categoryId = 1,
-                    description = "Description",
-                    usage = "Usage",
-                    benefits = "Benefits",
-                    disadvantages = "Disadvantages",
-                    price = 100.0,
-                    reminderDate = Date(),
-                    reminderTime = Date(),
-                    status = false
-                )
-            )
-        ), CategoryWithItemsEntity(
-            category = CategoryEntity(
-                categoryId = 2,
-                name = "Category 2",
-            ), items = listOf(
-                ItemEntity(
-                    itemId = 1,
-                    name = "Item 3",
-                    categoryId = 3,
-                    description = "Description",
-                    usage = "Usage",
-                    benefits = "Benefits",
-                    disadvantages = "Disadvantages",
-                    price = 100.0,
-                    reminderDate = Date(),
-                    reminderTime = Date(),
-                    status = false
-                ), ItemEntity(
-                    itemId = 2,
-                    name = "Item 4",
-                    categoryId = 4,
-                    description = "Description",
-                    usage = "Usage",
-                    benefits = "Benefits",
-                    disadvantages = "Disadvantages",
-                    price = 100.0,
-                    reminderDate = Date(),
-                    reminderTime = Date(),
-                    status = false
-                )
-            )
-        )
-    )
-
-    Surface {
-        HomeScreen(
-            navController = n,
-            categoriesWithItems = categoriesWithItems,
-            totalPrice = 500.0,
-            totalBoughtPrice = 300.0,
-            categoryVisibility = true
         )
     }
 }

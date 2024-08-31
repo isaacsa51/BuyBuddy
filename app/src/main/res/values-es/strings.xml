@@ -37,6 +37,8 @@
     <string name="back">Atrás</string>
     <string name="close">Cerrar</string>
     <string name="empty">Vacio</string>
+    <string name="error_selected_date">La fecha seleccionada debe ser posterior a hoy, intente seleccionar una fecha diferente</string>
+
     <string name="delete_current_item">Borrar producto actual</string>
     <string name="loading_category">Cargando categoría…</string>
     <string name="current_item_information">Información actual del producto</string>
@@ -60,11 +62,11 @@
     <string name="onboarding_second_description">Considerar el producto podrás decidir si comprarlo teniendo en cuenta diferentes aspectos y ahorrarte dinero.</string>
     <string name="dynamic_theme_notice">Material You design se lanzó con Android 12+. En dispositivos con Android 12 y versiones posteriores, la función “colores dinámicos” permite ver un tema generado a partir del fondo de pantalla que el usuario tiene actualmente, brindando una experiencia más personal y coherente.</string>
     <string name="quiz_topbar_count">" de %1$s"</string>
+    <string name="error_saving_data">Error al guardar al producto, intenta más tarde…</string>
     <string name="name">Nombre</string>
     <string name="description">Descripción</string>
     <string name="price">Precio</string>
     <string name="ok">OK</string>
-    <string name="error_selected_date">La fecha seleccionada no es válida, ingrese una fecha correcta</string>
     <string name="finished_quiz_title">Todo listo y guardado!</string>
     <string name="finished_quiz_subtitle">Puedes ver tus productos en la pantalla de inicio.</string>
     <string name="finished_quiz_info">A partir de ahora solo tendrás que esperar hasta que te aparezca el recordatorio y tengas en cuenta si quieres el producto o no.</string>

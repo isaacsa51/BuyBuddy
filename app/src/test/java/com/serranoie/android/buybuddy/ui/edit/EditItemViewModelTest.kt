@@ -10,6 +10,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
 import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -55,6 +56,9 @@ class EditItemViewModelTest {
 
     private lateinit var viewModel: EditItemViewModel
 
+    @MockK
+    private lateinit var userEventsTracker: UserEventsTracker
+
     @Before
     fun setup() {
         MockKAnnotations.init(this)
@@ -66,6 +70,7 @@ class EditItemViewModelTest {
             deleteItemUseCase,
             updateItemUseCase,
             updateItemStatusUseCase,
+            userEventsTracker,
             application
         )
     }
@@ -159,6 +164,7 @@ class EditItemViewModelTest {
             deleteItemUseCase,
             updateItemUseCase,
             updateItemStatusUseCase,
+            userEventsTracker,
             application
         ).apply {
             this.scheduleNotification = scheduleNotificationMock

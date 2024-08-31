@@ -1,7 +1,6 @@
 package com.serranoie.android.buybuddy.ui.edit
 
 import android.app.Application
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,6 +16,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
 import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -37,6 +37,7 @@ class EditItemViewModel
     private val deleteItemUseCase: DeleteItemUseCase,
     private val updateItemUseCase: UpdateItemUseCase,
     private val updateItemStatusUseCase: UpdateItemStatusUseCase,
+    private val userEventsTracker: UserEventsTracker,
     application: Application
 ) : AndroidViewModel(application) {
     private val steps = listOf(
@@ -158,13 +159,15 @@ class EditItemViewModel
     suspend fun getCategory(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             getCategoryByIdUseCase.getCategoryById(id).collect { category ->
-                when(category) {
+                when (category) {
                     is UseCaseResult.Success -> {
                         _isLoading.value = true
                         _categoryInfo.value = category.data
                         _errorState.value = null
                     }
+
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(category.exception.message.toString())
                         _isLoading.value = true
                         _errorState.value = category.exception.message ?: "An error occurred"
                     }
@@ -216,11 +219,12 @@ class EditItemViewModel
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     suspend fun deleteItem(id: Int) {
-        when(val result = deleteItemUseCase(id)) {
+        when (val result = deleteItemUseCase(id)) {
             is UseCaseResult.Success -> {
             }
 
             is UseCaseResult.Error -> {
+                userEventsTracker.logDataLoadingError(result.exception.message.toString())
             }
         }
     }

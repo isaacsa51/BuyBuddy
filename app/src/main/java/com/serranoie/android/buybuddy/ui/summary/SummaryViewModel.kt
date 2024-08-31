@@ -16,6 +16,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.GetCurrentMonthSummary
 import com.serranoie.android.buybuddy.domain.usecase.item.GetCurrentMonthSummaryItemsToBuyUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetYearlySummaryBoughtUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetYearlySummaryToBuyUseCase
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,6 +34,7 @@ class SummaryViewModel @Inject constructor(
     private val getYearlySummaryBoughtUseCase: GetYearlySummaryBoughtUseCase,
     private val getMonthlySumCategoryStatusZero: GetMonthlySumCategoryStatusZeroUseCase,
     private val getMonthlySumCategoryStatusOne: GetMonthlySumCategoryStatusOneUseCase,
+    private val userEventsTracker: UserEventsTracker,
 ) : ViewModel() {
 
     // Response states
@@ -76,6 +78,7 @@ class SummaryViewModel @Inject constructor(
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(result.exception.message.toString())
                         _errorState.value = result.exception.message ?: "An error occurred"
                     }
 
@@ -100,6 +103,7 @@ class SummaryViewModel @Inject constructor(
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(result.exception.message.toString())
                         _errorState.value = result.exception.message ?: "An error occurred"
                     }
 
@@ -124,6 +128,7 @@ class SummaryViewModel @Inject constructor(
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(result.exception.message.toString())
                         _errorState.value = result.exception.message ?: "An error occurred"
                     }
 
@@ -148,6 +153,7 @@ class SummaryViewModel @Inject constructor(
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(result.exception.message.toString())
                         _errorState.value = result.exception.message ?: "An error occurred"
                     }
 
@@ -173,6 +179,7 @@ class SummaryViewModel @Inject constructor(
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(result.exception.message.toString())
                         _errorState.value = result.exception.message ?: "An error occurred"
                     }
 
@@ -198,6 +205,7 @@ class SummaryViewModel @Inject constructor(
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(result.exception.message.toString())
                         _errorState.value = result.exception.message ?: "An error occurred"
                     }
 

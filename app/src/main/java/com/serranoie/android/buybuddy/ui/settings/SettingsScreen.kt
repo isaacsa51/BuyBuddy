@@ -8,24 +8,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.LocalPolice
 import androidx.compose.material.icons.rounded.BrightnessMedium
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,8 +33,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.serranoie.android.buybuddy.BuildConfig
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.MainActivity
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.navigation.Screen
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsCategory
 import com.serranoie.android.buybuddy.ui.settings.common.SettingsContainer
@@ -52,11 +52,15 @@ import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 @RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTracker) {
     val view = LocalView.current
     val context = LocalContext.current
     val viewModel = (context.getActivity() as MainActivity).settingsViewModel
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("settings_screen")
+    }
 
     Scaffold(
         topBar = {
@@ -69,6 +73,7 @@ fun SettingsScreen(navController: NavController) {
                 navigationIcon = {
                     IconButton(onClick = {
                         view.weakHapticFeedback()
+                        userEventsTracker.logButtonAction("back_button")
                         navController.navigateUp()
                     }) {
                         Icon(
@@ -85,31 +90,44 @@ fun SettingsScreen(navController: NavController) {
         LazyColumn(
             modifier = Modifier.padding(padding),
         ) {
-            item { DisplaySettings(viewModel = viewModel) }
+            item { DisplaySettings(viewModel = viewModel, userEventsTracker) }
 
-            item { BehaviourSettings(viewModel = viewModel) }
+            item { BehaviourSettings(viewModel = viewModel, userEventsTracker) }
 
-            item { InfoSettings(navController = navController) }
+            item { InfoSettings(navController = navController, userEventsTracker) }
+
+            if (BuildConfig.DEBUG) {
+                item {
+                    Button(onClick = {
+                        simulateError()
+                    }) {
+                        Text(text = "Throw Error")
+                    }
+                }
+            }
+
         }
     }
 }
 
+private fun simulateError() {
+    throw RuntimeException("Simulated error for demonstration purposes.")
+}
+
 @Composable
-fun DisplaySettings(viewModel: SettingsViewModel) {
+fun DisplaySettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsTracker) {
     val context = LocalContext.current
     val showThemeSheet = remember { mutableStateOf(false) }
 
-    val themeValue =
-        when (viewModel.getThemeValue()) {
-            ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
-            ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
-            else -> stringResource(id = R.string.theme_dialog_option3)
-        }
+    val themeValue = when (viewModel.getThemeValue()) {
+        ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
+        ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
+        else -> stringResource(id = R.string.theme_dialog_option3)
+    }
 
-    val materialYouValue =
-        remember {
-            mutableStateOf(viewModel.getMaterialYouValue())
-        }
+    val materialYouValue = remember {
+        mutableStateOf(viewModel.getMaterialYouValue())
+    }
 
     Spacer(modifier = Modifier.height(smallPadding))
 
@@ -120,7 +138,10 @@ fun DisplaySettings(viewModel: SettingsViewModel) {
             title = stringResource(id = R.string.theme_setting),
             description = stringResource(id = R.string.theme_setting_desc),
             icon = Icons.Rounded.BrightnessMedium,
-            onClick = { showThemeSheet.value = true },
+            onClick = {
+                showThemeSheet.value = true
+                userEventsTracker.logButtonAction("theme_button")
+            },
         )
 
         SettingsItemSwitch(
@@ -130,6 +151,8 @@ fun DisplaySettings(viewModel: SettingsViewModel) {
             switchState = materialYouValue,
             onCheckChange = { newValue ->
                 materialYouValue.value = newValue
+
+                userEventsTracker.logButtonAction("material_you_toggle: $newValue")
 
                 if (newValue) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -157,7 +180,7 @@ fun DisplaySettings(viewModel: SettingsViewModel) {
 }
 
 @Composable
-fun InfoSettings(navController: NavController) {
+fun InfoSettings(navController: NavController, userEventsTracker: UserEventsTracker) {
     SettingsContainer {
         SettingsCategory(title = stringResource(id = R.string.misc_setting_title))
 
@@ -165,30 +188,33 @@ fun InfoSettings(navController: NavController) {
             title = stringResource(id = R.string.app_info_setting),
             description = stringResource(id = R.string.app_info_setting_desc),
             icon = Icons.Rounded.Info,
-            onClick = { navController.navigate(Screen.ABOUT.name) },
+            onClick = {
+                userEventsTracker.logButtonAction("about_button")
+                navController.navigate(Screen.ABOUT.name)
+            },
         )
     }
     Spacer(modifier = Modifier.height(2.dp))
 }
 
 @Composable
-fun BehaviourSettings(viewModel: SettingsViewModel) {
+fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsTracker) {
 
-    val categoryVisibilityValue = remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
+    val categoryVisibilityValue =
+        remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
 
     SettingsContainer {
         SettingsCategory(title = stringResource(id = R.string.behaviour_label))
 
-        SettingsItemSwitch(
-            title = stringResource(R.string.show_empty_categories_label),
+        SettingsItemSwitch(title = stringResource(R.string.show_empty_categories_label),
             description = stringResource(R.string.empty_categories_desc),
             icon = Icons.Rounded.RemoveCircleOutline,
             switchState = categoryVisibilityValue,
             onCheckChange = { newValue ->
+                userEventsTracker.logButtonAction("show_empty_categories_toggle: $newValue")
                 categoryVisibilityValue.value = newValue
                 viewModel.setCategoryVisibility(newValue)
-            }
-        )
+            })
     }
 }
 
@@ -196,5 +222,10 @@ fun BehaviourSettings(viewModel: SettingsViewModel) {
 @PreviewLightDark
 @Composable
 fun SettingsScreenPreview() {
-    SettingsScreen(navController = NavController(LocalContext.current))
+    val crashlytics = FirebaseCrashlytics.getInstance()
+    val userEventsTracker = UserEventsTracker(crashlytics)
+
+    SettingsScreen(
+        navController = NavController(LocalContext.current), userEventsTracker = userEventsTracker
+    )
 }

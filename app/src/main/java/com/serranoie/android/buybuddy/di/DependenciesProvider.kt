@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.serranoie.android.buybuddy.data.persistance.BuyBuddyDatabase
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
 import com.serranoie.android.buybuddy.data.persistance.prefs.manager.LocalUserManagerImpl
@@ -29,6 +30,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategoryUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.PreferenceUtil
 import dagger.Module
 import dagger.Provides
@@ -43,6 +45,16 @@ object DependenciesProvider {
 
     // Extension function to create a DataStore instance
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+
+    @Provides
+    fun provideUserEventsTracker(crashlytics: FirebaseCrashlytics): UserEventsTracker {
+        return UserEventsTracker(crashlytics)
+    }
+
+    @Provides
+    fun provideFirebaseCrashlytics(): FirebaseCrashlytics {
+        return FirebaseCrashlytics.getInstance()
+    }
 
     @Provides
     @Singleton

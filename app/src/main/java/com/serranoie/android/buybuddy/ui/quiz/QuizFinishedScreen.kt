@@ -16,6 +16,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -30,16 +31,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import kotlinx.coroutines.launch
 
 @Composable
-fun QuizFinishedScreen(onDonePressed: () -> Unit) {
+fun QuizFinishedScreen(onDonePressed: () -> Unit, userEventsTracker: UserEventsTracker) {
     val view = LocalView.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("finished_quiz_screen")
+        userEventsTracker.logImportantAction("Quiz finished")
+    }
 
     Scaffold(
         snackbarHost = {
@@ -57,13 +64,14 @@ fun QuizFinishedScreen(onDonePressed: () -> Unit) {
         bottomBar = {
             Surface(
                 modifier =
-                    Modifier
-                        .navigationBarsPadding()
-                        .fillMaxWidth(),
+                Modifier
+                    .navigationBarsPadding()
+                    .fillMaxWidth(),
                 color = Color.Transparent,
             ) {
                 Button(
                     onClick = {
+                        userEventsTracker.logButtonAction("quiz_done_button")
                         view.strongHapticFeedback()
                         scope.launch {
                             snackbarHostState.showSnackbar(context.getString(R.string.reminder_saved))
@@ -71,9 +79,9 @@ fun QuizFinishedScreen(onDonePressed: () -> Unit) {
                         }
                     },
                     modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(basePadding),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(basePadding),
                 ) {
                     Text(text = stringResource(id = R.string.done))
                 }
@@ -122,15 +130,5 @@ private fun QuizResult(
                 modifier = Modifier.padding(horizontal = basePadding),
             )
         }
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun PreviewSurveyResult() {
-    Surface {
-        QuizFinishedScreen(
-            onDonePressed = {},
-        )
     }
 }

@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,11 +41,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.ItemPriceStatusZero
 import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusZero
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
 import com.serranoie.android.buybuddy.ui.common.EmptySummary
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.summary.screens.ChartProviderIncoming
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
@@ -90,8 +93,16 @@ val yearSummaryChart = object : ChartProviderIncoming {
 fun IncomingScreen(
     summaryItemsToBuy: List<ItemPriceStatusZero>?,
     yearlySummaryToBuy: List<MonthlySumStatusZero>?,
-    monthlyCategorySumToBuy: List<MonthlySumCategoryStatusZero>?
+    monthlyCategorySumToBuy: List<MonthlySumCategoryStatusZero>?,
+    userEventsTracker: UserEventsTracker
 ) {
+
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("incoming_screen")
+    }
+
+    userEventsTracker.logAdditionalInfo("Total products in Incoming section: ${summaryItemsToBuy?.size}")
+
     Scaffold { padding ->
         LazyColumn(
             modifier = Modifier
@@ -455,6 +466,9 @@ private fun CategoryListItem(
 @Composable
 @Preview(showBackground = true)
 private fun IncomingScreenPreview() {
+    val crashlytics = FirebaseCrashlytics.getInstance()
+    val userEventsTracker = UserEventsTracker(crashlytics)
+
     val summaryItemsToBuy = listOf(
         ItemPriceStatusZero(10.0),
         ItemPriceStatusZero(120.0),
@@ -474,5 +488,10 @@ private fun IncomingScreenPreview() {
         MonthlySumCategoryStatusZero("Art", listOf(100.0)),
     )
 
-    IncomingScreen(summaryItemsToBuy, yearlySummaryToBuy, monthlyCategorySumToBuy)
+    IncomingScreen(
+        summaryItemsToBuy,
+        yearlySummaryToBuy,
+        monthlyCategorySumToBuy,
+        userEventsTracker
+    )
 }

@@ -20,9 +20,11 @@ import org.junit.Test
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryEntity
 import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
 import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.launch
+import org.mockito.Mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
@@ -36,6 +38,9 @@ class HomeViewModelTest {
     @MockK
     private lateinit var getTotalPriceOfItemsBoughtUseCase: GetTotalPriceOfItemsBoughtUseCase
 
+    @Mock
+    private lateinit var userEventsTracker: UserEventsTracker
+
     private lateinit var viewModel: HomeViewModel
 
     private val categoryEntityMock = mockk<CategoryEntity>()
@@ -47,7 +52,8 @@ class HomeViewModelTest {
         viewModel = HomeViewModel(
             getCategoriesWithItemsUseCase,
             getTotalPriceOfItemsToBuyUseCase,
-            getTotalPriceOfItemsBoughtUseCase
+            getTotalPriceOfItemsBoughtUseCase,
+            userEventsTracker
         )
     }
 

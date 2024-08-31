@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.PreferenceUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,21 +18,34 @@ enum class ThemeMode {
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val preferenceUtil: PreferenceUtil
+    private val preferenceUtil: PreferenceUtil,
+    private val userEventsTracker: UserEventsTracker
 ) : ViewModel() {
 
     private val _theme = MutableLiveData(ThemeMode.Auto)
-    private val _materialYou = MutableLiveData(false)
-    private val _categoryVisibility = MutableStateFlow(false)
-
     val theme: LiveData<ThemeMode> = _theme
+
+    private val _materialYou = MutableLiveData(false)
     val materialYou: LiveData<Boolean> = _materialYou
+
+    private val _categoryVisibility = MutableStateFlow(false)
     val categoryVisibility: StateFlow<Boolean> = _categoryVisibility
 
     init {
         _theme.value = ThemeMode.entries.toTypedArray()[getThemeValue()]
         _materialYou.value = getMaterialYouValue()
         _categoryVisibility.value = getCategoryVisibilityValue()
+
+        logSettingsInfo()
+    }
+
+    private fun logSettingsInfo() {
+        val additionalInfo = mapOf(
+            "theme" to theme.value.toString(),
+            "materialYou" to materialYou.value.toString(),
+            "categoryVisibility" to categoryVisibility.value.toString()
+        )
+        userEventsTracker.logLoadedSettingsInfo("settings_loaded", additionalInfo)
     }
 
     fun setTheme(newTheme: ThemeMode) {
