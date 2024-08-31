@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.serranoie.android.buybuddy.BuildConfig
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.MainActivity
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
@@ -95,15 +96,16 @@ fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTr
 
             item { InfoSettings(navController = navController, userEventsTracker) }
 
-            item {
-                Button(
-                    onClick = {
+            if (BuildConfig.DEBUG) {
+                item {
+                    Button(onClick = {
                         simulateError()
+                    }) {
+                        Text(text = "Throw Error")
                     }
-                ) {
-                    Text(text = "Throw Error")
                 }
             }
+
         }
     }
 }
@@ -117,17 +119,15 @@ fun DisplaySettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsT
     val context = LocalContext.current
     val showThemeSheet = remember { mutableStateOf(false) }
 
-    val themeValue =
-        when (viewModel.getThemeValue()) {
-            ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
-            ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
-            else -> stringResource(id = R.string.theme_dialog_option3)
-        }
+    val themeValue = when (viewModel.getThemeValue()) {
+        ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
+        ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
+        else -> stringResource(id = R.string.theme_dialog_option3)
+    }
 
-    val materialYouValue =
-        remember {
-            mutableStateOf(viewModel.getMaterialYouValue())
-        }
+    val materialYouValue = remember {
+        mutableStateOf(viewModel.getMaterialYouValue())
+    }
 
     Spacer(modifier = Modifier.height(smallPadding))
 
@@ -206,8 +206,7 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
     SettingsContainer {
         SettingsCategory(title = stringResource(id = R.string.behaviour_label))
 
-        SettingsItemSwitch(
-            title = stringResource(R.string.show_empty_categories_label),
+        SettingsItemSwitch(title = stringResource(R.string.show_empty_categories_label),
             description = stringResource(R.string.empty_categories_desc),
             icon = Icons.Rounded.RemoveCircleOutline,
             switchState = categoryVisibilityValue,
@@ -215,8 +214,7 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
                 userEventsTracker.logButtonAction("show_empty_categories_toggle: $newValue")
                 categoryVisibilityValue.value = newValue
                 viewModel.setCategoryVisibility(newValue)
-            }
-        )
+            })
     }
 }
 
@@ -228,7 +226,6 @@ fun SettingsScreenPreview() {
     val userEventsTracker = UserEventsTracker(crashlytics)
 
     SettingsScreen(
-        navController = NavController(LocalContext.current),
-        userEventsTracker = userEventsTracker
+        navController = NavController(LocalContext.current), userEventsTracker = userEventsTracker
     )
 }
