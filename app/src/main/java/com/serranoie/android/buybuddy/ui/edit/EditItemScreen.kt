@@ -70,11 +70,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.Category
 import com.serranoie.android.buybuddy.domain.model.Item
@@ -82,6 +80,7 @@ import com.serranoie.android.buybuddy.ui.common.AlertDialogModal
 import com.serranoie.android.buybuddy.ui.common.ErrorLabelTxtFld
 import com.serranoie.android.buybuddy.ui.common.SlideToConfirm
 import com.serranoie.android.buybuddy.ui.common.TimePickerDialog
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.extraSmallPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
@@ -105,6 +104,7 @@ private enum class DialogType { DELETE }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditItemScreen(
+    userEventsTracker: UserEventsTracker,
     navController: NavController,
     productInfo: Item?,
     categoryInfo: Category?,
@@ -133,6 +133,10 @@ fun EditItemScreen(
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("edit_screen")
+    }
+
     Scaffold(
         topBar = {
             LargeTopAppBar(
@@ -146,6 +150,7 @@ fun EditItemScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
+                        userEventsTracker.logButtonAction("back_button")
                         view.strongHapticFeedback()
                         navController.navigateUp()
                     }) {
@@ -157,6 +162,7 @@ fun EditItemScreen(
                 },
                 actions = {
                     IconButton(onClick = {
+                        userEventsTracker.logButtonAction("delete_button")
                         view.strongHapticFeedback()
                         openDialog.value = DialogType.DELETE
                     }) {
@@ -191,6 +197,7 @@ fun EditItemScreen(
                 exit = fadeOut() + slideOutVertically(),
             ) {
                 BasicInfoHolder(
+                    userEventsTracker,
                     nameItemResponse,
                     onNameItemResponse,
                     itemDescription,
@@ -226,7 +233,9 @@ fun EditItemScreen(
                     enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
                     exit = fadeOut() + slideOutVertically()
                 ) {
-                    DateHolder(selectedDateTime, onSelectedDateTimeResponse, view)
+                    DateHolder(
+                        userEventsTracker, selectedDateTime, onSelectedDateTimeResponse, view
+                    )
                 }
 
                 AnimatedVisibility(
@@ -235,6 +244,7 @@ fun EditItemScreen(
                     exit = fadeOut() + slideOutVertically()
                 ) {
                     ActionsHolder(
+                        userEventsTracker,
                         productInfo?.status,
                         onItemStatusResponse,
                         navController,
@@ -317,6 +327,7 @@ private fun CategoryHolder(name: String?) {
 
 @Composable
 private fun BasicInfoHolder(
+    userEventsTracker: UserEventsTracker,
     itemName: String,
     onItemNameResponse: (String) -> Unit,
     itemDescription: String,
@@ -452,6 +463,7 @@ private fun BasicInfoHolder(
                     ),
                 )
                 .clickable {
+                    userEventsTracker.logButtonAction("usage_button")
                     view.weakHapticFeedback()
                     expanded = !expanded
                 },
@@ -486,6 +498,7 @@ private fun BasicInfoHolder(
                         valueRange = sliderRange,
                         steps = steps.size - 2,
                         onValueChange = { newValue ->
+                            userEventsTracker.logAdditionalInfo("new usage value: $newValue")
                             view.strongHapticFeedback()
                             sliderPosition = newValue
                             onItemUsageResponse(newValue.roundToInt())
@@ -557,7 +570,10 @@ private fun ReasonsHolder(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateHolder(
-    selectedDateTime: Date?, onSelectedDateTimeResponse: (Date) -> Unit, view: View
+    userEventsTracker: UserEventsTracker,
+    selectedDateTime: Date?,
+    onSelectedDateTimeResponse: (Date) -> Unit,
+    view: View
 ) {
     val context = LocalContext.current
 
@@ -582,6 +598,7 @@ private fun DateHolder(
             .padding(vertical = basePadding)
             .fillMaxWidth()
             .clickable {
+                userEventsTracker.logButtonAction("date_button")
                 view.weakHapticFeedback()
                 showDatePicker = true
             },
@@ -604,6 +621,7 @@ private fun DateHolder(
             confirmButton = {
                 TextButton(
                     onClick = {
+                        userEventsTracker.logButtonAction("ok_date_button")
                         view.weakHapticFeedback()
                         val selectedDateMillis = datePickerState.selectedDateMillis
                         if (selectedDateMillis != null) {
@@ -624,6 +642,7 @@ private fun DateHolder(
             },
             dismissButton = {
                 TextButton(onClick = {
+                    userEventsTracker.logButtonAction("cancel_date_button")
                     view.weakHapticFeedback()
                     showDatePicker = false
                 }) {
@@ -646,7 +665,10 @@ private fun DateHolder(
 
     if (showTimePicker) {
         TimePickerDialog(
-            onDismissRequest = { showTimePicker = false },
+            onDismissRequest = {
+                userEventsTracker.logButtonAction("cancel_time_button")
+                showTimePicker = false
+            },
             confirmButton = {
                 TextButton(onClick = {
                     selectedDateTime?.let { nonNullDate ->
@@ -662,15 +684,18 @@ private fun DateHolder(
                             onSelectedDateTimeResponse(selectedDateTime)
                             showTimePicker = false
                             formattedDate = dateToString(selectedDateTime)
+                            userEventsTracker.logAdditionalInfo("selected date: $formattedDate")
                         } else {
                             context.getString(R.string.error_selected_date).toToast(context)
                         }
                     }
+                    userEventsTracker.logButtonAction("ok_time_button")
                     view.weakHapticFeedback()
                 }) { Text("OK") }
             },
             dismissButton = {
                 TextButton(onClick = {
+                    userEventsTracker.logButtonAction("cancel_time_button")
                     view.weakHapticFeedback()
                     showTimePicker = false
                 }) {
@@ -689,6 +714,7 @@ private fun DateHolder(
 
 @Composable
 private fun ActionsHolder(
+    userEventsTracker: UserEventsTracker,
     currentItemStatus: Boolean?,
     onItemStatusResponse: (Boolean) -> Unit,
     navController: NavController,
@@ -713,6 +739,7 @@ private fun ActionsHolder(
                         onItemStatusResponse(true)
                     }
                 }
+                userEventsTracker.logButtonAction("status_complete_slide")
                 view.strongHapticFeedback()
             },
             onCancelPressed = {
@@ -724,6 +751,7 @@ private fun ActionsHolder(
                         }
                     }
                 }
+                userEventsTracker.logButtonAction("status_pending_slide")
                 view.strongHapticFeedback()
             },
         )
@@ -739,6 +767,7 @@ private fun ActionsHolder(
                     .height(48.dp)
                     .padding(horizontal = extraSmallPadding),
                 onClick = {
+                    userEventsTracker.logButtonAction("cancel_button")
                     view.strongHapticFeedback()
                     navController.navigateUp()
                 },
@@ -752,11 +781,11 @@ private fun ActionsHolder(
                     .height(48.dp)
                     .padding(horizontal = extraSmallPadding),
                 onClick = {
+                    userEventsTracker.logButtonAction("save_button")
                     view.strongHapticFeedback()
                     coroutineScope.launch {
                         onUpdateItemEvent(itemId)
                     }
-
                     navController.navigateUp()
                 },
             ) {
@@ -764,50 +793,4 @@ private fun ActionsHolder(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun EditItemScreenPreview() {
-    val navController = rememberNavController()
-    val dummyJob = Job()
-
-    EditItemScreen(
-        navController = navController,
-        productInfo = Item(
-            itemId = 1,
-            categoryId = 1,
-            name = "Item",
-            description = "Description",
-            price = 10.0,
-            usage = "Regularly",
-            benefits = "Benefits",
-            disadvantages = "Disadvantages",
-            reminderDate = Date(),
-            reminderTime = Date(),
-            status = false,
-        ),
-        categoryInfo = Category(
-            categoryId = 1,
-            name = "Art",
-        ),
-        isLoading = false,
-        nameItemResponse = "Item",
-        onNameItemResponse = { },
-        itemDescription = "Description",
-        onItemDescriptionResponse = { },
-        itemPrice = 150.0,
-        onItemPriceResponse = { },
-        itemBenefits = "Benefits",
-        onItemBenefitsResponse = { },
-        itemDisadvantages = "Disadvantages",
-        onItemDisadvantagesResponse = { },
-        selectedDateTime = Date(),
-        onSelectedDateTimeResponse = { },
-        itemUsage = 3,
-        onItemUsageResponse = { },
-        onItemStatusResponse = { },
-        onUpdateItemEvent = { dummyJob },
-        onDeleteItemEvent = { dummyJob },
-    )
 }

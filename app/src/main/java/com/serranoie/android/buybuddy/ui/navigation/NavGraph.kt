@@ -293,6 +293,7 @@ fun NavGraph(
                     }
 
                     EditItemScreen(
+                        userEventsTracker = userEventsTracker,
                         navController = navController,
                         isLoading = viewModel.isLoading,
                         productInfo = viewModel.currentItem,

@@ -16,6 +16,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
 import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -36,6 +37,7 @@ class EditItemViewModel
     private val deleteItemUseCase: DeleteItemUseCase,
     private val updateItemUseCase: UpdateItemUseCase,
     private val updateItemStatusUseCase: UpdateItemStatusUseCase,
+    private val userEventsTracker: UserEventsTracker,
     application: Application
 ) : AndroidViewModel(application) {
     private val steps = listOf(
@@ -165,6 +167,7 @@ class EditItemViewModel
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(category.exception.message.toString())
                         _isLoading.value = true
                         _errorState.value = category.exception.message ?: "An error occurred"
                     }
@@ -221,6 +224,7 @@ class EditItemViewModel
             }
 
             is UseCaseResult.Error -> {
+                userEventsTracker.logDataLoadingError(result.exception.message.toString())
             }
         }
     }

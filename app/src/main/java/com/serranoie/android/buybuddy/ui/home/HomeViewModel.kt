@@ -8,6 +8,7 @@ import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import com.serranoie.android.buybuddy.domain.usecase.category.GetCategoriesWithItemsUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetTotalPriceOfItemsBoughtUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetTotalPriceOfItemsToBuyUseCase
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ class HomeViewModel @Inject constructor(
     private val getCategoriesWithItemsUseCase: GetCategoriesWithItemsUseCase,
     private val getTotalPriceOfItemsToBuyUseCase: GetTotalPriceOfItemsToBuyUseCase,
     private val getTotalPriceOfItemsBoughtUseCase: GetTotalPriceOfItemsBoughtUseCase,
+    private val userEventsTracker: UserEventsTracker,
 ) : ViewModel() {
 
     // TODO: Implement Biometrics authentication
@@ -85,6 +87,7 @@ class HomeViewModel @Inject constructor(
                     }
 
                     is UseCaseResult.Error -> {
+                        userEventsTracker.logDataLoadingError(categoriesWithItems.exception.message.toString())
                         _isLoading.value = true
                         _errorState.value =
                             categoriesWithItems.exception.message ?: "An error occurred"
@@ -107,8 +110,8 @@ class HomeViewModel @Inject constructor(
                         }
 
                         is UseCaseResult.Error -> {
+                            userEventsTracker.logDataLoadingError(result.exception.message.toString())
                             _totalBoughtPrice.value = 0.0
-
                         }
                     }
                 }
@@ -121,6 +124,7 @@ class HomeViewModel @Inject constructor(
                         }
 
                         is UseCaseResult.Error -> {
+                            userEventsTracker.logDataLoadingError(result.exception.message.toString())
                             _totalPrice.value = 0.0
                         }
 
