@@ -49,7 +49,6 @@ import com.serranoie.android.buybuddy.ui.util.getActivity
 import com.serranoie.android.buybuddy.ui.util.toToast
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 
-@RequiresApi(Build.VERSION_CODES.P)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTracker) {
@@ -218,7 +217,6 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.P)
 @PreviewLightDark
 @Composable
 fun SettingsScreenPreview() {

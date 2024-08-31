@@ -43,7 +43,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@RequiresApi(Build.VERSION_CODES.P)
 @Composable
 fun NavGraph(
     navController: NavHostController,
