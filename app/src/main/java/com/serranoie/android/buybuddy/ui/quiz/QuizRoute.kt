@@ -8,11 +8,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.Questions
 import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateBenefitsQuestion
 import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateCategoryQuestion
@@ -21,28 +22,43 @@ import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateNameQuestion
 import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateReminderQuestion
 import com.serranoie.android.buybuddy.ui.quiz.questions.PopulateUsageQuestion
 import com.serranoie.android.buybuddy.ui.util.UiConstants.CONTENT_ANIMATION_DURATION
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
+import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuizRoute(
+    userEventsTracker: UserEventsTracker,
     onQuizComplete: () -> Unit,
     onNavUp: () -> Unit,
 ) {
+    val view = LocalView.current
     val viewModel: QuizViewModel = hiltViewModel()
     val quizScreenData = viewModel.quizScreenData
     val isNextEnabled = viewModel.isNextEnabled
 
     QuizContentScreen(quizScreenData = quizScreenData,
         isNextEnabled = isNextEnabled,
-        onPreviousPressed = { viewModel.onPreviousPressed() },
-        onNextPressed = { viewModel.onNextPressed() },
+        onPreviousPressed = {
+            userEventsTracker.logButtonAction("quiz_prev_button")
+            viewModel.onPreviousPressed()
+            view.weakHapticFeedback()
+        },
+        onNextPressed = {
+            userEventsTracker.logButtonAction("quiz_next_button")
+            viewModel.onNextPressed()
+            view.weakHapticFeedback()
+        },
         onClosePressed = {
+            userEventsTracker.logButtonAction("quiz_close_button")
+            view.strongHapticFeedback()
             onNavUp()
         },
         onDonePressed = {
+            userEventsTracker.logButtonAction("quiz_done_button")
             viewModel.onDonePressed(
                 onQuizComplete
             )
+            view.strongHapticFeedback()
         }) { paddingValues ->
 
         val modifier = Modifier
@@ -73,6 +89,7 @@ fun QuizRoute(
         ) { targetState ->
             when (targetState.currentQuestion) {
                 Questions.NAME -> PopulateNameQuestion(
+                    userEventsTracker,
                     nameItemResponse = viewModel.nameItemResponse,
                     onInputResponse = viewModel::onNameResponse,
                     descriptionResponse = viewModel.descriptionItemResponse,
@@ -83,24 +100,28 @@ fun QuizRoute(
                 )
 
                 Questions.CATEGORY -> PopulateCategoryQuestion(
+                    userEventsTracker,
                     selectedAnswer = viewModel.selectedCategoryName,
                     onOptionSelected = viewModel::onCategoryResponse,
                     modifier = modifier
                 )
 
                 Questions.BENEFITS -> PopulateBenefitsQuestion(
+                    userEventsTracker,
                     benefitsResponse = viewModel.benefitsResponse,
                     onInputResponse = viewModel::onBenefitsResponse,
                     modifier = modifier
                 )
 
                 Questions.CONTRAS -> PopulateDisadvantages(
+                    userEventsTracker,
                     onInputResponse = viewModel::onContrasResponse,
                     contrasResponse = viewModel.contrasResponse,
                     modifier = modifier,
                 )
 
                 Questions.USAGE -> PopulateUsageQuestion(
+                    userEventsTracker,
                     value = viewModel.usage,
                     onValueChange = viewModel::onUsageResponse,
                     modifier = modifier,
@@ -108,6 +129,7 @@ fun QuizRoute(
                 )
 
                 Questions.REMINDER -> PopulateReminderQuestion(
+                    userEventsTracker,
                     viewModel = viewModel,
                     modifier = modifier,
                 )
@@ -121,14 +143,8 @@ private fun getTransitionDirection(
     targetIndex: Int,
 ): AnimatedContentTransitionScope.SlideDirection {
     return if (targetIndex > initialIndex) {
-        // Going forwards in the survey: Set the initial offset to start
-        // at the size of the content so it slides in from right to left, and
-        // slides out from the left of the screen to -fullWidth
         AnimatedContentTransitionScope.SlideDirection.Left
     } else {
-        // Going back to the previous question in the set, we do the same
-        // transition as above, but with different offsets - the inverse of
-        // above, negative fullWidth to enter, and fullWidth to exit.
         AnimatedContentTransitionScope.SlideDirection.Right
     }
 }

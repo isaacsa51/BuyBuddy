@@ -11,31 +11,48 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
+import kotlinx.coroutines.launch
 
 @Composable
-fun QuizFinishedScreen(
-    onDonePressed: () -> Unit,
-) {
+fun QuizFinishedScreen(onDonePressed: () -> Unit, userEventsTracker: UserEventsTracker) {
+    val view = LocalView.current
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Surface {
-        Scaffold(content = { innerPadding ->
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("finished_quiz_screen")
+        userEventsTracker.logImportantAction("Quiz finished")
+    }
+
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+        content = { innerPadding ->
             val modifier = Modifier.padding(innerPadding)
             QuizResult(
                 title = stringResource(R.string.finished_quiz_title),
@@ -43,25 +60,34 @@ fun QuizFinishedScreen(
                 description = stringResource(R.string.finished_quiz_info),
                 modifier = modifier,
             )
-        }, bottomBar = {
+        },
+        bottomBar = {
             Surface(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .navigationBarsPadding()
                     .fillMaxWidth(),
-                color = Color.Transparent
+                color = Color.Transparent,
             ) {
                 Button(
-                    onClick = onDonePressed,
-
-                    modifier = Modifier
+                    onClick = {
+                        userEventsTracker.logButtonAction("quiz_done_button")
+                        view.strongHapticFeedback()
+                        scope.launch {
+                            snackbarHostState.showSnackbar(context.getString(R.string.reminder_saved))
+                            onDonePressed()
+                        }
+                    },
+                    modifier =
+                    Modifier
                         .fillMaxWidth()
-                        .padding(basePadding)
+                        .padding(basePadding),
                 ) {
                     Text(text = stringResource(id = R.string.done))
                 }
             }
-        })
-    }
+        },
+    )
 }
 
 @Composable
@@ -102,18 +128,6 @@ private fun QuizResult(
                 text = subtitle,
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = basePadding),
-            )
-        }
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun PreviewSurveyResult() {
-    BuyBuddyTheme {
-        Surface {
-            QuizFinishedScreen(
-                onDonePressed = {},
             )
         }
     }

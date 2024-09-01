@@ -1,8 +1,18 @@
 package com.serranoie.android.buybuddy.ui.edit
 
+import android.view.View
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,28 +26,35 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,67 +62,120 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.domain.model.Category
+import com.serranoie.android.buybuddy.domain.model.Item
 import com.serranoie.android.buybuddy.ui.common.AlertDialogModal
+import com.serranoie.android.buybuddy.ui.common.ErrorLabelTxtFld
 import com.serranoie.android.buybuddy.ui.common.SlideToConfirm
-import com.serranoie.android.buybuddy.ui.util.dateToString
+import com.serranoie.android.buybuddy.ui.common.TimePickerDialog
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
+import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.extraSmallPadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
+import com.serranoie.android.buybuddy.ui.util.Utils.dateToString
+import com.serranoie.android.buybuddy.ui.util.Utils.formatPrice
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
+import com.serranoie.android.buybuddy.ui.util.toToast
+import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import java.util.Calendar
+import java.util.Date
+import java.util.TimeZone
+import kotlin.math.roundToInt
+
+private enum class DialogType { DELETE }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditItemScreen(
-    navController: NavController, itemId: Int, viewModel: EditItemViewModel = hiltViewModel()
+    userEventsTracker: UserEventsTracker,
+    navController: NavController,
+    productInfo: Item?,
+    categoryInfo: Category?,
+    isLoading: Boolean,
+    nameItemResponse: String,
+    onNameItemResponse: (String) -> Unit,
+    itemDescription: String,
+    onItemDescriptionResponse: (String) -> Unit,
+    itemPrice: Double?,
+    onItemPriceResponse: (Double) -> Unit,
+    itemBenefits: String,
+    onItemBenefitsResponse: (String) -> Unit,
+    itemDisadvantages: String,
+    onItemDisadvantagesResponse: (String) -> Unit,
+    selectedDateTime: Date?,
+    onSelectedDateTimeResponse: (Date) -> Unit,
+    itemUsage: Int,
+    onItemUsageResponse: (Int) -> Unit,
+    onItemStatusResponse: (Boolean) -> Unit,
+    onUpdateItemEvent: (Int) -> Job,
+    onDeleteItemEvent: (Int) -> Job,
 ) {
-    var isLoading by remember { mutableStateOf(false) }
-    val openAlertDialog = remember { mutableStateOf(false) }
+    val view = LocalView.current
+    val openDialog = remember { mutableStateOf<DialogType?>(null) }
     val coroutineScope = rememberCoroutineScope()
-
-    val currentItem by viewModel.currentItem.collectAsState()
-    val currentCategory by viewModel.categoryInfo.collectAsState()
-
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
 
-    LaunchedEffect(itemId) {
-        viewModel.getItemById(itemId)
+    LaunchedEffect(Unit) {
+        userEventsTracker.logCurrentScreen("edit_screen")
     }
 
     Scaffold(
         topBar = {
-            MediumTopAppBar(title = {
-                Text(
-                    text = currentItem?.name ?: stringResource(R.string.loading),
-                    style = MaterialTheme.typography.headlineSmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }, navigationIcon = {
-                IconButton(onClick = { navController.navigateUp() }) {
-                    Icon(
-                        imageVector = Icons.Rounded.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
+            LargeTopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.product_info),
+                        style = MaterialTheme.typography.headlineSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
-                }
-            }, actions = {
-                IconButton(onClick = {
-                    openAlertDialog.value = true
-                }) {
-                    Icon(
-                        imageVector = Icons.Outlined.Delete,
-                        contentDescription = stringResource(R.string.delete_current_item),
-                    )
-                }
-            }, scrollBehavior = scrollBehavior
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        userEventsTracker.logButtonAction("back_button")
+                        view.strongHapticFeedback()
+                        navController.navigateUp()
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                        userEventsTracker.logButtonAction("delete_button")
+                        view.strongHapticFeedback()
+                        openDialog.value = DialogType.DELETE
+                    }) {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = stringResource(R.string.delete_current_item),
+                        )
+                    }
+                },
+                scrollBehavior = scrollBehavior,
             )
-        }, modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { padding ->
         Column(
             modifier = Modifier
@@ -113,268 +183,613 @@ fun EditItemScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(padding),
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                verticalAlignment = Alignment.CenterVertically,
+            AnimatedVisibility(
+                visible = !isLoading,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                exit = fadeOut() + slideOutVertically(),
             ) {
-                Box(
-                    modifier = Modifier.background(
-                        MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.medium,
-                    ),
+                CategoryHolder(categoryInfo?.name)
+            }
+
+            AnimatedVisibility(
+                visible = !isLoading,
+                enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                exit = fadeOut() + slideOutVertically(),
+            ) {
+                BasicInfoHolder(
+                    userEventsTracker,
+                    nameItemResponse,
+                    onNameItemResponse,
+                    itemDescription,
+                    onItemDescriptionResponse,
+                    itemPrice,
+                    onItemPriceResponse,
+                    itemUsage,
+                    onItemUsageResponse,
+                    view
+                )
+            }
+
+            Column(
+                modifier = Modifier.padding(
+                    horizontal = basePadding,
+                )
+            ) {
+                AnimatedVisibility(
+                    visible = !isLoading,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                    exit = fadeOut() + slideOutVertically()
                 ) {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Edit, contentDescription = stringResource(
-                                R.string.edit_button_label
-                            )
+                    ReasonsHolder(
+                        itemBenefits,
+                        onItemBenefitsResponse,
+                        itemDisadvantages,
+                        onItemDisadvantagesResponse
+                    )
+                }
+
+                AnimatedVisibility(
+                    visible = !isLoading,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    DateHolder(
+                        userEventsTracker, selectedDateTime, onSelectedDateTimeResponse, view
+                    )
+                }
+
+                AnimatedVisibility(
+                    visible = !isLoading,
+                    enter = fadeIn() + slideInVertically(initialOffsetY = { fullHeight -> fullHeight }),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    ActionsHolder(
+                        userEventsTracker,
+                        productInfo?.status,
+                        onItemStatusResponse,
+                        navController,
+                        productInfo?.itemId!!,
+                        onUpdateItemEvent,
+                        view
+                    )
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (productInfo?.name?.lowercase() == "dubai") {
+                        Text(
+                            text = stringResource(id = R.string.congrats_finding_this),
+                            style = MaterialTheme.typography.labelSmall.copy(textAlign = TextAlign.Center)
                         )
                     }
                 }
 
-                currentCategory?.let { category ->
-                    Text(
-                        text = category.name,
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp,
-                            vertical = 16.dp,
-                        ),
-                    )
-                } ?: Text(
-                    text = stringResource(R.string.loading_category),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(
-                        horizontal = 16.dp,
-                        vertical = 16.dp,
+                when (openDialog.value) {
+                    DialogType.DELETE -> {
+                        AlertDialogModal(
+                            onDismissRequest = { openDialog.value = null },
+                            onConfirmation = {
+                                navController.navigateUp()
+                                openDialog.value = null
+
+                                coroutineScope.launch {
+                                    Timber.v("onDeleteItemEvent: " + productInfo?.itemId!!)
+                                    onDeleteItemEvent(productInfo.itemId)
+                                }
+                            },
+                            dialogTitle = stringResource(R.string.title_delete_dialog),
+                            dialogText = stringResource(R.string.description_delete_dialog),
+                            icon = Icons.Rounded.Info,
+                        )
+                    }
+
+                    null -> {}
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryHolder(name: String?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = mediumPadding),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            modifier = Modifier.background(
+                MaterialTheme.colorScheme.secondaryContainer,
+                shape = MaterialTheme.shapes.medium,
+            ),
+        ) {
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = stringResource(
+                        R.string.edit_button_label,
                     ),
                 )
             }
+        }
 
+        Text(
+            text = name ?: "Null",
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(basePadding),
+        )
+    }
+}
 
+@Composable
+private fun BasicInfoHolder(
+    userEventsTracker: UserEventsTracker,
+    itemName: String,
+    onItemNameResponse: (String) -> Unit,
+    itemDescription: String,
+    onItemDescriptionResponse: (String) -> Unit,
+    itemPrice: Double?,
+    onItemPriceResponse: (Double) -> Unit,
+    itemUsage: Int,
+    onItemUsageResponse: (Int) -> Unit,
+    view: View,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var isValidPrice by remember { mutableStateOf(true) }
+    var priceText by remember { mutableStateOf(itemPrice.toString()) }
+
+    val steps = listOf(
+        R.string.usage_barely,
+        R.string.usage_rarely,
+        R.string.usage_ocasionally,
+        R.string.usage_sometimes,
+        R.string.usage_often,
+        R.string.usage_almost_everyday,
+    )
+
+    val sliderRange = 0f..(steps.size - 1).toFloat()
+    var sliderPosition by remember { mutableFloatStateOf(itemUsage.toFloat()) }
+
+    // States for empty fields
+    var isItemNameEmpty by remember { mutableStateOf(itemName.isEmpty()) }
+    var isItemDescriptionEmpty by remember { mutableStateOf(itemDescription.isEmpty()) }
+    var isItemPriceEmpty by remember { mutableStateOf(itemPrice == null) }
+
+    LaunchedEffect(itemPrice) {
+        priceText = itemPrice.toString()
+    }
+
+    Column(
+        modifier = Modifier.padding(
+            horizontal = basePadding,
+            vertical = basePadding,
+        ),
+    ) {
+        Text(
+            text = stringResource(R.string.current_item_information),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier
+                .padding(vertical = smallPadding)
+                .fillMaxWidth(),
+        )
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = itemName,
+            label = { Text(stringResource(id = R.string.name)) },
+            onValueChange = {
+                onItemNameResponse(it)
+                isItemNameEmpty = it.isEmpty()
+            },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            maxLines = 2,
+            textStyle = MaterialTheme.typography.titleLarge,
+            shape = RoundedCornerShape(7.dp),
+            isError = isItemNameEmpty
+        )
+
+        if (isItemNameEmpty) ErrorLabelTxtFld(text = stringResource(id = R.string.field_required))
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = itemDescription,
+            label = { Text(stringResource(id = R.string.description)) },
+            onValueChange = {
+                onItemDescriptionResponse(it)
+                isItemDescriptionEmpty = it.isEmpty()
+            },
+            trailingIcon = { Icons.Outlined.Edit },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            maxLines = 2,
+            textStyle = MaterialTheme.typography.titleLarge,
+            shape = RoundedCornerShape(7.dp),
+            isError = isItemDescriptionEmpty
+        )
+
+        if (isItemDescriptionEmpty) ErrorLabelTxtFld(text = stringResource(id = R.string.field_required))
+
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text(stringResource(id = R.string.price)) },
+            value = if (priceText.isBlank()) {
+                formatPrice(0.0)
+            } else {
+                formatPrice(priceText.toDoubleOrNull() ?: 0.0)
+            },
+            prefix = { Text("$") },
+            onValueChange = { newValue ->
+                priceText = newValue
+                isValidPrice = newValue.matches(Regex("^\\d+(\\.\\d{0,2})?$"))
+
+                if (isValidPrice) {
+                    onItemPriceResponse(newValue.toDoubleOrNull() ?: 0.0)
+                }
+            },
+            isError = !isValidPrice,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Number,
+            ),
+            singleLine = true,
+            textStyle = MaterialTheme.typography.titleLarge,
+            shape = RoundedCornerShape(7.dp),
+        )
+
+        if (!isValidPrice) ErrorLabelTxtFld(text = stringResource(id = R.string.invalid_price_format))
+
+        Text(
+            text = stringResource(R.string.usage_label),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = basePadding),
+        )
+
+        OutlinedCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = smallPadding)
+                .animateContentSize(
+                    animationSpec = tween(
+                        durationMillis = 300,
+                        easing = LinearOutSlowInEasing,
+                    ),
+                )
+                .clickable {
+                    userEventsTracker.logButtonAction("usage_button")
+                    view.weakHapticFeedback()
+                    expanded = !expanded
+                },
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+            shape = RoundedCornerShape(7.dp),
+        ) {
             Column(
-                modifier = Modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 24.dp,
-                ),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = stringResource(R.string.current_item_information),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .fillMaxWidth(),
+                    text = steps.getOrNull(itemUsage)?.let { stringResource(it) } ?: "Empty",
+                    modifier = Modifier.padding(basePadding),
+                    fontSize = 22.sp,
                 )
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    value = currentItem?.name ?: "",
-                    onValueChange = { /* Handle state change */ },
-                    trailingIcon = { Icons.Outlined.Edit },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    maxLines = 2,
-                    textStyle = MaterialTheme.typography.titleLarge,
-                )
+            }
 
-                OutlinedTextField(
+            if (expanded) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
-                    value = currentItem?.description ?: "",
-                    onValueChange = { /* Handle state change */ },
-                    trailingIcon = { Icons.Outlined.Edit },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    maxLines = 2,
-                    textStyle = MaterialTheme.typography.titleLarge,
-                )
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    value = currentItem?.price.toString(),
-                    onValueChange = { /* Handle state change */ },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    maxLines = 1,
-                    textStyle = MaterialTheme.typography.titleLarge,
-                )
-
-                OutlinedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                        .clickable {
-                            // TODO: Display modal dialog
-                        },
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    shape = RoundedCornerShape(5.dp),
+                        .padding(basePadding),
                 ) {
+                    Slider(
+                        value = sliderPosition,
+                        valueRange = sliderRange,
+                        steps = steps.size - 2,
+                        onValueChange = { newValue ->
+                            userEventsTracker.logAdditionalInfo("new usage value: $newValue")
+                            view.strongHapticFeedback()
+                            sliderPosition = newValue
+                            onItemUsageResponse(newValue.roundToInt())
+                        },
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReasonsHolder(
+    itemBenefits: String,
+    onItemBenefitsResponse: (String) -> Unit,
+    itemDisadvantages: String,
+    onItemDisadvantagesResponse: (String) -> Unit
+) {
+    Column {
+        Text(
+            text = stringResource(R.string.benefits),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(vertical = extraSmallPadding)
+                .fillMaxWidth(),
+        )
+
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+                .padding(vertical = extraSmallPadding),
+            value = itemBenefits,
+            onValueChange = onItemBenefitsResponse,
+            trailingIcon = { Icons.Outlined.Edit },
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            maxLines = 5,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            shape = RoundedCornerShape(7.dp),
+        )
+
+        Text(
+            text = stringResource(R.string.disadvantages),
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier
+                .padding(vertical = 4.dp)
+                .fillMaxWidth(),
+        )
+
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(220.dp)
+                .padding(vertical = extraSmallPadding),
+            value = itemDisadvantages,
+            trailingIcon = { Icons.Outlined.Edit },
+            onValueChange = onItemDisadvantagesResponse,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            maxLines = 5,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            shape = RoundedCornerShape(7.dp),
+        )
+    }
+
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DateHolder(
+    userEventsTracker: UserEventsTracker,
+    selectedDateTime: Date?,
+    onSelectedDateTimeResponse: (Date) -> Unit,
+    view: View
+) {
+    val context = LocalContext.current
+
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = selectedDateTime?.time,
+    )
+
+    var showDatePicker by remember { mutableStateOf(false) }
+    val timePickerState = rememberTimePickerState()
+    var showTimePicker by remember { mutableStateOf(false) }
+
+    var formattedDate by remember(selectedDateTime) {
+        mutableStateOf(
+            selectedDateTime?.let { date ->
+                dateToString(date)
+            } ?: "Invalid date",
+        )
+    }
+
+    OutlinedCard(
+        modifier = Modifier
+            .padding(vertical = basePadding)
+            .fillMaxWidth()
+            .clickable {
+                userEventsTracker.logButtonAction("date_button")
+                view.weakHapticFeedback()
+                showDatePicker = true
+            },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
+        shape = RoundedCornerShape(7.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.date_set_form, formattedDate),
+            modifier = Modifier.padding(basePadding),
+            fontSize = 22.sp,
+        )
+    }
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        userEventsTracker.logButtonAction("ok_date_button")
+                        view.weakHapticFeedback()
+                        val selectedDateMillis = datePickerState.selectedDateMillis
+                        if (selectedDateMillis != null) {
+                            val calendar = Calendar.getInstance(TimeZone.getDefault())
+                            calendar.timeInMillis = selectedDateMillis
+                            calendar.set(Calendar.HOUR_OF_DAY, 0)
+                            calendar.set(Calendar.MINUTE, 0)
+                            calendar.set(Calendar.SECOND, 0)
+                            calendar.set(Calendar.MILLISECOND, 0)
+
+                            onSelectedDateTimeResponse(calendar.time)
+
+                            showDatePicker = false
+                            showTimePicker = true
+                        }
+                    },
+                ) { Text(stringResource(R.string.ok)) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    userEventsTracker.logButtonAction("cancel_date_button")
+                    view.weakHapticFeedback()
+                    showDatePicker = false
+                }) {
                     Text(
-                        text = currentItem?.usage ?: "",
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp,
-                            vertical = 16.dp,
+                        stringResource(
+                            id = R.string.cancel,
                         ),
-                        fontSize = 22.sp,
                     )
                 }
+            },
+        ) {
+            DatePicker(
+                state = datePickerState,
+                dateValidator = { dateInMillis ->
+                    dateInMillis >= System.currentTimeMillis()
+                },
+            )
+        }
+    }
 
-                Text(
-                    text = stringResource(R.string.benefits),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth(),
-                )
+    if (showTimePicker) {
+        TimePickerDialog(
+            onDismissRequest = {
+                userEventsTracker.logButtonAction("cancel_time_button")
+                showTimePicker = false
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    selectedDateTime?.let { nonNullDate ->
+                        val calendar = Calendar.getInstance(TimeZone.getDefault())
+                        calendar.time = nonNullDate
+                        calendar.set(Calendar.HOUR_OF_DAY, timePickerState.hour)
+                        calendar.set(Calendar.MINUTE, timePickerState.minute)
+                        onSelectedDateTimeResponse(calendar.time)
+                        calendar.timeZone = TimeZone.getDefault()
 
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp)
-                        .padding(vertical = 8.dp),
-                    value = currentItem?.benefits ?: "",
-                    onValueChange = { /* Handle on change */ },
-                    trailingIcon = { Icons.Outlined.Edit },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    maxLines = 5,
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                )
 
-                Text(
-                    text = stringResource(R.string.disadvantages),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth(),
-                )
-
-                OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp)
-                        .padding(vertical = 8.dp),
-                    value = currentItem?.disadvantages ?: "",
-                    trailingIcon = { Icons.Outlined.Edit },
-                    onValueChange = { /* Handle on change */ },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    maxLines = 5,
-                    textStyle = MaterialTheme.typography.bodyLarge,
-                )
-
-                OutlinedCard(
-                    modifier = Modifier
-                        .padding(vertical = 16.dp)
-                        .fillMaxWidth()
-                        .clickable {
-                            // TODO: Display modal dialog
-                        },
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ),
-                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                    shape = RoundedCornerShape(5.dp),
-                ) {
+                        if (calendar.after(Calendar.getInstance())) {
+                            onSelectedDateTimeResponse(selectedDateTime)
+                            showTimePicker = false
+                            formattedDate = dateToString(selectedDateTime)
+                            userEventsTracker.logAdditionalInfo("selected date: $formattedDate")
+                        } else {
+                            context.getString(R.string.error_selected_date).toToast(context)
+                        }
+                    }
+                    userEventsTracker.logButtonAction("ok_time_button")
+                    view.weakHapticFeedback()
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    userEventsTracker.logButtonAction("cancel_time_button")
+                    view.weakHapticFeedback()
+                    showTimePicker = false
+                }) {
                     Text(
-                        text = stringResource(
-                            R.string.date_set_form, dateToString(currentItem?.reminderDate)
+                        stringResource(
+                            id = R.string.cancel,
                         ),
-                        modifier = Modifier.padding(
-                            horizontal = 16.dp,
-                            vertical = 16.dp,
-                        ),
-                        fontSize = 22.sp,
                     )
                 }
+            },
+        ) {
+            TimePicker(state = timePickerState)
+        }
+    }
+}
 
-                Spacer(modifier = Modifier.weight(1f))
+@Composable
+private fun ActionsHolder(
+    userEventsTracker: UserEventsTracker,
+    currentItemStatus: Boolean?,
+    onItemStatusResponse: (Boolean) -> Unit,
+    navController: NavController,
+    itemId: Int,
+    onUpdateItemEvent: (Int) -> Job,
+    view: View,
+) {
+    var isSlideToConfirmLoading by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
-                currentItem?.status?.let {
-                    SlideToConfirm(
-                        modifier = Modifier.padding(vertical = 16.dp),
-                        isLoading = it,
-                        currentStatus = currentItem?.status ?: false,
-                        onUnlockRequested = {
-                            if (!currentItem?.status!!) {
-                                isLoading = true
-                                coroutineScope.launch {
-                                    currentItem?.itemId?.let {
-                                        viewModel.updateItemStatus(
-                                            it, true
-                                        )
-                                    }
-                                }
-                            }
-                        },
-                        onCancelPressed = {
-                            if (currentItem?.status!!) {
-                                isLoading = false
-                                coroutineScope.launch {
-                                    currentItem?.itemId?.let {
-                                        viewModel.updateItemStatus(
-                                            it, false
-                                        )
-                                    }
-                                }
-                            }
-                        },
-                    )
-                }
+    Column {
+        Spacer(modifier = Modifier.weight(1f))
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                ) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .padding(horizontal = 8.dp),
-                        onClick = { navController.navigateUp() },
-                    ) {
-                        Text(text = stringResource(R.string.cancel))
-                    }
-
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(48.dp)
-                            .padding(horizontal = 8.dp),
-                        onClick = {
-                            // TODO: Handle in viewmodel changes on textinputs
-                            navController.navigateUp()
-                        },
-                    ) {
-                        Text(text = stringResource(R.string.save))
+        SlideToConfirm(
+            modifier = Modifier.padding(vertical = 16.dp),
+            isLoading = currentItemStatus ?: false,
+            currentStatus = currentItemStatus ?: false,
+            onUnlockRequested = {
+                if (!currentItemStatus!!) {
+                    isSlideToConfirmLoading = true
+                    coroutineScope.launch {
+                        onItemStatusResponse(true)
                     }
                 }
-
-                if (openAlertDialog.value) {
-                    AlertDialogModal(
-                        onDismissRequest = { openAlertDialog.value = false },
-                        onConfirmation = {
-                            openAlertDialog.value = false
-                            coroutineScope.launch {
-                                currentItem?.itemId?.let { viewModel.deleteItem(it, navController) }
-                            }
-                        },
-                        dialogTitle = stringResource(R.string.title_delete_dialog),
-                        dialogText = stringResource(R.string.description_delete_dialog),
-                        icon = Icons.Rounded.Info,
-                    )
+                userEventsTracker.logButtonAction("status_complete_slide")
+                view.strongHapticFeedback()
+            },
+            onCancelPressed = {
+                if (currentItemStatus!!) {
+                    isSlideToConfirmLoading = false
+                    coroutineScope.launch {
+                        coroutineScope.launch {
+                            onItemStatusResponse(false)
+                        }
+                    }
                 }
+                userEventsTracker.logButtonAction("status_pending_slide")
+                view.strongHapticFeedback()
+            },
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = largePadding),
+        ) {
+            OutlinedButton(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .padding(horizontal = extraSmallPadding),
+                onClick = {
+                    userEventsTracker.logButtonAction("cancel_button")
+                    view.strongHapticFeedback()
+                    navController.navigateUp()
+                },
+            ) {
+                Text(text = stringResource(R.string.cancel))
+            }
+
+            Button(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp)
+                    .padding(horizontal = extraSmallPadding),
+                onClick = {
+                    userEventsTracker.logButtonAction("save_button")
+                    view.strongHapticFeedback()
+                    coroutineScope.launch {
+                        onUpdateItemEvent(itemId)
+                    }
+                    navController.navigateUp()
+                },
+            ) {
+                Text(text = stringResource(R.string.save))
             }
         }
     }

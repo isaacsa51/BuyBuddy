@@ -6,5 +6,8 @@ enum class Screen {
     FINISHED_QUIZ,
     ONBOARDING,
     EDIT,
+    BACKUP,
+    SUMMARY,
     SETTINGS,
+    ABOUT,
 }

@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.quiz.questions
 
-import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,30 +8,38 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 
 @Composable
 fun BenefitsQuestion(
+    userEventsTracker: UserEventsTracker,
     @StringRes titleResourceId: Int,
     @StringRes directionsResourceId: Int,
     onInputResponse: (String) -> Unit,
     benefitsResponse: String,
     modifier: Modifier = Modifier,
 ) {
+
+    LaunchedEffect(key1 = benefitsResponse) {
+        if (benefitsResponse.isNotBlank()) {
+            val inputInfo = mapOf(
+                "itemBenefits" to benefitsResponse,
+            )
+
+            userEventsTracker.logQuizInfo("Benefits: ", inputInfo)
+        }
+    }
+
     QuestionWrapper(
         titleResourceId = titleResourceId,
         directionsResourceId = directionsResourceId,
@@ -41,10 +48,10 @@ fun BenefitsQuestion(
         Column {
             OutlinedTextField(
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = basePadding)
-                        .height(120.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = basePadding)
+                    .height(120.dp),
                 label = { Text(stringResource(id = R.string.reasons)) },
                 value = benefitsResponse,
                 onValueChange = onInputResponse,
@@ -59,33 +66,17 @@ fun BenefitsQuestion(
 
 @Composable
 fun PopulateBenefitsQuestion(
+    userEventsTracker: UserEventsTracker,
     onInputResponse: (String) -> Unit,
     benefitsResponse: String,
     modifier: Modifier,
 ) {
     BenefitsQuestion(
+        userEventsTracker,
         titleResourceId = R.string.benefit_question,
         directionsResourceId = R.string.reasons_helper,
         onInputResponse = onInputResponse,
         benefitsResponse = benefitsResponse,
         modifier = modifier,
     )
-}
-
-@Preview(name = "Light", uiMode = Configuration.UI_MODE_NIGHT_NO)
-@Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun BenefitsPreview() {
-    BuyBuddyTheme {
-        Surface {
-            val onInputResponse by remember { mutableStateOf("") }
-
-            BenefitsQuestion(
-                titleResourceId = R.string.benefit_question,
-                directionsResourceId = R.string.reasons_helper,
-                benefitsResponse = "",
-                onInputResponse = { onInputResponse },
-            )
-        }
-    }
 }

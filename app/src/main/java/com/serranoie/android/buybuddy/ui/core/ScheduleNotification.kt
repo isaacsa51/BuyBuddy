@@ -4,11 +4,10 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_ITEM_ID_KEY
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_MESSAGE_KEY
-import com.serranoie.android.buybuddy.ui.util.Constants.RMNDR_NOTI_TITLE_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_ITEM_ID_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_MESSAGE_KEY
+import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_TITLE_KEY
 import java.util.Calendar
 import java.util.Date
 
@@ -22,7 +21,10 @@ class ScheduleNotification {
     ) {
         val intent = Intent(context.applicationContext, ReminderReceiver::class.java).apply {
             putExtra(RMNDR_NOTI_TITLE_KEY, context.getString(R.string.notification_title))
-            putExtra(RMNDR_NOTI_MESSAGE_KEY, context.getString(R.string.notification_body, itemName))
+            putExtra(
+                RMNDR_NOTI_MESSAGE_KEY,
+                context.getString(R.string.notification_body, itemName)
+            )
             putExtra(RMNDR_NOTI_ITEM_ID_KEY, itemId)
         }
 
@@ -43,8 +45,6 @@ class ScheduleNotification {
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent
             )
-
-            Log.d("REMINDER", "Information: $itemName, $itemId, $reminderDate, $reminderTime")
         }
     }
 }

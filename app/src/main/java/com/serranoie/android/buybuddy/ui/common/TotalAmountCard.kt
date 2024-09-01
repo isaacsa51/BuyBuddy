@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.extraSmallPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
@@ -93,9 +92,7 @@ fun TotalAmountCard(
 @PreviewLightDark
 @Composable
 fun TotalAmountCardPreview() {
-    BuyBuddyTheme {
-        Surface {
-            TotalAmountCard(251.45, 0.0, Modifier.Companion.testTag("TotalAmountCard"))
-        }
+    Surface {
+        TotalAmountCard(251.45, 0.0, Modifier.Companion.testTag("TotalAmountCard"))
     }
 }

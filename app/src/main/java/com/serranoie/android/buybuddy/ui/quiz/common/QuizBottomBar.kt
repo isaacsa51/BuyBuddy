@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
-import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 
 @Composable
 fun QuizBottomBar(
@@ -37,17 +36,19 @@ fun QuizBottomBar(
 ) {
     Surface {
         Row(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+            modifier =
+                Modifier
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .fillMaxWidth()
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom))
+                    .padding(horizontal = 16.dp, vertical = 20.dp),
         ) {
             if (shouldShowPreviousButton) {
                 OutlinedButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(48.dp),
                     onClick = onPreviousPressed,
                 ) {
                     Text(text = stringResource(id = R.string.back))
@@ -56,9 +57,10 @@ fun QuizBottomBar(
             }
             if (shouldShowDoneButton) {
                 Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(48.dp),
                     onClick = onDonePressed,
                     enabled = isNextButtonEnabled,
                 ) {
@@ -66,9 +68,10 @@ fun QuizBottomBar(
                 }
             } else {
                 Button(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
+                    modifier =
+                        Modifier
+                            .weight(1f)
+                            .height(48.dp),
                     onClick = onNextPressed,
                     enabled = isNextButtonEnabled,
                 ) {
@@ -79,22 +82,19 @@ fun QuizBottomBar(
     }
 }
 
-
 @Preview(name = "Light", uiMode = Configuration.UI_MODE_NIGHT_NO)
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun QuizPreviewEnabled() {
-    BuyBuddyTheme {
-        Surface {
-            QuizBottomBar(
-                shouldShowPreviousButton = true,
-                shouldShowDoneButton = true,
-                isNextButtonEnabled = true,
-                onPreviousPressed = {},
-                onNextPressed = {},
-                onDonePressed = {},
-            )
-        }
+    Surface {
+        QuizBottomBar(
+            shouldShowPreviousButton = true,
+            shouldShowDoneButton = true,
+            isNextButtonEnabled = true,
+            onPreviousPressed = {},
+            onNextPressed = {},
+            onDonePressed = {},
+        )
     }
 }
 
@@ -102,17 +102,15 @@ private fun QuizPreviewEnabled() {
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun QuizPreviewDisabled() {
-    BuyBuddyTheme {
-        Surface {
-            QuizBottomBar(
-                shouldShowPreviousButton = true,
-                shouldShowDoneButton = true,
-                isNextButtonEnabled = false,
-                onPreviousPressed = {},
-                onNextPressed = {},
-                onDonePressed = {},
-            )
-        }
+    Surface {
+        QuizBottomBar(
+            shouldShowPreviousButton = true,
+            shouldShowDoneButton = true,
+            isNextButtonEnabled = false,
+            onPreviousPressed = {},
+            onNextPressed = {},
+            onDonePressed = {},
+        )
     }
 }
 
@@ -120,16 +118,14 @@ private fun QuizPreviewDisabled() {
 @Preview(name = "Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun QuizPreviewNoDone() {
-    BuyBuddyTheme {
-        Surface {
-            QuizBottomBar(
-                shouldShowPreviousButton = true,
-                shouldShowDoneButton = false,
-                isNextButtonEnabled = true,
-                onPreviousPressed = {},
-                onNextPressed = {},
-                onDonePressed = {},
-            )
-        }
+    Surface {
+        QuizBottomBar(
+            shouldShowPreviousButton = true,
+            shouldShowDoneButton = false,
+            isNextButtonEnabled = true,
+            onPreviousPressed = {},
+            onNextPressed = {},
+            onDonePressed = {},
+        )
     }
 }

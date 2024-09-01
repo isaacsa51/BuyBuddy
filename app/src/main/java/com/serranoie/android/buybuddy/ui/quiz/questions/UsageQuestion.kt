@@ -17,16 +17,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.QuizViewModel
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
+import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import kotlin.math.roundToInt
 
 @Composable
 fun UsageQuestion(
+    userEventsTracker: UserEventsTracker,
     @StringRes titleResourceId: Int,
     value: Int,
     onValueChange: (Int) -> Unit,
@@ -45,6 +49,7 @@ fun UsageQuestion(
             R.string.usage_almost_everyday,
         )
 
+    val view = LocalView.current
     val sliderRange = 0f..(steps.size - 1).toFloat()
     var sliderPosition by remember { mutableFloatStateOf(value.toFloat()) }
     val selectedIndex = sliderPosition.roundToInt()
@@ -58,14 +63,14 @@ fun UsageQuestion(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                Modifier
+                    .fillMaxWidth()
+                    .padding(basePadding),
             ) {
                 Text(
                     text = stringResource(steps[selectedIndex]),
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp),
+                    modifier = Modifier.padding(bottom = basePadding),
                 )
 
                 Slider(
@@ -75,7 +80,14 @@ fun UsageQuestion(
                     onValueChange = { newValue ->
                         sliderPosition = newValue
                         onValueChange(steps[newValue.roundToInt()])
+                        view.strongHapticFeedback()
                     },
+                    onValueChangeFinished = {
+                        userEventsTracker.logQuizInfo(
+                            "Usage: ",
+                            mapOf("Item usage: " to steps[selectedIndex].toString())
+                        )
+                    }
                 )
             }
         }
@@ -85,27 +97,27 @@ fun UsageQuestion(
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Start,
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1.8f),
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f),
             )
             Text(
                 text = stringResource(id = neutralTextResource),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1.8f),
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f),
             )
             Text(
                 text = stringResource(id = endTextResource),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.End,
                 modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .weight(1.8f),
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1.8f),
             )
         }
     }
@@ -113,6 +125,7 @@ fun UsageQuestion(
 
 @Composable
 fun PopulateUsageQuestion(
+    userEventsTracker: UserEventsTracker,
     viewModel: QuizViewModel,
     value: String?,
     onValueChange: (Int) -> Unit,
@@ -131,6 +144,7 @@ fun PopulateUsageQuestion(
         ).indexOfFirst { context.getString(it) == value }
 
     UsageQuestion(
+        userEventsTracker,
         titleResourceId = R.string.usage_question,
         value = if (usageIndex != -1) usageIndex else 0,
         onValueChange = viewModel::onUsageResponse,

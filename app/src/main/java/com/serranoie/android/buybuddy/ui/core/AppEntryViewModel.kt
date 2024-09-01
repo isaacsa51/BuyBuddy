@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.serranoie.android.buybuddy.domain.usecase.appentry.AppEntryUseCase
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -15,12 +16,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AppEntryViewModel @Inject constructor(
-    private val appEntryUseCase: AppEntryUseCase,
+    appEntryUseCase: AppEntryUseCase,
 ) : ViewModel() {
     var splashCondition by mutableStateOf(true)
     var startDestination by mutableStateOf(Route.AppStartNavigation.route)
-
-    var dynamicColorsEnabled by mutableStateOf(false)
 
     init {
         appEntryUseCase.readAppEntry().onEach { shouldStartFromHome ->
@@ -29,17 +28,8 @@ class AppEntryViewModel @Inject constructor(
             } else {
                 Route.AppStartNavigation.route
             }
+            delay(250)
             splashCondition = false
         }.launchIn(viewModelScope)
-
-        appEntryUseCase.checkTheme().onEach { isEnabled ->
-            dynamicColorsEnabled = isEnabled
-        }.launchIn(viewModelScope)
-    }
-
-    fun toggleDynamicColors(enabled: Boolean) {
-        viewModelScope.launch {
-            appEntryUseCase.saveTheme(enabled)
-        }
     }
 }

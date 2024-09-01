@@ -2,18 +2,20 @@ package com.serranoie.android.buybuddy.ui.quiz
 
 import android.app.Application
 import androidx.annotation.StringRes
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.Item
+import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategoryUseCase
 import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.Questions
 import com.serranoie.android.buybuddy.ui.quiz.questions.Category
+import com.serranoie.android.buybuddy.ui.util.toToast
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Date
@@ -22,8 +24,11 @@ import javax.inject.Inject
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val insertItemWithCategoryUseCase: InsertItemWithCategoryUseCase,
-    application: Application
+    application: Application,
+    private val userEventsTracker: UserEventsTracker,
 ) : AndroidViewModel(application) {
+
+    private val scheduleNotification by lazy { ScheduleNotification() }
 
     private val questionOrder: List<Questions> = listOf(
         Questions.NAME,
@@ -40,7 +45,7 @@ class QuizViewModel @Inject constructor(
     val isNextEnabled: Boolean
         get() = _isNextEnabled.value
 
-    // Responses exposed as State
+    // Responses States
     private val _nameItemResponse = mutableStateOf("")
     val nameItemResponse: String
         get() = _nameItemResponse.value
@@ -77,11 +82,11 @@ class QuizViewModel @Inject constructor(
     val reminderResponse: Date?
         get() = _reminderResponse.value
 
-    // Quiz status exposed as state
     private val _quizScreenData = mutableStateOf(createQuizScreenData())
     val quizScreenData: QuizScreenData
         get() = _quizScreenData.value
 
+    // Quiz status exposed as state
     fun onNameResponse(itemName: String) {
         _nameItemResponse.value = itemName
         _isNextEnabled.value = getIsNextEnabled()
@@ -123,9 +128,6 @@ class QuizViewModel @Inject constructor(
         _isNextEnabled.value = getIsNextEnabled()
     }
 
-    /**
-     * Returns true if the ViewModel handled the back press (i.e., it went back one question)
-     */
     fun onBackPressed(): Boolean {
         if (questionIndex == 0) {
             return false
@@ -169,20 +171,29 @@ class QuizViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            insertItemWithCategoryUseCase(itemData, selectedCategoryName)
+            when (val result = insertItemWithCategoryUseCase(itemData, selectedCategoryName)) {
+                is UseCaseResult.Success -> {
+                    val itemId = result.data
 
-            // Schedule the notification
-            reminderResponse?.let {
-                ScheduleNotification().scheduleNotification(
-                    context = getApplication<Application>().applicationContext,
-                    itemId = itemData.itemId ?: 0,
-                    itemName = itemData.name,
-                    reminderDate = reminderResponse,
-                    reminderTime = reminderResponse
-                )
+                    reminderResponse?.let {
+                        scheduleNotification.scheduleNotification(
+                            context = getApplication<Application>().applicationContext,
+                            itemId = itemId,
+                            itemName = itemData.name,
+                            reminderDate = reminderResponse,
+                            reminderTime = reminderResponse
+                        )
+                    }
+                    onSurveyComplete()
+                }
+
+                is UseCaseResult.Error -> {
+                    result.exception.printStackTrace()
+                    userEventsTracker.logException(result.exception)
+                    val context = getApplication<Application>().applicationContext
+                    context.getString(R.string.error_saving_data).toToast(context)
+                }
             }
-
-            onSurveyComplete()
         }
     }
 

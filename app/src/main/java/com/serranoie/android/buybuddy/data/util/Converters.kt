@@ -13,4 +13,14 @@ class Converters {
     fun dateToTimestamp(date: Date?): Long? {
         return date?.time
     }
+
+    @TypeConverter
+    fun fromString(value: String?): List<Double>? {
+        return value?.split(",")?.mapNotNull { it.toDoubleOrNull() }
+    }
+
+    @TypeConverter
+    fun toString(list: List<Double>?): String? {
+        return list?.joinToString(",")
+    }
 }

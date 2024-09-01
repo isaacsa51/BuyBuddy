@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.serranoie.android.buybuddy.data.util.Constants
 import com.serranoie.android.buybuddy.data.util.Constants.USER_SETTINGS
 import com.serranoie.android.buybuddy.domain.manager.LocalUserManager
+import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -25,9 +26,13 @@ class LocalUserManagerImpl(private val context: Context) : LocalUserManager {
         }
     }
 
-    override fun checkTheme(): Flow<Boolean> {
+    override fun checkTheme(): Flow<UseCaseResult<Boolean>> {
         return context.dataStore.data.map { preferences ->
-            preferences[PreferenceKeys.STATUS_THEME] ?: false
+            try {
+                UseCaseResult.Success(preferences[PreferenceKeys.STATUS_THEME] ?: false)
+            } catch (e: Exception) {
+                UseCaseResult.Error(e)
+            }
         }
     }
 

@@ -19,7 +19,7 @@ import java.util.Date
     ],
     indices = [Index(value = ["categoryId"])]
 )
-class ItemEntity(
+data class ItemEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "itemId") val itemId: Int?,
     @ColumnInfo(name = "name") val name: String,
@@ -32,4 +32,18 @@ class ItemEntity(
     @ColumnInfo(name = "reminderDate") val reminderDate: Date?,
     @ColumnInfo(name = "reminderTime") val reminderTime: Date?,
     @ColumnInfo(name = "status") val status: Boolean = false,
+)
+
+data class ItemPriceEntityStatusZero(val price: Double?)
+
+data class ItemPriceEntityStatusOne(val price: Double?)
+
+data class MonthlySumEntityStatusZero(
+    val month: String?,
+    val totalSum: Double?
+)
+
+data class MonthlySumEntityStatusOne(
+    val month: String?,
+    val totalSum: Double?
 )

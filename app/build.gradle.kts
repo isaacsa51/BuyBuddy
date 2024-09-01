@@ -1,3 +1,5 @@
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -12,12 +14,16 @@ android {
     namespace = "com.serranoie.android.buybuddy"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     defaultConfig {
         applicationId = "com.serranoie.android.buybuddy"
         minSdk = 25
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 110
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -28,16 +34,37 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+            isDebuggable = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
+            signingConfig = signingConfigs.getByName("debug")
+
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = true
+            }
+
+            applicationVariants.all {
+                outputs
+                    .map {
+                        it as com.android.build.gradle.internal.api.ApkVariantOutputImpl
+                    }
+                    .all { output ->
+                        output.outputFileName = "BuyBuddy-v${versionName}.apk"
+                        false
+                    }
+            }
         }
         debug {
             isMinifyEnabled = false
             isDebuggable = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            configure<CrashlyticsExtension> {
+                mappingFileUploadEnabled = false
+            }
             signingConfig = signingConfigs.getByName("debug")
         }
         create("beta") {
@@ -50,12 +77,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -84,6 +111,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.material)
+    implementation(libs.play.services.base)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -107,11 +136,20 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.8")
 
+    // Compose navigation
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // Compose animation
+    implementation("androidx.compose.animation:animation:1.7.0-beta05")
+
+    // Live Data
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.8")
+
     // ViewModel KTX
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
 
     // Splash API
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation("androidx.core:core-splashscreen:1.0.0")
 
     // Kotlinx Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
@@ -166,6 +204,18 @@ dependencies {
     androidTestImplementation("androidx.test:core:1.6.1")
     androidTestImplementation("androidx.test:runner:1.6.1")
     androidTestImplementation("androidx.test:rules:1.6.1")
+
+    // Biometrics
+    implementation("androidx.biometric:biometric:1.1.0")
+
+    // Coil image loader
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Compose charts
+    implementation("io.github.ehsannarmani:compose-charts:0.0.13")
+
+    // Timber
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
 
 kapt {

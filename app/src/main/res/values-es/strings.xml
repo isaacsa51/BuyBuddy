@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">BuyBuddy</string>
 
+    <string name="field_required">Es necesario completar este campo</string>
     <string name="category_art">Arte</string>
     <string name="category_automotive">Automotriz</string>
     <string name="category_beauty">Belleza</string>
@@ -23,7 +24,7 @@
     <string name="reminder_question">¿Cuándo deberíamos comunicarnos con usted sobre este artículo?</string>
     <string name="select_date">Seleccione una fecha</string>
     <string name="usage_almost_everyday">Casi todos los días</string>
-    <string name="usage_often">Seguidos</string>
+    <string name="usage_often">Seguido</string>
     <string name="usage_sometimes">Algunas veces</string>
     <string name="usage_ocasionally">Ocasionalmente</string>
     <string name="usage_rarely">Rara vez</string>
@@ -35,16 +36,22 @@
     <string name="loading">Cargando…</string>
     <string name="back">Atrás</string>
     <string name="close">Cerrar</string>
+    <string name="empty">Vacio</string>
+    <string name="error_selected_date">La fecha seleccionada debe ser posterior a hoy, intente seleccionar una fecha diferente</string>
+
     <string name="delete_current_item">Borrar producto actual</string>
     <string name="loading_category">Cargando categoría…</string>
     <string name="current_item_information">Información actual del producto</string>
     <string name="benefits">Beneficios</string>
     <string name="disadvantages">Desventajas</string>
+    <string name="usage_label">Uso actual del producto</string>
     <string name="cancel">Cancelar</string>
     <string name="save">Guardar</string>
     <string name="done">Listo</string>
     <string name="title_delete_dialog">¿Seguro que quiere borrar este producto?</string>
     <string name="description_delete_dialog">Al confirmar la eliminación de este producto aceptas si el producto actual ya ha sido comprado o si no es necesario.</string>
+    <string name="title_usage_dialog">Seleccione el uso del producto</string>
+    <string name="description_usage_dialog">Usa el slider de abajo para modificar el uso del producto actual.</string>
     <string name="create_item_label">Crear producto</string>
     <string name="onboarding_image_label">OnBoarding imagen</string>
     <string name="next">Siguiente</string>
@@ -55,11 +62,11 @@
     <string name="onboarding_second_description">Considerar el producto podrás decidir si comprarlo teniendo en cuenta diferentes aspectos y ahorrarte dinero.</string>
     <string name="dynamic_theme_notice">Material You design se lanzó con Android 12+. En dispositivos con Android 12 y versiones posteriores, la función “colores dinámicos” permite ver un tema generado a partir del fondo de pantalla que el usuario tiene actualmente, brindando una experiencia más personal y coherente.</string>
     <string name="quiz_topbar_count">" de %1$s"</string>
+    <string name="error_saving_data">Error al guardar al producto, intenta más tarde…</string>
     <string name="name">Nombre</string>
     <string name="description">Descripción</string>
     <string name="price">Precio</string>
     <string name="ok">OK</string>
-    <string name="error_selected_date">La fecha seleccionada no es válida, ingrese una fecha correcta</string>
     <string name="finished_quiz_title">Todo listo y guardado!</string>
     <string name="finished_quiz_subtitle">Puedes ver tus productos en la pantalla de inicio.</string>
     <string name="finished_quiz_info">A partir de ahora solo tendrás que esperar hasta que te aparezca el recordatorio y tengas en cuenta si quieres el producto o no.</string>
@@ -72,4 +79,81 @@
     <string name="total_spent">Total gastado</string>
     <string name="date_set_form">Recordatorio para: %1$s</string>
     <string name="edit_screen_date_format">dd \'de\' MMMM, HH:mm a</string>
+    <string name="reminder_saved">Producto guardado!</string>
+    <string name="invalid_price_format">Por favor ingresa un valor de precio válido</string>
+    <string name="product_info">Información del producto</string>
+    <string name="drawer_home">Inicio</string>
+    <string name="summary_home">Resumen</string>
+    <string name="backup_home">Respaldo</string>
+    <string name="settings_home">Ajustes</string>
+    <string name="rate_us_home">Calificanos</string>
+
+    <!--  Settings values  -->
+    <string name="settings_title">Ajustes</string>
+    <string name="theme_dialog_option1">Claro</string>
+    <string name="theme_dialog_option2">Oscuro</string>
+    <string name="theme_dialog_option3">Predeterminado del Sistema</string>
+    <string name="display_settings_title">Tema</string>
+    <string name="theme_setting">Tema predeterminado</string>
+    <string name="theme_setting_desc">Cambia el tema de la app</string>
+    <string name="material_you_setting">Material You</string>
+    <string name="material_you_setting_desc">Cambia el tema según tu fondo de pantalla (Solo A12+)</string>
+    <string name="material_you_error">Esta función solo está disponible en versiones Android 12+</string>
+    <string name="theme_dialog_title">Cambiar tema</string>
+    <string name="theme_dialog_apply_button">Aceptar</string>
+    <string name="show_empty_categories_label">Mostrar categorías vacías</string>
+    <string name="empty_categories_desc">Ser capaz de ver categorías vacías en la pantalla de inicio.</string>
+    <string name="behaviour_label">Comportamiento</string>
+
+    <!-- App lock -->
+    <string name="app_lock_screen_title">BuyBuddy está bloqueado</string>
+    <string name="app_lock_screen_subtitle">Haga clic en el botón de abajo para autenticarse.</string>
+    <string name="app_lock_button_text">Autorizar</string>
+    <string name="app_lock_button_icon_desc">Desbloquear App</string>
+    <string name="app_lock_unable_to_authenticate">El bloqueo de aplicaciones está deshabilitado porque el dispositivo no puede autenticarse</string>
+
+    <!-- Biometric Lock -->
+    <string name="security_settings_title">Seguridad</string>
+    <string name="security_app_lock">Bloqueo biometrico</string>
+    <string name="app_lock_setting_desc">Usa tu huella dactilar para desbloquear la app.</string>
+    <string name="bio_lock_title">Desbloquear BuyBuddy</string>
+    <string name="bio_lock_subtitle">Confirme su bloqueo de pantalla, PIN o contraseña.</string>
+    <string name="auth_successful">La autenticación fue exitosa!</string>
+    <string name="auth_failed">La autenticación falló!</string>
+    <string name="auth_error">Error de autenticación: %s</string>
+
+    <!--  Info Values  -->
+    <string name="misc_setting_title">Información</string>
+    <string name="license_setting"><![CDATA[Licencia y reconocimiento]]></string>
+    <string name="license_setting_desc">Mostrar información de licencia de código abierto</string>
+    <string name="app_info_setting">Información de la aplicación</string>
+    <string name="app_info_setting_desc">Mostrar la versión de la aplicación y enlaces útiles.</string>
+
+    <!-- About Screen -->
+    <string name="about_screen_header">Acerca</string>
+    <string name="about_readme_title">README</string>
+    <string name="about_readme_desc">Consulta el repositorio de GitHub y el archivo README de la aplicación.</string>
+    <string name="about_website_title">Website</string>
+    <string name="about_website_desc">Visita nuestro sitio web para obtener más información y explorar nuestras otras aplicaciones y proyectos..</string>
+    <string name="about_privacy_title">Política de privacidad</string>
+    <string name="about_privacy_desc">Lea nuestra última política de privacidad y términos de servicio en GitHub.</string>
+    <string name="about_gh_issue_title">GitHub Issues</string>
+    <string name="about_gh_issue_desc">Envíe informes de errores o solicitudes de funciones creando un problema en GitHub.</string>
+    <string name="about_support_title">Apoye el desarrollo</string>
+    <string name="about_support_desc">Si cree que merezco una tasa de café por mi trabajo, puede apoyarme haciendolo aquí.</string>
+    <string name="about_version_title">Versión</string>
+    <string name="about_version_desc">Versión-%s</string>
+
+    <!-- Summary Screen -->
+    <string name="summary_screen_title">Resumen</string>
+    <string name="empty_summary">No hay registros de productos en este mes…</string>
+    <string name="spent_title">Comprado</string>
+    <string name="incoming_title">Por comprar</string>
+    <string name="total_title_spent">Total a gastar en este mes</string>
+    <string name="total_title_incoming">Gastos a hacer en este mes</string>
+    <string name="current_month">Mes actual</string>
+    <string name="summary_label">Resumen por categoría</string>
+    <string name="transactions_category_label">Transacciones: %1$s</string>
+
+    <string name="congrats_finding_this">Te ves muy intimidante en tu Honda Civic 2024 Sport+...</string>
 </resources>
