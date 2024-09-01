@@ -49,6 +49,9 @@ class HomeViewModelTest {
     fun setup() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(UnconfinedTestDispatcher())
+
+        userEventsTracker = mockk()
+
         viewModel = HomeViewModel(
             getCategoriesWithItemsUseCase,
             getTotalPriceOfItemsToBuyUseCase,

@@ -1,0 +1,14 @@
+name: On Pull Request Opened on MASTER
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  lint:
+    name: Lint RELEASE Variant
+    uses: ./.github/workflows/job_lint_release.yml
+
+  test:
+    name: Test RELEASE Variant
+    uses: ./.github/workflows/job_test_release.yml
