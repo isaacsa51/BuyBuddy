@@ -171,27 +171,30 @@ class QuizViewModel @Inject constructor(
         )
 
         viewModelScope.launch {
-            when (val result = insertItemWithCategoryUseCase(itemData, selectedCategoryName)) {
-                is UseCaseResult.Success -> {
-                    val itemId = result.data
+            insertItemWithCategoryUseCase(itemData, selectedCategoryName).collect { result ->
 
-                    reminderResponse?.let {
-                        scheduleNotification.scheduleNotification(
-                            context = getApplication<Application>().applicationContext,
-                            itemId = itemId,
-                            itemName = itemData.name,
-                            reminderDate = reminderResponse,
-                            reminderTime = reminderResponse
-                        )
+                when (result) {
+                    is UseCaseResult.Success<*> -> {
+                        val itemId = result.data
+
+                        reminderResponse?.let {
+                            scheduleNotification.scheduleNotification(
+                                context = getApplication<Application>().applicationContext,
+                                itemId = itemId.toString().toInt(),
+                                itemName = itemData.name,
+                                reminderDate = reminderResponse,
+                                reminderTime = reminderResponse
+                            )
+                        }
+                        onSurveyComplete()
                     }
-                    onSurveyComplete()
-                }
 
-                is UseCaseResult.Error -> {
-                    result.exception.printStackTrace()
-                    userEventsTracker.logException(result.exception)
-                    val context = getApplication<Application>().applicationContext
-                    context.getString(R.string.error_saving_data).toToast(context)
+                    is UseCaseResult.Error -> {
+                        result.exception.printStackTrace()
+                        userEventsTracker.logException(result.exception)
+                        val context = getApplication<Application>().applicationContext
+                        context.getString(R.string.error_saving_data).toToast(context)
+                    }
                 }
             }
         }
