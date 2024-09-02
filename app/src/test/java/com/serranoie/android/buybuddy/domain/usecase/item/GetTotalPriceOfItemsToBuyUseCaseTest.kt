@@ -34,6 +34,7 @@ class GetTotalPriceOfItemsToBuyUseCaseTest {
             val result = awaitItem()
             assertTrue(result is UseCaseResult.Success)
             assertEquals(totalPrice, (result as UseCaseResult.Success).data)
+            awaitComplete()
         }
     }
 
@@ -47,6 +48,7 @@ class GetTotalPriceOfItemsToBuyUseCaseTest {
             val result = awaitItem()
             assertTrue(result is UseCaseResult.Error)
             assertEquals(exception.message, (result as UseCaseResult.Error).exception.message)
+            awaitComplete()
         }
     }
 }
