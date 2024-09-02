@@ -19,7 +19,7 @@ jobs:
       - name: Load Google Services
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: echo $DATA | base64 -di > app/google-services.json
+        run: touch ./app/google-services.json && echo $GOOGLE_SERVICES_JSON | base64 -di > ./app/google-services.json
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
