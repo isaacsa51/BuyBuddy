@@ -18,7 +18,7 @@ jobs:
 
       - name: Load Google Services
         env:
-          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
         run: echo $DATA | base64 -di > app/google-services.json
 
       - name: Setup Gradle
