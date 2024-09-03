@@ -131,6 +131,8 @@ dependencies {
     testImplementation("com.google.truth:truth:1.1.3")
     androidTestImplementation("com.google.truth:truth:1.1.3")
 
+    // Testing Kotlin Flows
+    testImplementation("app.cash.turbine:turbine:1.1.0")
 
     // Compose UI Testing
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.8")

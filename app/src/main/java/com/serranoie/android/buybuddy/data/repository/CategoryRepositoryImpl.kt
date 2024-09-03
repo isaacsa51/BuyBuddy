@@ -18,7 +18,7 @@ class CategoryRepositoryImpl @Inject constructor(private val buyBuddyDao: BuyBud
         buyBuddyDao.getCategoriesWithItems()
 
     override suspend fun getCategoryById(categoryId: Int): Flow<Category> =
-        buyBuddyDao.getCategoryById(categoryId)
+        buyBuddyDao.getCategoryById(categoryId).map { it.toDomain() }
 
     override suspend fun getCategorySummaryWithStatusZero(month: String): Flow<List<MonthlySumCategoryStatusZero>?> =
         buyBuddyDao.getSummaryOfCategoryWithStatusZero(month).map { categoryPriceList ->

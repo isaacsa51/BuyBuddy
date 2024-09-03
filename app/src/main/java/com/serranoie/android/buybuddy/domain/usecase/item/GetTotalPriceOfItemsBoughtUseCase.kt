@@ -8,12 +8,16 @@ import javax.inject.Inject
 
 class GetTotalPriceOfItemsBoughtUseCase @Inject constructor(private val repository: ItemRepositoryImpl) {
     suspend operator fun invoke(): Flow<UseCaseResult<Double>> = flow {
-        repository.getTotalPriceOfItemsBought().collect { price ->
-            if (price != null) {
-                emit(UseCaseResult.Success(price))
-            } else {
-                emit(UseCaseResult.Error(Exception("Total price is null")))
+        try {
+            repository.getTotalPriceOfItemsBought().collect { price ->
+                if (price != null) {
+                    emit(UseCaseResult.Success(price))
+                } else {
+                    emit(UseCaseResult.Error(Exception("Total price is null")))
+                }
             }
+        } catch (e: Exception) {
+            emit(UseCaseResult.Error(e))
         }
     }
 }

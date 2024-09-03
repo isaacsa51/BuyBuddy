@@ -40,12 +40,12 @@ fun CategoryWithItems.toEntity(categoryEntity: CategoryEntity): CategoryWithItem
     )
 }
 
-//fun MonthlySumCategoryEntityStatusZero.toDomain(): MonthlySumCategoryStatusZero {
-//    return MonthlySumCategoryStatusZero(
-//        categoryName = this.categoryName,
-//        totalPrice = this.totalPrice
-//    )
-//}
+fun MonthlySumCategoryEntityStatusZero.toDomain(): MonthlySumCategoryStatusZero {
+    return MonthlySumCategoryStatusZero(
+        categoryName = this.categoryName,
+        totalPrice = this.totalPrice
+    )
+}
 
 fun MonthlySumCategoryEntityStatusOne.toDomain(): MonthlySumCategoryStatusOne {
     return MonthlySumCategoryStatusOne(

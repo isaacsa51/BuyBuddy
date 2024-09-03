@@ -120,7 +120,7 @@ interface BuyBuddyDao {
     suspend fun getCategoryByName(categoryName: String): CategoryEntity?
 
     @Query("SELECT * FROM category WHERE categoryId = :categoryId")
-    fun getCategoryById(categoryId: Int): Flow<Category>
+    fun getCategoryById(categoryId: Int): Flow<CategoryEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategory(category: CategoryEntity): Long
