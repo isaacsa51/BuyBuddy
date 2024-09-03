@@ -20,22 +20,17 @@ jobs:
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          # Print the base64 data to inspect its format
-          echo "$DATA" | head -c 100
+          # Write the raw JSON to google-services.json
+          echo "$DATA" > app/google-services.json
 
-          # Try decoding the base64 string to google-services.json
-          if ! echo "$DATA" | base64 -di > app/google-services.json; then
-            echo "Base64 decoding failed! Check your encoded secret." >&2
-            exit 1
-          fi
-    
-          # Check if the file is a valid JSON file
+          # Validate the JSON file
           if ! jq . app/google-services.json > /dev/null 2>&1; then
             echo "google-services.json is NOT valid JSON!" >&2
+            cat app/google-services.json
             exit 1
           fi
 
-          # Output the first few lines for debugging purposes (optional)
+          # Output the first few lines of the decoded JSON for debugging (optional)
           head -n 10 app/google-services.json
           
       - name: Setup Gradle

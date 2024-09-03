@@ -19,7 +19,19 @@ jobs:
       - name: Load Google Services
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: touch ./app/google-services.json && echo $GOOGLE_SERVICES_JSON | base64 -di > ./app/google-services.json
+        run: |
+          # Write the raw JSON to google-services.json
+          echo "$DATA" > app/google-services.json
+
+          # Validate the JSON file
+          if ! jq . app/google-services.json > /dev/null 2>&1; then
+            echo "google-services.json is NOT valid JSON!" >&2
+            cat app/google-services.json
+            exit 1
+          fi
+
+          # Output the first few lines of the decoded JSON for debugging (optional)
+          head -n 10 app/google-services.json
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
