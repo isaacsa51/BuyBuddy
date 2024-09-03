@@ -23,24 +23,21 @@ jobs:
           # Print the base64 data to inspect its format
           echo "$DATA" | head -c 100
 
-          # Decode the base64 string to google-services.json
-          echo "$DATA" | base64 -di > app/google-services.json || {
-            echo "Base64 decoding failed!" >&2
+          # Try decoding the base64 string to google-services.json
+          if ! echo "$DATA" | base64 -di > app/google-services.json; then
+            echo "Base64 decoding failed! Check your encoded secret." >&2
             exit 1
-          }
+          fi
     
           # Check if the file is a valid JSON file
-          cat app/google-services.json | jq . > /dev/null
-          if [ $? -eq 0 ]; then
-            echo "google-services.json is valid JSON."
-          else
+          if ! jq . app/google-services.json > /dev/null 2>&1; then
             echo "google-services.json is NOT valid JSON!" >&2
             exit 1
           fi
 
           # Output the first few lines for debugging purposes (optional)
           head -n 10 app/google-services.json
-
+          
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
