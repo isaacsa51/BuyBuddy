@@ -43,7 +43,7 @@ For submitting bug reports, feature requests, questions, or any other ideas to i
 ### Testing
 - [JUnit4](https://github.com/junit-team/junit4) (test framework, compatible with Android)
 - [MockK](https://mockk.io/) (unit test assertions)
-- [Turbine](https://github.com/cashapp/turbine)
+- [Turbine](https://github.com/cashapp/turbine) (Small testing library for kotlinx.coroutines - Flows)
 
 ### Local Persistence
 - [DataStore](https://developer.android.com/topic/libraries/architecture/datastore) (key-value storage)
