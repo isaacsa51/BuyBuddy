@@ -78,7 +78,9 @@ object DependenciesProvider {
 
     @Provides
     @Singleton
-    fun providePreferenceUtil(@ApplicationContext context: Context) = PreferenceUtil(context)
+    fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil {
+        return PreferenceUtil(context)
+    }
 
     @Provides
     @Singleton

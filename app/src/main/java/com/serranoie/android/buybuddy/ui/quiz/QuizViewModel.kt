@@ -24,8 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val insertItemWithCategoryUseCase: InsertItemWithCategoryUseCase,
-    application: Application,
     private val userEventsTracker: UserEventsTracker,
+    application: Application,
 ) : AndroidViewModel(application) {
 
     private val scheduleNotification by lazy { ScheduleNotification() }

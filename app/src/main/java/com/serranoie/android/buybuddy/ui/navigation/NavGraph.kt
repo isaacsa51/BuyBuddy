@@ -1,7 +1,5 @@
 package com.serranoie.android.buybuddy.ui.navigation
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.EaseOut
@@ -352,7 +350,10 @@ fun NavGraph(
                         towards = AnimatedContentTransitionScope.SlideDirection.End
                     )
                 }) {
-                    SettingsScreen(navController = navController, userEventsTracker = userEventsTracker)
+                    SettingsScreen(
+                        navController = navController,
+                        userEventsTracker = userEventsTracker
+                    )
                 }
 
                 composable(route = Route.About.route, enterTransition = {

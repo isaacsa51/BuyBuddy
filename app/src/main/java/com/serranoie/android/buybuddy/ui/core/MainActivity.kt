@@ -39,17 +39,12 @@ class MainActivity : ComponentActivity() {
 
     private val onBoardViewModel by viewModels<AppEntryViewModel>()
 
-    lateinit var settingsViewModel: SettingsViewModel
-    lateinit var homeViewModel: HomeViewModel
+    val settingsViewModel by viewModels<SettingsViewModel>()
 
-    @Inject
-    lateinit var userEventsTracker: UserEventsTracker
+    @Inject lateinit var userEventsTracker: UserEventsTracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        settingsViewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
-        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
         enableEdgeToEdge(
             statusBarStyle =
