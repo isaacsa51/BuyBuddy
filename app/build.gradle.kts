@@ -1,3 +1,4 @@
+import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
@@ -25,7 +26,7 @@ android {
         versionCode = 110
         versionName = "1.1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.serranoie.android.buybuddy.HiltTestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -48,9 +49,7 @@ android {
 
             applicationVariants.all {
                 outputs
-                    .map {
-                        it as com.android.build.gradle.internal.api.ApkVariantOutputImpl
-                    }
+                    .map { it as ApkVariantOutputImpl }
                     .all { output ->
                         output.outputFileName = "BuyBuddy-v${versionName}.apk"
                         false
@@ -95,7 +94,12 @@ android {
 
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes.add("META-INF/LICENSE.md")
+            excludes.add("META-INF/LICENSE.txt")
+            excludes.add("META-INF/ASL2.0")
+            excludes.add("META-INF/NOTICE.md")
+            excludes.add("META-INF/NOTICE")
+            excludes.add("META-INF/LICENSE-notice.md")
         }
     }
 }
@@ -114,9 +118,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.play.services.base)
     testImplementation(libs.junit)
+    testImplementation(libs.junit.jupiter)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
@@ -124,8 +128,6 @@ dependencies {
     // Core Testing
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("androidx.arch.core:core-testing:2.2.0")
-    testImplementation("com.google.dagger:hilt-android-testing:2.51.1")
-    kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
     testImplementation("com.google.truth:truth:1.1.3")
@@ -178,7 +180,6 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.51.1")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.51.1")
-    kaptTest("com.google.dagger:hilt-android-compiler:2.51.1")
 
     // Espresso
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
@@ -187,7 +188,6 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.11")
     testImplementation("io.mockk:mockk-agent:1.13.11")
     androidTestImplementation("io.mockk:mockk-android:1.13.11")
-    androidTestImplementation("io.mockk:mockk-agent:1.13.11")
 
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")

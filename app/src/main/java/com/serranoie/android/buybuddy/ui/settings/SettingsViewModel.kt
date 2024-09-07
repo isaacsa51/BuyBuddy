@@ -92,6 +92,6 @@ class SettingsViewModel @Inject constructor(
     fun getCurrentTheme(): ThemeMode {
         return if (theme.value == ThemeMode.Auto) {
             if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
-        } else theme.value!!
+        } else theme.value
     }
 }
