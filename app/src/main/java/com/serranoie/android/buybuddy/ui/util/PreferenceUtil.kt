@@ -1,9 +1,10 @@
 package com.serranoie.android.buybuddy.ui.util
 
 import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class PreferenceUtil @Inject constructor(context: Context) {
+class PreferenceUtil @Inject constructor(@ApplicationContext context: Context) {
     companion object {
         // Shared preferences file name
         private const val PREFS_NAME = "buybuddy_settings"

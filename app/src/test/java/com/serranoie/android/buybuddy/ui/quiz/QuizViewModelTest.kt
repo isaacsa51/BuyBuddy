@@ -37,7 +37,7 @@ class QuizViewModelTest {
     fun setup() {
         MockKAnnotations.init(this)
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = QuizViewModel(insertItemWithCategoryUseCase, application, userEventsTracker)
+        viewModel = QuizViewModel(insertItemWithCategoryUseCase, userEventsTracker, application)
 
         every { application.getString(any<Int>()) } returns ""
     }
