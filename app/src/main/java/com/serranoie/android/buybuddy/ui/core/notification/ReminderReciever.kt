@@ -1,4 +1,4 @@
-package com.serranoie.android.buybuddy.ui.core
+package com.serranoie.android.buybuddy.ui.core.notification
 
 import android.Manifest
 import android.app.Activity
@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.core.MainActivity
 import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_CHNNL_ID
 import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_ITEM_ID_KEY
 import com.serranoie.android.buybuddy.ui.util.NotificationConstants.RMNDR_NOTI_MESSAGE_KEY

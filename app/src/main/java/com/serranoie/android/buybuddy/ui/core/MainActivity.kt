@@ -5,15 +5,20 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -21,12 +26,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
+import com.serranoie.android.buybuddy.ui.core.biometrics.BiometricAuthenticator
+import com.serranoie.android.buybuddy.ui.core.notification.ReminderReceiver
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
-import com.serranoie.android.buybuddy.ui.home.HomeViewModel
 import com.serranoie.android.buybuddy.ui.navigation.NavGraph
 import com.serranoie.android.buybuddy.ui.settings.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,29 +40,30 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     private lateinit var navController: NavHostController
 
     private val onBoardViewModel by viewModels<AppEntryViewModel>()
 
     val settingsViewModel by viewModels<SettingsViewModel>()
 
-    @Inject lateinit var userEventsTracker: UserEventsTracker
+    @Inject
+    lateinit var userEventsTracker: UserEventsTracker
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge(
             statusBarStyle =
-                SystemBarStyle.auto(
-                    Color.Transparent.toArgb(),
-                    Color.Transparent.toArgb(),
-                ),
+            SystemBarStyle.auto(
+                Color.Transparent.toArgb(),
+                Color.Transparent.toArgb(),
+            ),
             navigationBarStyle =
-                SystemBarStyle.auto(
-                    Color.Transparent.toArgb(),
-                    Color.Transparent.toArgb(),
-                ),
+            SystemBarStyle.auto(
+                Color.Transparent.toArgb(),
+                Color.Transparent.toArgb(),
+            ),
         )
 
         actionBar?.hide()
@@ -75,21 +82,51 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BuyBuddyTheme(settingsViewModel = settingsViewModel) {
+                var showContent by remember { mutableStateOf(false) }
+                val biometricAuthenticator = remember { BiometricAuthenticator(this) }
+
                 navController = rememberNavController()
-                Surface(
-                    modifier =
+
+                LaunchedEffect(Unit) {
+                    if (settingsViewModel.getAppLockValue()) {
+                        biometricAuthenticator.promptBiometricAuth(
+                            title = "Login",
+                            subtitle = "Authenticate to continue",
+                            negativeButtonText = "Cancel",
+                            fragmentActivity = this@MainActivity,
+                            onSuccess = {
+                                showContent = true
+                            },
+                            onFailed = {
+                                showContent = false
+                            },
+                            onError = { _, errorString ->
+                                showContent = false
+                            }
+                        )
+                    } else {
+                        showContent = true
+                    }
+                }
+
+                if (showContent) {
+                    Surface(
+                        modifier =
                         Modifier
                             .imePadding()
                             .fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    val startDestination = onBoardViewModel.startDestination
-                    NavGraph(navController, startDestination, userEventsTracker)
+                        color = MaterialTheme.colorScheme.background,
+                    ) {
+                        val startDestination = onBoardViewModel.startDestination
+                        NavGraph(navController, startDestination, userEventsTracker)
 
-                    intent?.getStringExtra("nav_route")?.let { navRoute ->
-                        Timber.i("User navigated via Notification to product: $navRoute")
-                        navController.navigate(navRoute)
+                        intent?.getStringExtra("nav_route")?.let { navRoute ->
+                            Timber.i("User navigated via Notification to product: $navRoute")
+                            navController.navigate(navRoute)
+                        }
                     }
+                } else {
+                    CircularProgressIndicator()
                 }
             }
         }

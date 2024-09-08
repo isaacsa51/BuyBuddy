@@ -9,7 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.BrightnessMedium
+import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.Button
@@ -202,6 +204,8 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
     val categoryVisibilityValue =
         remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
 
+    val appLockValue = remember { mutableStateOf(viewModel.getAppLockValue()) }
+
     SettingsContainer {
         SettingsCategory(title = stringResource(id = R.string.behaviour_label))
 
@@ -213,17 +217,18 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
                 userEventsTracker.logButtonAction("show_empty_categories_toggle: $newValue")
                 categoryVisibilityValue.value = newValue
                 viewModel.setCategoryVisibility(newValue)
-            })
+            }
+        )
+
+        SettingsItemSwitch(title = stringResource(R.string.app_lock_screen_title),
+            description = stringResource(R.string.app_lock_setting_desc),
+            icon = Icons.Rounded.Lock,
+            switchState = appLockValue,
+            onCheckChange = { newValue ->
+                userEventsTracker.logButtonAction("app_lock_toggle: $newValue")
+                appLockValue.value = newValue
+                viewModel.setAppLock(newValue)
+            }
+        )
     }
-}
-
-@PreviewLightDark
-@Composable
-fun SettingsScreenPreview() {
-    val crashlytics = FirebaseCrashlytics.getInstance()
-    val userEventsTracker = UserEventsTracker(crashlytics)
-
-    SettingsScreen(
-        navController = NavController(LocalContext.current), userEventsTracker = userEventsTracker
-    )
 }

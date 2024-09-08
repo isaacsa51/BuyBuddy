@@ -9,7 +9,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.DeleteItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
-import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.notification.ScheduleNotification
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery

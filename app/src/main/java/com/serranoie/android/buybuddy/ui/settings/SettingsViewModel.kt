@@ -82,12 +82,6 @@ class SettingsViewModel @Inject constructor(
     fun getCategoryVisibilityValue() =
         preferenceUtil.getBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, false)
 
-    /**
-     * Get the current theme of the app, regardless of the system theme.
-     * This will always return either [ThemeMode.Light] or [ThemeMode.Dark].
-     * If user has set the theme to Auto it will return the system theme,
-     * again Light or Dark instead of [ThemeMode.Auto].
-     */
     @Composable
     fun getCurrentTheme(): ThemeMode {
         return if (theme.value == ThemeMode.Auto) {
