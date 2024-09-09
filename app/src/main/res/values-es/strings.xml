@@ -111,13 +111,17 @@
     <string name="app_lock_button_text">Autorizar</string>
     <string name="app_lock_button_icon_desc">Desbloquear App</string>
     <string name="app_lock_unable_to_authenticate">El bloqueo de aplicaciones está deshabilitado porque el dispositivo no puede autenticarse</string>
+    <string name="biometric_not_available">Autenticación biométrica no disponible para este dispositivo.</string>
+    <string name="biometric_temporary_not_available">Autenticación biométrica no disponible en este momento.</string>"
+    <string name="biometric_available_not_enrolled">Primero debe registrar/agregar una huella digital/identificación facial…</string>
+    <string name="unlock_button">Desbloquear app</string>
+
 
     <!-- Biometric Lock -->
     <string name="security_settings_title">Seguridad</string>
     <string name="security_app_lock">Bloqueo biometrico</string>
     <string name="app_lock_setting_desc">Usa tu huella dactilar para desbloquear la app.</string>
     <string name="bio_lock_title">Desbloquear BuyBuddy</string>
-    <string name="bio_lock_subtitle">Confirme su bloqueo de pantalla, PIN o contraseña.</string>
     <string name="auth_successful">La autenticación fue exitosa!</string>
     <string name="auth_failed">La autenticación falló!</string>
     <string name="auth_error">Error de autenticación: %s</string>

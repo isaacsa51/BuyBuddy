@@ -11,10 +11,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,8 +27,12 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.core.biometrics.BiometricAuthenticator
+import com.serranoie.android.buybuddy.ui.core.biometrics.BlockedAppScreen
+import com.serranoie.android.buybuddy.ui.core.biometrics.FingerprintAuthCallback
+import com.serranoie.android.buybuddy.ui.core.biometrics.FingerprintAuthenticationDialogFragment
 import com.serranoie.android.buybuddy.ui.core.notification.ReminderReceiver
 import com.serranoie.android.buybuddy.ui.core.theme.BuyBuddyTheme
 import com.serranoie.android.buybuddy.ui.navigation.NavGraph
@@ -40,7 +42,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : FragmentActivity() {
+class MainActivity : FragmentActivity(), FingerprintAuthCallback {
     private lateinit var navController: NavHostController
 
     private val onBoardViewModel by viewModels<AppEntryViewModel>()
@@ -49,6 +51,8 @@ class MainActivity : FragmentActivity() {
 
     @Inject
     lateinit var userEventsTracker: UserEventsTracker
+
+    private var showContent by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,40 +86,38 @@ class MainActivity : FragmentActivity() {
 
         setContent {
             BuyBuddyTheme(settingsViewModel = settingsViewModel) {
-                var showContent by remember { mutableStateOf(false) }
                 val biometricAuthenticator = remember { BiometricAuthenticator(this) }
-
                 navController = rememberNavController()
 
-                LaunchedEffect(Unit) {
-                    if (settingsViewModel.getAppLockValue()) {
+                val authenticate: () -> Unit = {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         biometricAuthenticator.promptBiometricAuth(
-                            title = "Login",
-                            subtitle = "Authenticate to continue",
-                            negativeButtonText = "Cancel",
-                            fragmentActivity = this@MainActivity,
-                            onSuccess = {
-                                showContent = true
-                            },
-                            onFailed = {
+                            title = getString(R.string.bio_lock_title),
+                            subtitle = getString(R.string.app_lock_setting_desc),
+                            negativeButtonText = getString(R.string.cancel),
+                            fragmentActivity = this,
+                            onSuccess = { showContent = true },
+                            onFailed = { showContent = false },
+                            onError = { errorCode, errorString ->
                                 showContent = false
-                            },
-                            onError = { _, errorString ->
-                                showContent = false
+                                Toast.makeText(
+                                    this,
+                                    getString(R.string.auth_error, errorString),
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         )
                     } else {
-                        showContent = true
+                        showFingerprintDialog()
                     }
                 }
 
                 if (showContent) {
                     Surface(
-                        modifier =
-                        Modifier
+                        modifier = Modifier
                             .imePadding()
                             .fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background,
+                        color = MaterialTheme.colorScheme.background
                     ) {
                         val startDestination = onBoardViewModel.startDestination
                         NavGraph(navController, startDestination, userEventsTracker)
@@ -126,10 +128,19 @@ class MainActivity : FragmentActivity() {
                         }
                     }
                 } else {
-                    CircularProgressIndicator()
+                    BlockedAppScreen(onUnlockPressed = authenticate)
                 }
             }
         }
+    }
+
+    private fun showFingerprintDialog() {
+        val fingerprintDialog = FingerprintAuthenticationDialogFragment()
+        fingerprintDialog.show(supportFragmentManager, "FingerprintDialog")
+    }
+
+    override fun onAuthenticationSucceeded(success: Boolean) {
+        showContent = success
     }
 
     private fun requestNotificationPermission() {
