@@ -1,4 +1,4 @@
-name: Testing Google Services
+name: Testing Google Services on Debug
 
 on:
   workflow_call:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   run_tests:
-    name: Testing release variant
+    name: Testing debug variant
     runs-on: ubuntu-latest
 
     steps:
