@@ -21,7 +21,7 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           # Write the raw JSON to google-services.json
-          echo "$DATA" > app/google-services.json
+          echo "$DATA" | base64 -d > app/google-services.json
 
           # Validate the JSON file
           if ! jq . app/google-services.json > /dev/null 2>&1; then

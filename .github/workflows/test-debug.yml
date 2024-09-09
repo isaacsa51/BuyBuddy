@@ -1,7 +1,9 @@
-name: Unit Tests in Debug Variant
+name: Testing Google Services on Debug
 
 on:
   workflow_call:
+
+  workflow_dispatch:
 
 jobs:
   run_tests:
@@ -20,17 +22,14 @@ jobs:
         env:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
         run: |
-          # Write the raw JSON to google-services.json
           echo "$DATA" | base64 -d > app/google-services.json
-
-          # Validate the JSON file
+    
           if ! jq . app/google-services.json > /dev/null 2>&1; then
             echo "google-services.json is NOT valid JSON!" >&2
             cat app/google-services.json
             exit 1
           fi
 
-          # Output the first few lines of the decoded JSON for debugging (optional)
           head -n 10 app/google-services.json
 
       - name: Setup Gradle
@@ -41,3 +40,6 @@ jobs:
 
       - name: Execute Gradle command - testDebugUnitTest
         run: ./gradlew testDebugUnitTest
+
+      - name: Execute Gradle command - lintDebug
+        run: ./gradlew lintDebug
