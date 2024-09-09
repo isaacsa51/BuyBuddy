@@ -9,10 +9,21 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -41,6 +53,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
 
+@OptIn(ExperimentalLayoutApi::class)
 @AndroidEntryPoint
 class MainActivity : FragmentActivity(), FingerprintAuthCallback {
     private lateinit var navController: NavHostController
@@ -49,13 +62,15 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
 
     val settingsViewModel by viewModels<SettingsViewModel>()
 
+    private lateinit var showContentState: MutableState<Boolean>
+
     @Inject
     lateinit var userEventsTracker: UserEventsTracker
 
-    private var showContent by mutableStateOf(false)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        showContentState = mutableStateOf(!settingsViewModel.getAppLockValue())
 
         enableEdgeToEdge(
             statusBarStyle =
@@ -86,20 +101,25 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
 
         setContent {
             BuyBuddyTheme(settingsViewModel = settingsViewModel) {
+                val layoutDirection = LocalLayoutDirection.current
+                val displayCutout = WindowInsets.displayCutout.asPaddingValues()
+                val startPadding = displayCutout.calculateStartPadding(layoutDirection)
+                val endPadding = displayCutout.calculateEndPadding(layoutDirection)
+
                 val biometricAuthenticator = remember { BiometricAuthenticator(this) }
                 navController = rememberNavController()
 
                 val authenticate: () -> Unit = {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         biometricAuthenticator.promptBiometricAuth(
                             title = getString(R.string.bio_lock_title),
                             subtitle = getString(R.string.app_lock_setting_desc),
                             negativeButtonText = getString(R.string.cancel),
                             fragmentActivity = this,
-                            onSuccess = { showContent = true },
-                            onFailed = { showContent = false },
-                            onError = { errorCode, errorString ->
-                                showContent = false
+                            onSuccess = { showContentState.value = true },
+                            onFailed = { showContentState.value = false },
+                            onError = { _, errorString ->
+                                showContentState.value = false
                                 Toast.makeText(
                                     this,
                                     getString(R.string.auth_error, errorString),
@@ -112,12 +132,27 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
                     }
                 }
 
-                if (showContent) {
+                LaunchedEffect(Unit) {
+                    if (settingsViewModel.getAppLockValue()) {
+                        authenticate()
+                    }
+                }
+
+                if (showContentState.value) {
                     Surface(
                         modifier = Modifier
+                            .padding(
+                                PaddingValues(
+                                    start = startPadding,
+                                    end = endPadding,
+                                    bottom = displayCutout.calculateBottomPadding()
+                                )
+                            )
                             .imePadding()
+                            .imeNestedScroll()
                             .fillMaxSize(),
-                        color = MaterialTheme.colorScheme.background
+                        color = MaterialTheme.colorScheme.background,
+
                     ) {
                         val startDestination = onBoardViewModel.startDestination
                         NavGraph(navController, startDestination, userEventsTracker)
@@ -140,7 +175,8 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
     }
 
     override fun onAuthenticationSucceeded(success: Boolean) {
-        showContent = success
+        Timber.i("Authentication succeeded: $success")
+        showContentState.value = success
     }
 
     private fun requestNotificationPermission() {
