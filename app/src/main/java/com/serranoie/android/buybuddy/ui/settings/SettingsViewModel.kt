@@ -3,6 +3,7 @@ package com.serranoie.android.buybuddy.ui.settings
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.PreferenceUtil
@@ -82,16 +83,12 @@ class SettingsViewModel @Inject constructor(
     fun getCategoryVisibilityValue() =
         preferenceUtil.getBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, false)
 
-    /**
-     * Get the current theme of the app, regardless of the system theme.
-     * This will always return either [ThemeMode.Light] or [ThemeMode.Dark].
-     * If user has set the theme to Auto it will return the system theme,
-     * again Light or Dark instead of [ThemeMode.Auto].
-     */
     @Composable
     fun getCurrentTheme(): ThemeMode {
-        return if (theme.value == ThemeMode.Auto) {
+        val currentTheme = theme.collectAsState()
+
+        return if (currentTheme.value == ThemeMode.Auto) {
             if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
-        } else theme.value
+        } else currentTheme.value
     }
 }

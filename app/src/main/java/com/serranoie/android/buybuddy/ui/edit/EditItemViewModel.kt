@@ -15,7 +15,7 @@ import com.serranoie.android.buybuddy.domain.usecase.item.DeleteItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
-import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.notification.ScheduleNotification
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

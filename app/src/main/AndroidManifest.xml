@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
 
     <application
@@ -26,7 +27,7 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name=".ui.core.ReminderReceiver"
+            android:name=".ui.core.notification.ReminderReceiver"
             android:enabled="true" />
     </application>
 

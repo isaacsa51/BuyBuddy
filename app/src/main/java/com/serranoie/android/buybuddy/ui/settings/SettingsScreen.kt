@@ -1,7 +1,6 @@
 package com.serranoie.android.buybuddy.ui.settings
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -10,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.BrightnessMedium
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.Button
@@ -30,10 +30,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.serranoie.android.buybuddy.BuildConfig
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.MainActivity
@@ -97,10 +95,12 @@ fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTr
 
             if (BuildConfig.DEBUG) {
                 item {
-                    Button(onClick = {
-                        simulateError()
-                    }) {
-                        Text(text = "Throw Error")
+                    SettingsContainer {
+                        Button(onClick = {
+                            simulateError()
+                        }) {
+                            Text(text = "Throw Error")
+                        }
                     }
                 }
             }
@@ -202,6 +202,8 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
     val categoryVisibilityValue =
         remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
 
+    val appLockValue = remember { mutableStateOf(viewModel.getAppLockValue()) }
+
     SettingsContainer {
         SettingsCategory(title = stringResource(id = R.string.behaviour_label))
 
@@ -213,17 +215,18 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
                 userEventsTracker.logButtonAction("show_empty_categories_toggle: $newValue")
                 categoryVisibilityValue.value = newValue
                 viewModel.setCategoryVisibility(newValue)
-            })
+            }
+        )
+
+        SettingsItemSwitch(title = stringResource(R.string.security_app_lock),
+            description = stringResource(R.string.app_lock_setting_desc),
+            icon = Icons.Rounded.Lock,
+            switchState = appLockValue,
+            onCheckChange = { newValue ->
+                userEventsTracker.logButtonAction("app_lock_toggle: $newValue")
+                appLockValue.value = newValue
+                viewModel.setAppLock(newValue)
+            }
+        )
     }
-}
-
-@PreviewLightDark
-@Composable
-fun SettingsScreenPreview() {
-    val crashlytics = FirebaseCrashlytics.getInstance()
-    val userEventsTracker = UserEventsTracker(crashlytics)
-
-    SettingsScreen(
-        navController = NavController(LocalContext.current), userEventsTracker = userEventsTracker
-    )
 }

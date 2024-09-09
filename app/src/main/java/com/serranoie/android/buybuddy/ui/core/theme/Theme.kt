@@ -296,9 +296,7 @@ fun BuyBuddyTheme(
 ) {
     val context = LocalContext.current
     val themeState by settingsViewModel.theme.collectAsState()
-//    val materialYouState = settingsViewModel.materialYou.observeAsState(initial = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
     val materialYouState by settingsViewModel.materialYou.collectAsState()
-
 
     val colorScheme = getColorScheme(
         themeState = themeState,

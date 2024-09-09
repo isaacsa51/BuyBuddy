@@ -125,6 +125,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // AppCompat Activity
+    implementation(libs.androidx.appcompat)
+
     // Core Testing
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
     testImplementation("androidx.arch.core:core-testing:2.2.0")

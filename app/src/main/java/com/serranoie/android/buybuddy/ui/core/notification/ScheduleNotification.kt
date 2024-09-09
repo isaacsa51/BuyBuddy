@@ -1,4 +1,4 @@
-package com.serranoie.android.buybuddy.ui.core
+package com.serranoie.android.buybuddy.ui.core.notification
 
 import android.app.AlarmManager
 import android.app.PendingIntent
