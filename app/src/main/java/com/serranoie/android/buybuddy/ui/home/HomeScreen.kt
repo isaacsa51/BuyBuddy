@@ -19,11 +19,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Backup
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.ThumbUp
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Backup
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Menu
@@ -105,13 +107,12 @@ fun HomeScreen(
             route = Screen.SUMMARY.name
         ),
 
-        // TODO: Implement backup functionality to the app
-        /*NavigationItem(
+        NavigationItem(
             title = stringResource(id = R.string.backup_home),
             selectedIcon = Icons.Rounded.Backup,
             unselectedIcon = Icons.Outlined.Backup,
             route = Screen.BACKUP.name
-        ),*/
+        ),
         NavigationItem(
             title = stringResource(id = R.string.settings_home),
             selectedIcon = Icons.Rounded.Settings,

@@ -17,6 +17,8 @@ object UiConstants {
     val pageIndicatorWidth = 52.dp
 
     const val CONTENT_ANIMATION_DURATION = 300
+
+    const val BACKUP_FILE_NAME = "buybuddy_backup.json"
 }
 
 fun View.weakHapticFeedback() {
@@ -27,7 +29,6 @@ fun View.strongHapticFeedback() {
     this.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
 }
 
-fun String.
-        toToast(context: Context, length: Int = Toast.LENGTH_SHORT) {
+fun String.toToast(context: Context, length: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(context, this, length).show()
 }

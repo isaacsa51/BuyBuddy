@@ -1,7 +1,6 @@
 package com.serranoie.android.buybuddy.ui.settings
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -13,10 +12,12 @@ import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -97,10 +98,15 @@ fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTr
 
             if (BuildConfig.DEBUG) {
                 item {
-                    Button(onClick = {
-                        simulateError()
-                    }) {
-                        Text(text = "Throw Error")
+                    SettingsContainer {
+                        Button(
+                            onClick = {
+                                simulateError()
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Text(text = "Throw Error", color = MaterialTheme.colorScheme.onError)
+                        }
                     }
                 }
             }
