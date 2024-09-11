@@ -5,12 +5,17 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonDeserializer
 import com.serranoie.android.buybuddy.data.backup.BackupData
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -21,9 +26,7 @@ class BackupViewModel @Inject constructor(
     fun generateBackupFile(context: Context, uri: Uri) {
         viewModelScope.launch {
             val backupData = getAllDataForBackup()
-
             val jsonData = convertToJson(backupData)
-            Timber.i("JSON Data: $jsonData")
 
             saveJsonToFile(context, uri, jsonData)
         }
@@ -52,7 +55,12 @@ class BackupViewModel @Inject constructor(
     }
 
     private fun parseJsonToBackupData(jsonData: String): BackupData {
-        val gson = Gson()
+        val gson = GsonBuilder()
+            .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
+                val format = SimpleDateFormat("MMM dd, yyyy hh:mm:ss a", Locale.US)
+                format.parse(json.asString)
+            })
+            .create()
         return gson.fromJson(jsonData, BackupData::class.java)
     }
 
@@ -60,6 +68,7 @@ class BackupViewModel @Inject constructor(
         backupData.categoriesWithItems.forEach { categoryWithItems ->
             dao.insertCategory(categoryWithItems.category)
             categoryWithItems.items.forEach { item ->
+                Timber.d("Inserting item: $item")
                 dao.insertItem(item)
             }
         }
