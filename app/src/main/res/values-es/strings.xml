@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">BuyBuddy</string>
 
     <string name="field_required">Es necesario completar este campo</string>
     <string name="category_art">Arte</string>
@@ -66,7 +65,7 @@
     <string name="name">Nombre</string>
     <string name="description">Descripción</string>
     <string name="price">Precio</string>
-    <string name="ok">OK</string>
+    <string name="ok">Ok</string>
     <string name="finished_quiz_title">Todo listo y guardado!</string>
     <string name="finished_quiz_subtitle">Puedes ver tus productos en la pantalla de inicio.</string>
     <string name="finished_quiz_info">A partir de ahora solo tendrás que esperar hasta que te aparezca el recordatorio y tengas en cuenta si quieres el producto o no.</string>
@@ -96,7 +95,6 @@
     <string name="display_settings_title">Tema</string>
     <string name="theme_setting">Tema predeterminado</string>
     <string name="theme_setting_desc">Cambia el tema de la app</string>
-    <string name="material_you_setting">Material You</string>
     <string name="material_you_setting_desc">Cambia el tema según tu fondo de pantalla (Solo A12+)</string>
     <string name="material_you_error">Esta función solo está disponible en versiones Android 12+</string>
     <string name="theme_dialog_title">Cambiar tema</string>
@@ -135,9 +133,9 @@
 
     <!-- About Screen -->
     <string name="about_screen_header">Acerca</string>
-    <string name="about_readme_title">README</string>
+    <string name="about_readme_title">Información</string>
     <string name="about_readme_desc">Consulta el repositorio de GitHub y el archivo README de la aplicación.</string>
-    <string name="about_website_title">Website</string>
+    <string name="about_website_title">Sitio web</string>
     <string name="about_website_desc">Visita nuestro sitio web para obtener más información y explorar nuestras otras aplicaciones y proyectos..</string>
     <string name="about_privacy_title">Política de privacidad</string>
     <string name="about_privacy_desc">Lea nuestra última política de privacidad y términos de servicio en GitHub.</string>
@@ -158,6 +156,13 @@
     <string name="current_month">Mes actual</string>
     <string name="summary_label">Resumen por categoría</string>
     <string name="transactions_category_label">Transacciones: %1$s</string>
+
+    <!-- Backup Screen -->
+    <string name="backup_screen_title">Respaldo</string>
+    <string name="backup_info">Realice una copia de seguridad de los datos de su aplicación, incluido todos sus productos, recordatorios y transacciones actuales y podrá restaurarlos fácilmente cuando lo desee.</string>
+    <string name="backup_sidenote">Tenga en cuenta que el respaldo no incluye ajustes de la aplicación.</string>
+    <string name="backup_generate_button">Generar Respaldo</string>
+    <string name="backup_restore_button">Cargar Respaldo</string>
 
     <string name="congrats_finding_this">Te ves muy intimidante en tu Honda Civic 2024 Sport+...</string>
 </resources>

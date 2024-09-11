@@ -76,7 +76,7 @@ fun BackupScreen(
             LargeTopAppBar(
                 title = {
                     Text(
-                        text = "Backup",
+                        text = stringResource(id = R.string.backup_screen_title),
                     )
                 },
                 navigationIcon = {
@@ -122,13 +122,13 @@ fun BackupScreen(
                 }
 
                 Text(
-                    text = "Back up your app data including all your products, current reminders & transactions, this can be easily restored whenever you want.",
+                    text = stringResource(id = R.string.backup_info),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(basePadding),
                 )
 
                 Text(
-                    text = "Take in consideration that backup data don't include app settings.",
+                    text = stringResource(id = R.string.backup_sidenote),
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Normal,
                     modifier = Modifier.padding(
@@ -147,7 +147,7 @@ fun BackupScreen(
                             .padding(start = basePadding)
                             .weight(0.5f),
                     ) {
-                        Text(text = "Generate Backup")
+                        Text(text = stringResource(id = R.string.backup_generate_button))
                     }
 
                     Spacer(modifier = Modifier.weight(0.04f))
@@ -160,7 +160,7 @@ fun BackupScreen(
                             .padding(end = basePadding)
                             .weight(0.5f),
                     ) {
-                        Text(text = "Restore Backup")
+                        Text(text = stringResource(id = R.string.backup_restore_button))
                     }
                 }
             }
