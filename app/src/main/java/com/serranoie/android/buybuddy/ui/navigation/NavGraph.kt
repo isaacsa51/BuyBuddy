@@ -220,11 +220,15 @@ fun NavGraph(
             }) {
                 val viewModel = hiltViewModel<BackupViewModel>()
 
-                BackupScreen(navController = navController,
-                    onGenerateBackupFile = {
-                        viewModel.generateBackupFile(context = navController.context)
+                BackupScreen(
+                    navController = navController,
+                    onGenerateBackupFile = { uri ->
+                        viewModel.generateBackupFile(context = navController.context, uri = uri)
                     },
-                    onRestoreBackupFile = { viewModel.restoreBackupFile(context = navController.context) })
+                    onRestoreBackupFile = { uri ->
+                        viewModel.restoreBackupFile(context = navController.context, uri = uri)
+                    }
+                )
             }
 
             composable(route = Route.FinishedQuiz.route, enterTransition = {

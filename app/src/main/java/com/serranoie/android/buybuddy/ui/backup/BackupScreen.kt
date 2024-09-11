@@ -3,6 +3,7 @@ package com.serranoie.android.buybuddy.ui.backup
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContracts.CreateDocument
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material3.Card
@@ -29,13 +29,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.util.UiConstants.BACKUP_FILE_NAME
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
@@ -53,17 +50,26 @@ import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 @Composable
 fun BackupScreen(
     navController: NavController,
-    onGenerateBackupFile: () -> Unit,
-    onRestoreBackupFile: () -> Unit,
+    onGenerateBackupFile: (Uri) -> Unit,
+    onRestoreBackupFile: (Uri) -> Unit,
 ) {
     val view = LocalView.current
-    val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
 
-    val result = remember { mutableStateOf<Uri?>(null) }
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
-        result.value = it
-    }
+    val launcherCreateDocument =
+        rememberLauncherForActivityResult(CreateDocument("application/json")) { uri ->
+            if (uri != null) {
+                onGenerateBackupFile(uri)
+            }
+        }
+
+    val launcherOpenDocument =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri != null) {
+                onRestoreBackupFile(uri)
+            }
+        }
+
 
     Scaffold(
         topBar = {
@@ -134,45 +140,29 @@ fun BackupScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     FilledTonalButton(
-                        onClick = { onGenerateBackupFile() },
+                        onClick = {
+                            launcherCreateDocument.launch(BACKUP_FILE_NAME)
+                        },
                         modifier = Modifier
                             .padding(start = basePadding)
                             .weight(0.5f),
                     ) {
-                        Text(
-                            text = "Generate Backup",
-                        )
+                        Text(text = "Generate Backup")
                     }
 
                     Spacer(modifier = Modifier.weight(0.04f))
 
                     OutlinedButton(
                         onClick = {
-                            launcher.launch(arrayOf("application/json"))
+                            launcherOpenDocument.launch(arrayOf("application/json"))
                         },
                         modifier = Modifier
                             .padding(end = basePadding)
                             .weight(0.5f),
                     ) {
-                        Text(
-                            text = "Restore Backup",
-                        )
-                    }
-
-                    result.value?.let { json ->
-                        Text(text = "Document Path: " + json.path.toString())
+                        Text(text = "Restore Backup")
                     }
                 }
-
-                Text(
-                    text = "The backup file of your products is located at: /sdcard/Android/data/com.serranoie.android.buybuddy/files/buybuddy_backup.json",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(basePadding)
-                        .wrapContentSize(Alignment.BottomCenter)
-                )
             }
         }
     }
