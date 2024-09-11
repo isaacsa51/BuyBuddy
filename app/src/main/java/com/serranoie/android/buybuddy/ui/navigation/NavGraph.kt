@@ -354,7 +354,8 @@ fun NavGraph(
                     )
                 }) {
                     SettingsScreen(
-                        navController = navController, userEventsTracker = userEventsTracker
+                        navController = navController,
+                        userEventsTracker = userEventsTracker
                     )
                 }
 

@@ -126,10 +126,10 @@
     <string name="security_app_lock">Biometric Lock</string>
     <string name="app_lock_setting_desc">Use your fingerprint to unlock the app.</string>
     <string name="bio_lock_title">Unlock BuyBuddy</string>
-    <string name="bio_lock_subtitle">Confirm your screen lock, PIN or password.</string>
     <string name="auth_successful">Authentication succeeded!</string>
     <string name="auth_failed">Authentication failed!</string>
-    <string name="auth_error">Authentication error: %s</string>
+    <string name="auth_error">Authentication error: %s</string>]
+    <string name="unlock_button">Unlock app</string>
 
     <!--  Info Values  -->
     <string name="misc_setting_title">Information</string>
@@ -137,6 +137,9 @@
     <string name="license_setting_desc">Show open source license information</string>
     <string name="app_info_setting">App Information</string>
     <string name="app_info_setting_desc">Show app version and useful links.</string>
+    <string name="biometric_not_available">Biometric authentication not available for this device.</string>
+    <string name="biometric_temporary_not_available">Biometric authentication not available at this moment.</string>"
+    <string name="biometric_available_not_enrolled">You should register/add a fingerprint/face ID first…</string>
 
     <!-- About Screen -->
     <string name="about_screen_header">About</string>

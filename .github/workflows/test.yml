@@ -24,7 +24,6 @@ jobs:
         run: |
           echo "$DATA" | base64 -d > app/google-services.json
     
-          # Validate the JSON file
           if ! jq . app/google-services.json > /dev/null 2>&1; then
             echo "google-services.json is NOT valid JSON!" >&2
             cat app/google-services.json

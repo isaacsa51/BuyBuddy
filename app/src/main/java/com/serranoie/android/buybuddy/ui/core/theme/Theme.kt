@@ -12,6 +12,8 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -293,12 +295,12 @@ fun BuyBuddyTheme(
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
-    val themeState = settingsViewModel.theme.observeAsState(initial = ThemeMode.Auto)
-    val materialYouState = settingsViewModel.materialYou.observeAsState(initial = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+    val themeState by settingsViewModel.theme.collectAsState()
+    val materialYouState by settingsViewModel.materialYou.collectAsState()
 
     val colorScheme = getColorScheme(
-        themeState = themeState.value,
-        materialYouState = materialYouState.value,
+        themeState = themeState,
+        materialYouState = materialYouState,
         darkTheme = darkTheme,
         context = context,
     )

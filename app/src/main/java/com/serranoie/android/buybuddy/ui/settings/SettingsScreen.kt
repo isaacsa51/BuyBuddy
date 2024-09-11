@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.BrightnessMedium
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.RemoveCircleOutline
 import androidx.compose.material3.Button
@@ -31,10 +32,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.serranoie.android.buybuddy.BuildConfig
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.MainActivity
@@ -105,131 +104,133 @@ fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTr
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
-                            Text(text = "Throw Error", color = MaterialTheme.colorScheme.onError)
+                            Text(text = "Throw Error")
                         }
                     }
                 }
             }
-
         }
     }
-}
 
-private fun simulateError() {
-    throw RuntimeException("Simulated error for demonstration purposes.")
-}
-
-@Composable
-fun DisplaySettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsTracker) {
-    val context = LocalContext.current
-    val showThemeSheet = remember { mutableStateOf(false) }
-
-    val themeValue = when (viewModel.getThemeValue()) {
-        ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
-        ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
-        else -> stringResource(id = R.string.theme_dialog_option3)
+    private fun simulateError() {
+        throw RuntimeException("Simulated error for demonstration purposes.")
     }
 
-    val materialYouValue = remember {
-        mutableStateOf(viewModel.getMaterialYouValue())
-    }
+    @Composable
+    fun DisplaySettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsTracker) {
+        val context = LocalContext.current
+        val showThemeSheet = remember { mutableStateOf(false) }
 
-    Spacer(modifier = Modifier.height(smallPadding))
+        val themeValue = when (viewModel.getThemeValue()) {
+            ThemeMode.Light.ordinal -> stringResource(id = R.string.theme_dialog_option1)
+            ThemeMode.Dark.ordinal -> stringResource(id = R.string.theme_dialog_option2)
+            else -> stringResource(id = R.string.theme_dialog_option3)
+        }
 
-    SettingsContainer {
-        SettingsCategory(title = stringResource(id = R.string.display_settings_title))
+        val materialYouValue = remember {
+            mutableStateOf(viewModel.getMaterialYouValue())
+        }
 
-        SettingsItem(
-            title = stringResource(id = R.string.theme_setting),
-            description = stringResource(id = R.string.theme_setting_desc),
-            icon = Icons.Rounded.BrightnessMedium,
-            onClick = {
-                showThemeSheet.value = true
-                userEventsTracker.logButtonAction("theme_button")
-            },
-        )
+        Spacer(modifier = Modifier.height(smallPadding))
 
-        SettingsItemSwitch(
-            title = stringResource(id = R.string.material_you_setting),
-            description = stringResource(id = R.string.material_you_setting_desc),
-            icon = Icons.Rounded.Palette,
-            switchState = materialYouValue,
-            onCheckChange = { newValue ->
-                materialYouValue.value = newValue
+        SettingsContainer {
+            SettingsCategory(title = stringResource(id = R.string.display_settings_title))
 
-                userEventsTracker.logButtonAction("material_you_toggle: $newValue")
+            SettingsItem(
+                title = stringResource(id = R.string.theme_setting),
+                description = stringResource(id = R.string.theme_setting_desc),
+                icon = Icons.Rounded.BrightnessMedium,
+                onClick = {
+                    showThemeSheet.value = true
+                    userEventsTracker.logButtonAction("theme_button")
+                },
+            )
 
-                if (newValue) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        viewModel.setMaterialYou(true)
+            SettingsItemSwitch(
+                title = stringResource(id = R.string.material_you_setting),
+                description = stringResource(id = R.string.material_you_setting_desc),
+                icon = Icons.Rounded.Palette,
+                switchState = materialYouValue,
+                onCheckChange = { newValue ->
+                    materialYouValue.value = newValue
+
+                    userEventsTracker.logButtonAction("material_you_toggle: $newValue")
+
+                    if (newValue) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            viewModel.setMaterialYou(true)
+                        } else {
+                            materialYouValue.value = false
+                            context.getString(R.string.material_you_error).toToast(context)
+                        }
                     } else {
-                        materialYouValue.value = false
-                        context.getString(R.string.material_you_error).toToast(context)
+                        viewModel.setMaterialYou(false)
                     }
-                } else {
-                    viewModel.setMaterialYou(false)
-                }
-            },
-        )
+                },
+            )
 
-        if (showThemeSheet.value) {
-            ThemePickerDialog(
-                themeValue = themeValue,
-                showThemeDialog = showThemeSheet,
-                onThemeChange = { newTheme ->
-                    viewModel.setTheme(newTheme)
+            if (showThemeSheet.value) {
+                ThemePickerDialog(
+                    themeValue = themeValue,
+                    showThemeDialog = showThemeSheet,
+                    onThemeChange = { newTheme ->
+                        viewModel.setTheme(newTheme)
+                    },
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun InfoSettings(navController: NavController, userEventsTracker: UserEventsTracker) {
+        SettingsContainer {
+            SettingsCategory(title = stringResource(id = R.string.misc_setting_title))
+
+            SettingsItem(
+                title = stringResource(id = R.string.app_info_setting),
+                description = stringResource(id = R.string.app_info_setting_desc),
+                icon = Icons.Rounded.Info,
+                onClick = {
+                    userEventsTracker.logButtonAction("about_button")
+                    navController.navigate(Screen.ABOUT.name)
                 },
             )
         }
+        Spacer(modifier = Modifier.height(2.dp))
     }
-}
 
-@Composable
-fun InfoSettings(navController: NavController, userEventsTracker: UserEventsTracker) {
-    SettingsContainer {
-        SettingsCategory(title = stringResource(id = R.string.misc_setting_title))
+    @Composable
+    fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsTracker) {
 
-        SettingsItem(
-            title = stringResource(id = R.string.app_info_setting),
-            description = stringResource(id = R.string.app_info_setting_desc),
-            icon = Icons.Rounded.Info,
-            onClick = {
-                userEventsTracker.logButtonAction("about_button")
-                navController.navigate(Screen.ABOUT.name)
-            },
-        )
+        val categoryVisibilityValue =
+            remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
+
+        val appLockValue = remember { mutableStateOf(viewModel.getAppLockValue()) }
+
+        SettingsContainer {
+            SettingsCategory(title = stringResource(id = R.string.behaviour_label))
+
+            SettingsItemSwitch(title = stringResource(R.string.show_empty_categories_label),
+                description = stringResource(R.string.empty_categories_desc),
+                icon = Icons.Rounded.RemoveCircleOutline,
+                switchState = categoryVisibilityValue,
+                onCheckChange = { newValue ->
+                    userEventsTracker.logButtonAction("show_empty_categories_toggle: $newValue")
+                    categoryVisibilityValue.value = newValue
+                    viewModel.setCategoryVisibility(newValue)
+                }
+            )
+
+            SettingsItemSwitch(title = stringResource(R.string.security_app_lock),
+                description = stringResource(R.string.app_lock_setting_desc),
+                icon = Icons.Rounded.Lock,
+                switchState = appLockValue,
+                onCheckChange = { newValue ->
+                    userEventsTracker.logButtonAction("app_lock_toggle: $newValue")
+                    appLockValue.value = newValue
+                    viewModel.setAppLock(newValue)
+                }
+            )
+        }
     }
-    Spacer(modifier = Modifier.height(2.dp))
-}
-
-@Composable
-fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsTracker) {
-
-    val categoryVisibilityValue =
-        remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
-
-    SettingsContainer {
-        SettingsCategory(title = stringResource(id = R.string.behaviour_label))
-
-        SettingsItemSwitch(title = stringResource(R.string.show_empty_categories_label),
-            description = stringResource(R.string.empty_categories_desc),
-            icon = Icons.Rounded.RemoveCircleOutline,
-            switchState = categoryVisibilityValue,
-            onCheckChange = { newValue ->
-                userEventsTracker.logButtonAction("show_empty_categories_toggle: $newValue")
-                categoryVisibilityValue.value = newValue
-                viewModel.setCategoryVisibility(newValue)
-            })
-    }
-}
-
-@PreviewLightDark
-@Composable
-fun SettingsScreenPreview() {
-    val crashlytics = FirebaseCrashlytics.getInstance()
-    val userEventsTracker = UserEventsTracker(crashlytics)
-
-    SettingsScreen(
-        navController = NavController(LocalContext.current), userEventsTracker = userEventsTracker
-    )
 }

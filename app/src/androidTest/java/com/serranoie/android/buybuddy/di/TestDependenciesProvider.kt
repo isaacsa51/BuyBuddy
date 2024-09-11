@@ -1,10 +1,6 @@
 package com.serranoie.android.buybuddy.di
 
 import android.app.Application
-import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.serranoie.android.buybuddy.data.persistance.BuyBuddyDatabase
@@ -12,15 +8,12 @@ import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
 import com.serranoie.android.buybuddy.data.persistance.prefs.manager.LocalUserManagerImpl
 import com.serranoie.android.buybuddy.data.repository.CategoryRepositoryImpl
 import com.serranoie.android.buybuddy.data.repository.ItemRepositoryImpl
-import com.serranoie.android.buybuddy.data.util.Constants
-import com.serranoie.android.buybuddy.domain.manager.LocalUserManager
 import com.serranoie.android.buybuddy.domain.usecase.appentry.AppEntryUseCase
 import com.serranoie.android.buybuddy.domain.usecase.appentry.CheckThemeUseCase
 import com.serranoie.android.buybuddy.domain.usecase.appentry.ReadAppEntry
 import com.serranoie.android.buybuddy.domain.usecase.appentry.SaveAppEntry
 import com.serranoie.android.buybuddy.domain.usecase.appentry.SaveThemeUseCase
 import com.serranoie.android.buybuddy.domain.usecase.category.GetCategoriesWithItemsUseCase
-import com.serranoie.android.buybuddy.domain.usecase.category.GetCategoryByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.DeleteItemUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetItemByIdUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.GetItemsUseCase
@@ -31,37 +24,53 @@ import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategory
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemStatusUseCase
 import com.serranoie.android.buybuddy.domain.usecase.item.UpdateItemUseCase
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
-import com.serranoie.android.buybuddy.ui.util.PreferenceUtil
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.mockk.Runs
+import io.mockk.every
+import io.mockk.just
+import io.mockk.mockk
 import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
 @Module
-object DependenciesProvider {
-
-    // Extension function to create a DataStore instance
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
+@InstallIn(SingletonComponent::class)
+object TestDependenciesProvider {
 
     @Provides
+    @Singleton
+    fun provideBuyBuddyDatabase(app: Application): BuyBuddyDatabase {
+        return Room.inMemoryDatabaseBuilder(
+            app,
+            BuyBuddyDatabase::class.java
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseCrashlytics(): FirebaseCrashlytics {
+        val mockCrashlytics = mockk<FirebaseCrashlytics>(relaxed = true)
+        every { mockCrashlytics.log(any()) } just Runs
+        every { mockCrashlytics.setCustomKey(any<String>(), any<String>()) } just Runs
+        every { mockCrashlytics.setCustomKey(any<String>(), any<Int>()) } just Runs
+        every { mockCrashlytics.setCustomKey(any<String>(), any<Boolean>()) } just Runs
+        every { mockCrashlytics.setCustomKey(any<String>(), any<Long>()) } just Runs
+        every { mockCrashlytics.setCustomKey(any<String>(), any<Float>()) } just Runs
+        every { mockCrashlytics.setCustomKey(any<String>(), any<Double>()) } just Runs
+        return mockCrashlytics
+    }
+
+    @Provides
+    @Singleton
     fun provideUserEventsTracker(crashlytics: FirebaseCrashlytics): UserEventsTracker {
         return UserEventsTracker(crashlytics)
     }
 
     @Provides
-    fun provideFirebaseCrashlytics(): FirebaseCrashlytics {
-        return FirebaseCrashlytics.getInstance()
-    }
-
-    @Provides
     @Singleton
-    fun provideBuyBuddyDatabase(@ApplicationContext appContext: Context): BuyBuddyDatabase {
-        return Room.databaseBuilder(
-            appContext, BuyBuddyDatabase::class.java, Constants.DB_NAME
-        ).fallbackToDestructiveMigration().build()
+    fun provideItemRepository(db: BuyBuddyDatabase): ItemRepositoryImpl {
+        return ItemRepositoryImpl(db.buyBuddyDao())
     }
 
     @Provides
@@ -72,29 +81,16 @@ object DependenciesProvider {
 
     @Provides
     @Singleton
-    fun provideLocalUserManager(
-        application: Application,
-    ): LocalUserManager = LocalUserManagerImpl(application)
+    fun provideLocalUserManager(app: Application) = LocalUserManagerImpl(app)
 
     @Provides
     @Singleton
-    fun providePreferenceUtil(@ApplicationContext context: Context): PreferenceUtil {
-        return PreferenceUtil(context)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAppEntryUseCase(localUserManager: LocalUserManager) = AppEntryUseCase(
+    fun provideAppEntryUseCase(localUserManager: LocalUserManagerImpl) = AppEntryUseCase(
         readAppEntry = ReadAppEntry(localUserManager),
         saveAppEntry = SaveAppEntry(localUserManager),
         checkTheme = CheckThemeUseCase(localUserManager),
         saveTheme = SaveThemeUseCase(localUserManager),
     )
-
-    @Provides
-    fun provideGetCategoryByIdUseCase(repository: CategoryRepositoryImpl): GetCategoryByIdUseCase {
-        return GetCategoryByIdUseCase(repository)
-    }
 
     @Provides
     fun provideGetCategoriesWithItemsUseCase(repository: CategoryRepositoryImpl): GetCategoriesWithItemsUseCase {

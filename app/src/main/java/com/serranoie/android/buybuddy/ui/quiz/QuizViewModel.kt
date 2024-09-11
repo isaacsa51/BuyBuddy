@@ -11,7 +11,7 @@ import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.Item
 import com.serranoie.android.buybuddy.domain.usecase.UseCaseResult
 import com.serranoie.android.buybuddy.domain.usecase.item.InsertItemWithCategoryUseCase
-import com.serranoie.android.buybuddy.ui.core.ScheduleNotification
+import com.serranoie.android.buybuddy.ui.core.notification.ScheduleNotification
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.Questions
 import com.serranoie.android.buybuddy.ui.quiz.questions.Category
@@ -24,8 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class QuizViewModel @Inject constructor(
     private val insertItemWithCategoryUseCase: InsertItemWithCategoryUseCase,
-    application: Application,
     private val userEventsTracker: UserEventsTracker,
+    application: Application,
 ) : AndroidViewModel(application) {
 
     private val scheduleNotification by lazy { ScheduleNotification() }
