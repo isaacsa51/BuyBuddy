@@ -24,20 +24,26 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.serranoie.android.buybuddy.R
@@ -52,9 +58,13 @@ fun BackupScreen(
     navController: NavController,
     onGenerateBackupFile: (Uri) -> Unit,
     onRestoreBackupFile: (Uri) -> Unit,
+    backupResultState: BackupResultState,
+    onSnackbarDismissed: () -> Unit
 ) {
+    val context = LocalContext.current
     val view = LocalView.current
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(rememberTopAppBarState())
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val launcherCreateDocument =
         rememberLauncherForActivityResult(CreateDocument("application/json")) { uri ->
@@ -70,6 +80,19 @@ fun BackupScreen(
             }
         }
 
+    LaunchedEffect(backupResultState) {
+        when (backupResultState) {
+            is BackupResultState.Success -> {
+                snackbarHostState.showSnackbar(getString(context, R.string.backup_success))
+                onSnackbarDismissed()
+            }
+            is BackupResultState.Error -> {
+                snackbarHostState.showSnackbar("Error: ${backupResultState.message}")
+                onSnackbarDismissed()
+            }
+            else -> {}
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -94,6 +117,7 @@ fun BackupScreen(
             )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         Column {
             Column(
@@ -173,5 +197,11 @@ fun BackupScreen(
 private fun BackupScreenPreview() {
     val navController = rememberNavController()
 
-    BackupScreen(navController, onGenerateBackupFile = {}, onRestoreBackupFile = {})
+    BackupScreen(navController, onGenerateBackupFile = {}, onRestoreBackupFile = {}, backupResultState = BackupResultState.Idle, onSnackbarDismissed = {})
+}
+
+sealed class BackupResultState {
+    data object Idle : BackupResultState()
+    data object Success : BackupResultState()
+    data class Error(val message: String) : BackupResultState()
 }

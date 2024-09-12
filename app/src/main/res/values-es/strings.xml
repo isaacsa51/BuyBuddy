@@ -163,6 +163,10 @@
     <string name="backup_sidenote">Tenga en cuenta que el respaldo no incluye ajustes de la aplicación.</string>
     <string name="backup_generate_button">Generar Respaldo</string>
     <string name="backup_restore_button">Cargar Respaldo</string>
+    <string name="backup_success">Copia de seguridad restaurada con éxito</string>
+    <string name="backup_save_file_error">Error al guardar el archivo de respaldo</string>
+    <string name="backup_error_file">Error al leer el archivo de respaldo</string>
+    <string name="backup_error_reading_json">Error al leer el archivo JSON</string>
 
     <string name="congrats_finding_this">Te ves muy intimidante en tu Honda Civic 2024 Sport+...</string>
 </resources>

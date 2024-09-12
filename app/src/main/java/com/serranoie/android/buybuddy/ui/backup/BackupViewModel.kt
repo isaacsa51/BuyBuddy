@@ -1,15 +1,20 @@
 package com.serranoie.android.buybuddy.ui.backup
 
+import android.app.Application
 import android.content.Context
 import android.net.Uri
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
+import com.google.gson.JsonSyntaxException
+import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.data.backup.BackupData
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -20,8 +25,16 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BackupViewModel @Inject constructor(
-    private val dao: BuyBuddyDao
-) : ViewModel() {
+    private val dao: BuyBuddyDao,
+    application: Application
+) : AndroidViewModel(application) {
+
+    private val _backupResultState = MutableStateFlow<BackupResultState>(BackupResultState.Idle)
+    val backupResultState: StateFlow<BackupResultState> = _backupResultState
+
+    fun resetBackupResultState() {
+        _backupResultState.value = BackupResultState.Idle
+    }
 
     fun generateBackupFile(context: Context, uri: Uri) {
         viewModelScope.launch {
@@ -38,9 +51,16 @@ class BackupViewModel @Inject constructor(
 
             if (jsonData != null) {
                 val backupData = parseJsonToBackupData(jsonData)
-                insertBackupDataToDatabase(backupData)
+
+                if (backupData != null) {
+                    insertBackupDataToDatabase(backupData)
+                    _backupResultState.value = BackupResultState.Success
+                } else {
+                    // Parsing error has already been handled in parseJsonToBackupData
+                }
             } else {
-                Timber.e("Failed to read JSON data from file.")
+                _backupResultState.value =
+                    BackupResultState.Error(getApplication<Application>().getString(R.string.backup_error_reading_json))
             }
         }
     }
@@ -54,14 +74,21 @@ class BackupViewModel @Inject constructor(
         }
     }
 
-    private fun parseJsonToBackupData(jsonData: String): BackupData {
-        val gson = GsonBuilder()
-            .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
-                val format = SimpleDateFormat("MMM dd, yyyy hh:mm:ss a", Locale.US)
-                format.parse(json.asString)
-            })
-            .create()
-        return gson.fromJson(jsonData, BackupData::class.java)
+    private fun parseJsonToBackupData(jsonData: String): BackupData? {
+        return try {
+            val gson = GsonBuilder()
+                .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
+                    val format = SimpleDateFormat("MMM dd, yyyy hh:mm:ss a", Locale.US)
+                    format.parse(json.asString)
+                })
+                .create()
+            gson.fromJson(jsonData, BackupData::class.java)
+        } catch (e: JsonSyntaxException) {
+            Timber.e(e, "Error parsing backup data")
+            _backupResultState.value =
+                BackupResultState.Error(getApplication<Application>().getString(R.string.backup_error_reading_json))
+            null
+        }
     }
 
     private suspend fun insertBackupDataToDatabase(backupData: BackupData) {
@@ -98,7 +125,11 @@ class BackupViewModel @Inject constructor(
                 outputStream.write(jsonData.toByteArray())
                 Timber.d("Backup file saved to selected location.")
             }
+
+            _backupResultState.value = BackupResultState.Success
         } catch (e: Exception) {
+            _backupResultState.value =
+                BackupResultState.Error(getApplication<Application>().getString(R.string.backup_save_file_error))
             Timber.e(e, "Failed to save backup file")
         }
     }

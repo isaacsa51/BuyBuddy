@@ -219,6 +219,7 @@ fun NavGraph(
                 )
             }) {
                 val viewModel = hiltViewModel<BackupViewModel>()
+                val backupResultState by viewModel.backupResultState.collectAsStateWithLifecycle()
 
                 BackupScreen(
                     navController = navController,
@@ -227,7 +228,9 @@ fun NavGraph(
                     },
                     onRestoreBackupFile = { uri ->
                         viewModel.restoreBackupFile(context = navController.context, uri = uri)
-                    }
+                    },
+                    backupResultState = backupResultState,
+                    onSnackbarDismissed = { viewModel.resetBackupResultState() }
                 )
             }
 
