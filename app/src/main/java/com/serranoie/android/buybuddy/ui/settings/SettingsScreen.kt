@@ -95,7 +95,7 @@ fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTr
 
             item { InfoSettings(navController = navController, userEventsTracker) }
 
-            if (BuildConfig.DEBUG) {
+            if (BuildConfig.BUILD_TYPE == "debug") {
                 item {
                     SettingsContainer {
                         Button(
