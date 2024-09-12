@@ -104,6 +104,9 @@ fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTr
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
+                        Button(onClick = {
+                            simulateError()
+                        }) {
                             Text(text = "Throw Error")
                         }
                     }
@@ -224,6 +227,7 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
 
         SettingsItemSwitch(
             title = stringResource(R.string.security_app_lock),
+        SettingsItemSwitch(title = stringResource(R.string.security_app_lock),
             description = stringResource(R.string.app_lock_setting_desc),
             icon = Icons.Rounded.Lock,
             switchState = appLockValue,
