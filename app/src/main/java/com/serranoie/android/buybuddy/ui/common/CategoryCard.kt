@@ -47,59 +47,55 @@ fun CategoryCard(
     var expanded by remember { mutableStateOf(false) }
 
     Card(
-        colors =
-            CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-            ),
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .padding(smallPadding)
-                .animateContentSize(
-                    animationSpec =
-                        tween(
-                            durationMillis = 300,
-                            easing = LinearOutSlowInEasing,
-                        ),
-                ).clickable { expanded = !expanded },
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(smallPadding)
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = LinearOutSlowInEasing,
+                ),
+            )
+            .clickable { expanded = !expanded },
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = categoryWithItems.category.name,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Black,
-                modifier =
-                    Modifier.padding(
-                        start = largePadding,
-                        top = basePadding,
-                        end = largePadding,
-                        bottom = basePadding,
-                    ),
+                modifier = Modifier.padding(
+                    start = largePadding,
+                    top = basePadding,
+                    end = largePadding,
+                    bottom = basePadding,
+                ),
             )
 
             if (expanded) {
                 categoryWithItems.items.forEach { item ->
 
                     Row(
-                        modifier =
-                            Modifier
-                                .noRippleClickable { }
-                                .padding(
-                                    horizontal = largePadding,
-                                    vertical = basePadding,
-                                ).fillMaxWidth()
-                                .clickable {
-                                    view.weakHapticFeedback()
-                                    navController.navigate(Route.Edit.editItemRoute(item.itemId!!))
-                                },
+                        modifier = Modifier
+                            .noRippleClickable { }
+                            .padding(
+                                horizontal = largePadding,
+                                vertical = basePadding,
+                            )
+                            .fillMaxWidth()
+                            .clickable {
+                                view.weakHapticFeedback()
+                                navController.navigate(Route.Edit.editItemRoute(item.itemId!!))
+                            },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (item.status) {
                             Icon(
-                                modifier =
-                                    Modifier
-                                        .padding(start = smallPadding)
-                                        .size(20.dp),
+                                modifier = Modifier
+                                    .padding(start = smallPadding)
+                                    .size(20.dp),
                                 imageVector = Icons.Rounded.Check,
                                 contentDescription = "Check icon",
                             )
@@ -114,10 +110,9 @@ fun CategoryCard(
                             )
                         } else {
                             Icon(
-                                modifier =
-                                    Modifier
-                                        .padding(start = smallPadding)
-                                        .size(20.dp),
+                                modifier = Modifier
+                                    .padding(start = smallPadding)
+                                    .size(20.dp),
                                 imageVector = Icons.Outlined.Circle,
                                 contentDescription = "Icon",
                             )

@@ -1,9 +1,9 @@
 package com.serranoie.android.buybuddy.ui.settings
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.PreferenceUtil
@@ -22,11 +22,11 @@ class SettingsViewModel @Inject constructor(
     private val userEventsTracker: UserEventsTracker
 ) : ViewModel() {
 
-    private val _theme = MutableLiveData(ThemeMode.Auto)
-    val theme: LiveData<ThemeMode> = _theme
+    private val _theme = MutableStateFlow(ThemeMode.Auto)
+    val theme: StateFlow<ThemeMode> = _theme
 
-    private val _materialYou = MutableLiveData(false)
-    val materialYou: LiveData<Boolean> = _materialYou
+    private val _materialYou = MutableStateFlow(false)
+    val materialYou: StateFlow<Boolean> = _materialYou
 
     private val _categoryVisibility = MutableStateFlow(false)
     val categoryVisibility: StateFlow<Boolean> = _categoryVisibility
@@ -39,7 +39,8 @@ class SettingsViewModel @Inject constructor(
         logSettingsInfo()
     }
 
-    private fun logSettingsInfo() {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun logSettingsInfo() {
         val additionalInfo = mapOf(
             "theme" to theme.value.toString(),
             "materialYou" to materialYou.value.toString(),
@@ -49,12 +50,12 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun setTheme(newTheme: ThemeMode) {
-        _theme.postValue(newTheme)
+        _theme.value = newTheme
         preferenceUtil.putInt(PreferenceUtil.APP_THEME_INT, newTheme.ordinal)
     }
 
     fun setMaterialYou(newValue: Boolean) {
-        _materialYou.postValue(newValue)
+        _materialYou.value = newValue
         preferenceUtil.putBoolean(PreferenceUtil.MATERIAL_YOU_BOOL, newValue)
     }
 
@@ -82,16 +83,12 @@ class SettingsViewModel @Inject constructor(
     fun getCategoryVisibilityValue() =
         preferenceUtil.getBoolean(PreferenceUtil.CATEGORY_VISIBILITY_BOOL, false)
 
-    /**
-     * Get the current theme of the app, regardless of the system theme.
-     * This will always return either [ThemeMode.Light] or [ThemeMode.Dark].
-     * If user has set the theme to Auto it will return the system theme,
-     * again Light or Dark instead of [ThemeMode.Auto].
-     */
     @Composable
     fun getCurrentTheme(): ThemeMode {
-        return if (theme.value == ThemeMode.Auto) {
+        val currentTheme = theme.collectAsState()
+
+        return if (currentTheme.value == ThemeMode.Auto) {
             if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
-        } else theme.value!!
+        } else currentTheme.value
     }
 }
