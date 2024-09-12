@@ -1,6 +1,7 @@
 package com.serranoie.android.buybuddy.ui.core
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -40,6 +41,7 @@ import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.core.biometrics.BiometricAuthenticator
@@ -228,6 +230,27 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
                 }
                 return
             }
+        }
+    }
+}
+
+fun Activity.launchInAppReview(
+    onComplete: (() -> Unit)? = null,
+) {
+    val reviewManager = ReviewManagerFactory.create(this)
+    val request = reviewManager.requestReviewFlow()
+    request.addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            val reviewInfo = task.result
+            val flow = reviewManager.launchReviewFlow(this, reviewInfo)
+            flow.addOnCompleteListener {
+                // The flow has finished. The API doesn't indicate whether the user
+                // reviewed or not, or even whether the review dialog was shown.
+                // Therefore, no matter the result, continue with your app's flow.
+                onComplete?.invoke()
+            }
+        } else {
+            onComplete?.invoke()
         }
     }
 }

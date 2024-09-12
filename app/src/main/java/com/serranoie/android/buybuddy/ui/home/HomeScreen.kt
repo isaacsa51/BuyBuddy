@@ -1,5 +1,6 @@
 package com.serranoie.android.buybuddy.ui.home
 
+import android.app.Activity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -63,8 +64,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getString
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
 import com.serranoie.android.buybuddy.ui.common.CategoryCard
@@ -72,6 +75,7 @@ import com.serranoie.android.buybuddy.ui.common.EmptyListScreen
 import com.serranoie.android.buybuddy.ui.common.TotalAmountCard
 import com.serranoie.android.buybuddy.ui.core.MainActivity
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
+import com.serranoie.android.buybuddy.ui.core.launchInAppReview
 import com.serranoie.android.buybuddy.ui.navigation.NavigationItem
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
@@ -81,6 +85,7 @@ import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,6 +135,8 @@ fun HomeScreen(
     val view = LocalView.current
     val context = LocalContext.current
     val settingsViewModel = (context.getActivity() as MainActivity).settingsViewModel
+    val manager = ReviewManagerFactory.create(context)
+    val request = manager.requestReviewFlow()
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -166,7 +173,14 @@ fun HomeScreen(
 
                                 userEventsTracker.logButtonAction("drawer_button: ${item.title}")
 
-                                navController.navigate(item.route)
+                                // Creating condition to determine to trigger review flow or navigation
+                                if (item.title == getString(context, R.string.rate_us_home)) {
+                                    val activity = context.getActivity() as? Activity
+
+                                    activity?.launchInAppReview()
+                                } else {
+                                    navController.navigate(item.route)
+                                }
                                 scope.launch {
                                     drawerState.close()
                                 }
