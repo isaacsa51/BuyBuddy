@@ -1,58 +1,67 @@
 package com.serranoie.android.buybuddy.ui.backup
 
+import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import app.cash.turbine.test
 import com.google.gson.Gson
 import com.serranoie.android.buybuddy.data.backup.BackupData
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryEntity
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
 import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
-import io.mockk.MockKAnnotations
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.mockk
 import io.mockk.verify
+import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import java.util.Date
 
 @ExperimentalCoroutinesApi
 class BackupViewModelTest {
 
-    @MockK
-    private lateinit var dao: BuyBuddyDao
+    @get:Rule
+    val instantExecutorRule = InstantTaskExecutorRule()
 
-    @MockK
-    private lateinit var context: Context
-
-    @MockK
-    private lateinit var uri: Uri
+    private val dao: BuyBuddyDao = mockk()
+    private val application: Application = mockk()
+    private val context: Context = mockk()
+    private val uri: Uri = mockk()
 
     private lateinit var viewModel: BackupViewModel
 
-
     @Before
     fun setup() {
-        MockKAnnotations.init(this)
-        viewModel = BackupViewModel(dao)
         Dispatchers.setMain(UnconfinedTestDispatcher())
+        viewModel = BackupViewModel(dao, application)
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `test backupResultState initializes to Idle`() = runTest {
+        viewModel.backupResultState.test {
+            assertEquals(BackupResultState.Idle, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
     }
 
     @Test
@@ -177,10 +186,24 @@ class BackupViewModelTest {
 
     @Test
     fun `restoreBackupFile should log error if failed to read JSON`() = runTest {
-        every { context.contentResolver.openInputStream(uri) } returns null
+        val mockApplication = mockk<Application>()
+        val errorString = "Failed to read JSON data"
+        every { mockApplication.getString(any()) } returns errorString
 
-        viewModel.restoreBackupFile(context, uri)
+        val mockContext = mockk<Context>()
+        every { mockContext.applicationContext } returns mockApplication
+        val contentResolver = mockk<ContentResolver>()
+        every { mockContext.contentResolver } returns contentResolver
+        every { contentResolver.openInputStream(uri) } returns null
 
-        verify { context.contentResolver.openInputStream(uri) }
+        val viewModel = BackupViewModel(dao, mockApplication)
+
+        viewModel.restoreBackupFile(mockContext, uri)
+        advanceUntilIdle()
+
+        assertEquals(
+            BackupResultState.Error(errorString),
+            viewModel.backupResultState.value
+        )
     }
 }

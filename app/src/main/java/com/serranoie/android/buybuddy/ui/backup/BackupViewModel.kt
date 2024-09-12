@@ -3,6 +3,7 @@ package com.serranoie.android.buybuddy.ui.backup
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -47,18 +49,19 @@ class BackupViewModel @Inject constructor(
 
     fun restoreBackupFile(context: Context, uri: Uri) {
         viewModelScope.launch {
-            val jsonData = readJsonFromFile(context, uri)
+            try{
+                val inputStream = context.contentResolver.openInputStream(uri)
+                    ?: throw IOException("InputStream is null")
 
-            if (jsonData != null) {
-                val backupData = parseJsonToBackupData(jsonData)
+                val jsonString = inputStream.bufferedReader().use { it.readText() }
+                val backupData = parseJsonToBackupData(jsonString)
 
                 if (backupData != null) {
                     insertBackupDataToDatabase(backupData)
                     _backupResultState.value = BackupResultState.Success
-                } else {
-                    // Parsing error has already been handled in parseJsonToBackupData
                 }
-            } else {
+            } catch (e: Exception) {
+                Timber.e(e, "Error restoring backup file")
                 _backupResultState.value =
                     BackupResultState.Error(getApplication<Application>().getString(R.string.backup_error_reading_json))
             }
@@ -74,7 +77,8 @@ class BackupViewModel @Inject constructor(
         }
     }
 
-    private fun parseJsonToBackupData(jsonData: String): BackupData? {
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    fun parseJsonToBackupData(jsonData: String): BackupData? {
         return try {
             val gson = GsonBuilder()
                 .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
