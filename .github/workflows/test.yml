@@ -23,14 +23,12 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           echo "$DATA" | base64 -d > app/google-services.json
-          
+    
           if ! jq . app/google-services.json > /dev/null 2>&1; then
             echo "google-services.json is NOT valid JSON!" >&2
             cat app/google-services.json
             exit 1
           fi
-
-          head -n 10 app/google-services.json
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2

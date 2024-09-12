@@ -22,6 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.serranoie.android.buybuddy.ui.backup.BackupScreen
+import com.serranoie.android.buybuddy.ui.backup.BackupViewModel
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.edit.EditItemScreen
 import com.serranoie.android.buybuddy.ui.edit.EditItemViewModel
@@ -143,29 +144,25 @@ fun NavGraph(
                 )
             }
 
-            composable(
-                route = Route.Summary.route,
-                enterTransition = {
-                    fadeIn(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideIntoContainer(
-                        animationSpec = tween(300, easing = EaseIn),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+            composable(route = Route.Summary.route, enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                },
-                exitTransition = {
-                    fadeOut(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideOutOfContainer(
-                        animationSpec = tween(300, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                ) + slideIntoContainer(
+                    animationSpec = tween(300, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            }, exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                }
-            ) {
+                ) + slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }) {
                 val summaryViewModel = hiltViewModel<SummaryViewModel>()
 
                 val summaryItemsToBuy by summaryViewModel.summaryItemsToBuy.collectAsStateWithLifecycle()
@@ -202,30 +199,39 @@ fun NavGraph(
                 )
             }
 
-            composable(
-                route = Route.Backup.route,
-                enterTransition = {
-                    fadeIn(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideIntoContainer(
-                        animationSpec = tween(300, easing = EaseIn),
-                        towards = AnimatedContentTransitionScope.SlideDirection.Start
+            composable(route = Route.Backup.route, enterTransition = {
+                fadeIn(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                },
-                exitTransition = {
-                    fadeOut(
-                        animationSpec = tween(
-                            300, easing = LinearEasing
-                        )
-                    ) + slideOutOfContainer(
-                        animationSpec = tween(300, easing = EaseOut),
-                        towards = AnimatedContentTransitionScope.SlideDirection.End
+                ) + slideIntoContainer(
+                    animationSpec = tween(300, easing = EaseIn),
+                    towards = AnimatedContentTransitionScope.SlideDirection.Start
+                )
+            }, exitTransition = {
+                fadeOut(
+                    animationSpec = tween(
+                        300, easing = LinearEasing
                     )
-                }
-            ) {
-                BackupScreen(navController = navController)
+                ) + slideOutOfContainer(
+                    animationSpec = tween(300, easing = EaseOut),
+                    towards = AnimatedContentTransitionScope.SlideDirection.End
+                )
+            }) {
+                val viewModel = hiltViewModel<BackupViewModel>()
+                val backupResultState by viewModel.backupResultState.collectAsStateWithLifecycle()
+
+                BackupScreen(
+                    navController = navController,
+                    onGenerateBackupFile = { uri ->
+                        viewModel.generateBackupFile(context = navController.context, uri = uri)
+                    },
+                    onRestoreBackupFile = { uri ->
+                        viewModel.restoreBackupFile(context = navController.context, uri = uri)
+                    },
+                    backupResultState = backupResultState,
+                    onSnackbarDismissed = { viewModel.resetBackupResultState() }
+                )
             }
 
             composable(route = Route.FinishedQuiz.route, enterTransition = {

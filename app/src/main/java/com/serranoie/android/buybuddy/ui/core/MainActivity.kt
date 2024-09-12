@@ -1,6 +1,7 @@
 package com.serranoie.android.buybuddy.ui.core
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -97,6 +98,8 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestNotificationPermission()
+        } else {
+            requestExternalStoragePermission(this)
         }
 
         setContent {
@@ -177,6 +180,16 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
     override fun onAuthenticationSucceeded(success: Boolean) {
         Timber.i("Authentication succeeded: $success")
         showContentState.value = success
+    }
+
+    private fun requestExternalStoragePermission(context: Context) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE),
+                0
+            )
+        }
     }
 
     private fun requestNotificationPermission() {

@@ -107,13 +107,12 @@ fun HomeScreen(
             route = Screen.SUMMARY.name
         ),
 
-        // TODO: Implement backup functionality to the app
-        /*NavigationItem(
+        NavigationItem(
             title = stringResource(id = R.string.backup_home),
             selectedIcon = Icons.Rounded.Backup,
             unselectedIcon = Icons.Outlined.Backup,
             route = Screen.BACKUP.name
-        ),*/
+        ),
         NavigationItem(
             title = stringResource(id = R.string.settings_home),
             selectedIcon = Icons.Rounded.Settings,

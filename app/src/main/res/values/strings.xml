@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BuyBuddy</string>
+    <string name="app_name" translatable="false">BuyBuddy</string>
 
     <!-- General strings -->
     <string name="notification_title">Don\'t forget about this product!</string>
@@ -10,7 +10,7 @@
     <string name="name">Name</string>
     <string name="description">Description</string>
     <string name="price">Price</string>
-    <string name="ok">OK</string>
+    <string name="ok">Ok</string>
     <string name="reasons">Benefits</string>
     <string name="next">Next</string>
     <string name="get_started">Get Started</string>
@@ -104,7 +104,7 @@
     <string name="display_settings_title">Theme</string>
     <string name="theme_setting">Default Theme</string>
     <string name="theme_setting_desc">Change the theme of the app</string>
-    <string name="material_you_setting">Material You</string>
+    <string name="material_you_setting" translatable="false">Material You</string>
     <string name="material_you_setting_desc">Switch theme according to your wallpaper (A12+ Only)</string>
     <string name="material_you_error">This feature is only for devices running Android 12 or above.</string>
     <string name="theme_dialog_title">Change Theme</string>
@@ -143,7 +143,7 @@
 
     <!-- About Screen -->
     <string name="about_screen_header">About</string>
-    <string name="about_readme_title">README</string>
+    <string name="about_readme_title">Information</string>
     <string name="about_readme_desc">Checkout the GitHub repository and the app\'s README.</string>
     <string name="about_website_title">Website</string>
     <string name="about_website_desc">Checkout our website for more information and explore our other apps and projects.</string>
@@ -166,6 +166,17 @@
     <string name="current_month">Current month</string>
     <string name="summary_label">Summary per category</string>
     <string name="transactions_category_label">Transactions: %1$s</string>
+
+    <!-- Backup Screen -->
+    <string name="backup_screen_title">Backup</string>
+    <string name="backup_info">Back up your app data including all your products, current reminders &amp; transactions, this can be easily restored whenever you want.</string>
+    <string name="backup_sidenote">Take in consideration that backup data don\'t include app settings.</string>
+    <string name="backup_generate_button">Generate Backup</string>
+    <string name="backup_restore_button">Restore Backup</string>
+    <string name="backup_success">Backup restored successfully</string>
+    <string name="backup_save_file_error">Failed to save backup file</string>
+    <string name="backup_error_file">Error reading backup file</string>
+    <string name="backup_error_reading_json">Failed to read JSON data</string>
 
     <string name="congrats_finding_this">You look very intimidating in your 2024 Honda Civic Sport...</string>
 </resources>

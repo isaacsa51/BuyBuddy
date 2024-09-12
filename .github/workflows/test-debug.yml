@@ -1,17 +1,19 @@
-name: Lint Debug Variant
+name: Testing Google Services on Debug
 
 on:
   workflow_call:
 
+  workflow_dispatch:
+
 jobs:
-  lint:
-    name: Linting debug variant
+  run_tests:
+    name: Testing debug variant
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -21,7 +23,7 @@ jobs:
           DATA: ${{ secrets.GOOGLE_SERVICES_JSON_DEBUG }}
         run: |
           echo "$DATA" | base64 -d > app/google-services.json
-          
+    
           if ! jq . app/google-services.json > /dev/null 2>&1; then
             echo "google-services.json is NOT valid JSON!" >&2
             cat app/google-services.json
@@ -35,6 +37,9 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      - name: Execute Gradle command - testDebugUnitTest
+        run: ./gradlew testDebugUnitTest
 
       - name: Execute Gradle command - lintDebug
         run: ./gradlew lintDebug
