@@ -10,9 +10,12 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonSyntaxException
+import com.google.gson.reflect.TypeToken
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.data.backup.BackupData
 import com.serranoie.android.buybuddy.data.persistance.dao.BuyBuddyDao
+import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
+import com.serranoie.android.buybuddy.data.persistance.entity.ItemEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,8 +30,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class BackupViewModel @Inject constructor(
-    private val dao: BuyBuddyDao,
-    application: Application
+    private val dao: BuyBuddyDao, application: Application
 ) : AndroidViewModel(application) {
 
     private val _backupResultState = MutableStateFlow<BackupResultState>(BackupResultState.Idle)
@@ -49,9 +51,10 @@ class BackupViewModel @Inject constructor(
 
     fun restoreBackupFile(context: Context, uri: Uri) {
         viewModelScope.launch {
-            try{
-                val inputStream = context.contentResolver.openInputStream(uri)
-                    ?: throw IOException("InputStream is null")
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri) ?: throw IOException(
+                    "InputStream is null"
+                )
 
                 val jsonString = inputStream.bufferedReader().use { it.readText() }
                 val backupData = parseJsonToBackupData(jsonString)
@@ -63,7 +66,7 @@ class BackupViewModel @Inject constructor(
             } catch (e: Exception) {
                 Timber.e(e, "Error restoring backup file")
                 _backupResultState.value =
-                    BackupResultState.Error(getApplication<Application>().getString(R.string.backup_error_reading_json))
+                    BackupResultState.Error("in JSON")
             }
         }
     }
@@ -80,13 +83,30 @@ class BackupViewModel @Inject constructor(
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun parseJsonToBackupData(jsonData: String): BackupData? {
         return try {
-            val gson = GsonBuilder()
-                .registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
-                    val format = SimpleDateFormat("MMM dd, yyyy hh:mm:ss a", Locale.US)
-                    format.parse(json.asString)
-                })
-                .create()
-            gson.fromJson(jsonData, BackupData::class.java)
+            val listType = object : TypeToken<List<CategoryWithItemsEntity>>() {}.type
+            val itemsListType = object : TypeToken<List<ItemEntity>>() {}.type
+
+            val gson =
+                GsonBuilder().registerTypeAdapter(Date::class.java, JsonDeserializer { json, _, _ ->
+                        val format = SimpleDateFormat("MMM dd, yyyy hh:mm:ss a", Locale.US)
+                        format.parse(json.asString)
+                    }).create()
+
+            val backupData = gson.fromJson<BackupData>(jsonData, BackupData::class.java)
+            val categoriesWithItems = gson.fromJson<List<CategoryWithItemsEntity>>(
+                gson.toJson(backupData.categoriesWithItems),
+                listType
+            ).map { categoryWithItems ->
+                val items = gson.fromJson<List<ItemEntity>>(
+                    gson.toJson(categoryWithItems.items),
+                    itemsListType
+                )
+                categoryWithItems.copy(items = items)
+            }
+
+            val items = gson.fromJson<List<ItemEntity>>(gson.toJson(backupData.items), itemsListType)
+
+            backupData.copy(categoriesWithItems = categoriesWithItems, items = items)
         } catch (e: JsonSyntaxException) {
             Timber.e(e, "Error parsing backup data")
             _backupResultState.value =
@@ -112,9 +132,7 @@ class BackupViewModel @Inject constructor(
         val items = dao.getAllItems().first()
 
         return BackupData(
-            categoriesWithItems = categoriesWithItems,
-            categories = categories,
-            items = items
+            categoriesWithItems = categoriesWithItems, categories = categories, items = items
         )
     }
 
