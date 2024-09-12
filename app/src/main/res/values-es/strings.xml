@@ -15,7 +15,7 @@
     <string name="name_helper">Ingrese la información del producto abajo</string>
     <string name="category_question">¿Este producto a qué categorías pertenece?</string>
     <string name="category_helper">Seleccione una categoría</string>
-    <string name="usage_question">¿Que tan frecuente usarás este producto??</string>
+    <string name="usage_question">¿Que tan frecuente usarás este producto?</string>
     <string name="usage_helper">Desliza para seleccionar</string>
     <string name="benefit_question">¿Puede escribir algunas razones por las que este producto le será de utilidad?</string>
     <string name="cons_question">¿Qué tal algunas razones por las que es posible que no necesites este artículo?</string>

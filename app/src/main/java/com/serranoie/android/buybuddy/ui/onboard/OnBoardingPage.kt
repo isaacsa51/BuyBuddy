@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -16,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
@@ -27,7 +29,7 @@ fun OnBoardingPage(page: Page) {
             modifier =
                 Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(fraction = 0.5f),
+                    .fillMaxHeight(fraction = 0.65f),
             painter = painterResource(id = page.image),
             contentDescription = stringResource(R.string.onboarding_image_label),
             contentScale = ContentScale.Fit,
@@ -42,7 +44,7 @@ fun OnBoardingPage(page: Page) {
         Text(
             text = stringResource(id = page.description),
             modifier = Modifier.padding(horizontal = mediumPadding, vertical = basePadding),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
 }

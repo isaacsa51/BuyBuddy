@@ -154,7 +154,6 @@ class MainActivity : FragmentActivity(), FingerprintAuthCallback {
                                 )
                             )
                             .imePadding()
-                            .imeNestedScroll()
                             .fillMaxSize(),
                         color = MaterialTheme.colorScheme.background,
 
