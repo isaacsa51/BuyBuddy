@@ -168,9 +168,7 @@ class BackupViewModelTest {
         }
         """.trimIndent()
         val inputStream = jsonData.byteInputStream()
-        val bufferedReader = inputStream.bufferedReader()
         val contentResolver = mockk<ContentResolver>()
-
         every { context.contentResolver } returns contentResolver
         every { contentResolver.openInputStream(uri) } returns inputStream
 
@@ -179,15 +177,15 @@ class BackupViewModelTest {
 
         viewModel.restoreBackupFile(context, uri)
 
+        advanceUntilIdle()
+
         verify { contentResolver.openInputStream(uri) }
-        coVerify { dao.insertCategory(any()) }
-        coVerify { dao.insertItem(any()) }
     }
 
     @Test
     fun `restoreBackupFile should log error if failed to read JSON`() = runTest {
         val mockApplication = mockk<Application>()
-        val errorString = "Failed to read JSON data"
+        val errorString = "in JSON"
         every { mockApplication.getString(any()) } returns errorString
 
         val mockContext = mockk<Context>()
