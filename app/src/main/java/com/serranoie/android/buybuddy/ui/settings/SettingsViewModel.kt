@@ -1,6 +1,10 @@
 package com.serranoie.android.buybuddy.ui.settings
 
+import android.content.Context
+import android.hardware.fingerprint.FingerprintManager
+import android.os.Build
 import androidx.annotation.VisibleForTesting
+import androidx.biometric.BiometricManager
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -90,5 +94,15 @@ class SettingsViewModel @Inject constructor(
         return if (currentTheme.value == ThemeMode.Auto) {
             if (isSystemInDarkTheme()) ThemeMode.Dark else ThemeMode.Light
         } else currentTheme.value
+    }
+
+    fun isBiometricAvailable(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val biometricManager = BiometricManager.from(context)
+            biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
+        } else {
+            val fingerprintManager = context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+            fingerprintManager.isHardwareDetected && fingerprintManager.hasEnrolledFingerprints()
+        }
     }
 }

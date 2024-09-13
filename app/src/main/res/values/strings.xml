@@ -130,6 +130,7 @@
     <string name="auth_failed">Authentication failed!</string>
     <string name="auth_error">Authentication error: %s</string>]
     <string name="unlock_button">Unlock app</string>
+    <string name="no_fingerprints_enrolled">No fingerprints are enrolled. Please enroll at least one fingerprint to enable biometric lock.</string>
 
     <!--  Info Values  -->
     <string name="misc_setting_title">Information</string>
