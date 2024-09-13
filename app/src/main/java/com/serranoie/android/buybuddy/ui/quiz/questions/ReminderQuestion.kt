@@ -109,12 +109,26 @@ fun ReminderQuestion(
                     TextButton(
                         onClick = {
                             view.weakHapticFeedback()
+
                             val selectedDateMillis = datePickerState.selectedDateMillis
+
                             if (selectedDateMillis != null) {
-                                val calendar = Calendar.getInstance()
-                                calendar.timeInMillis = selectedDateMillis
-                                calendar.timeZone = TimeZone.getDefault()
-                                selectedDate = calendar.time
+                                val selectedCalendar = Calendar.getInstance().apply {
+                                    timeInMillis = selectedDateMillis
+                                    timeZone = TimeZone.getDefault()
+                                }
+
+                                val currentCalendar = Calendar.getInstance().apply {
+                                    timeZone = TimeZone.getDefault()
+                                }
+
+                                // Check if the selected date is different from the current date
+                                if (selectedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR) || selectedCalendar.get(Calendar.DAY_OF_YEAR) != currentCalendar.get(Calendar.DAY_OF_YEAR)) {
+                                    // Add one day if the selected date is not the current day
+                                    selectedCalendar.add(Calendar.DAY_OF_YEAR, 1)
+                                }
+
+                                selectedDate = selectedCalendar.time
                                 showDatePicker = false
                                 showTimePicker = true
                             }
