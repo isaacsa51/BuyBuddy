@@ -1,5 +1,6 @@
 package com.serranoie.android.buybuddy.ui.settings
 
+import android.content.Context
 import android.os.Build
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -91,7 +92,7 @@ fun SettingsScreen(navController: NavController, userEventsTracker: UserEventsTr
         ) {
             item { DisplaySettings(viewModel = viewModel, userEventsTracker) }
 
-            item { BehaviourSettings(viewModel = viewModel, userEventsTracker) }
+            item { BehaviourSettings(viewModel = viewModel, userEventsTracker, context = context) }
 
             item { InfoSettings(navController = navController, userEventsTracker) }
 
@@ -201,8 +202,11 @@ fun InfoSettings(navController: NavController, userEventsTracker: UserEventsTrac
 }
 
 @Composable
-fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEventsTracker) {
-
+fun BehaviourSettings(
+    viewModel: SettingsViewModel,
+    userEventsTracker: UserEventsTracker,
+    context: Context
+) {
     val categoryVisibilityValue =
         remember { mutableStateOf(viewModel.getCategoryVisibilityValue()) }
 
@@ -222,14 +226,19 @@ fun BehaviourSettings(viewModel: SettingsViewModel, userEventsTracker: UserEvent
             }
         )
 
-        SettingsItemSwitch(title = stringResource(R.string.security_app_lock),
+        SettingsItemSwitch(
+            title = stringResource(R.string.security_app_lock),
             description = stringResource(R.string.app_lock_setting_desc),
             icon = Icons.Rounded.Lock,
             switchState = appLockValue,
             onCheckChange = { newValue ->
-                userEventsTracker.logButtonAction("app_lock_toggle: $newValue")
-                appLockValue.value = newValue
-                viewModel.setAppLock(newValue)
+                if (viewModel.isBiometricAvailable(context)) {
+                    userEventsTracker.logButtonAction("app_lock_toggle: $newValue")
+                    appLockValue.value = newValue
+                    viewModel.setAppLock(newValue)
+                } else {
+                    context.getString(R.string.no_fingerprints_enrolled).toToast(context)
+                }
             }
         )
     }
