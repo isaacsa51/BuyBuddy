@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 
 @Composable
@@ -44,7 +45,7 @@ fun EmptySummary() {
                 textAlign = TextAlign.Center
             ),
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = smallPadding),
+            modifier = Modifier.padding(horizontal = largePadding, vertical = smallPadding),
         )
     }
 }

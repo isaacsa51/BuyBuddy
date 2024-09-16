@@ -33,9 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.serranoie.android.buybuddy.data.persistance.entity.CategoryWithItemsEntity
 import com.serranoie.android.buybuddy.ui.navigation.Route
+import com.serranoie.android.buybuddy.ui.util.UiConstants.CONTENT_ANIMATION_DURATION
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
+import com.serranoie.android.buybuddy.ui.util.noRippleClickable
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 
 @Composable
@@ -55,7 +57,7 @@ fun CategoryCard(
             .padding(smallPadding)
             .animateContentSize(
                 animationSpec = tween(
-                    durationMillis = 300,
+                    durationMillis = CONTENT_ANIMATION_DURATION,
                     easing = LinearOutSlowInEasing,
                 ),
             )

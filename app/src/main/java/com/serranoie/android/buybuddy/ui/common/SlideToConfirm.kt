@@ -58,6 +58,9 @@ import androidx.wear.compose.material.SwipeableState
 import androidx.wear.compose.material.rememberSwipeableState
 import androidx.wear.compose.material.swipeable
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.util.UiConstants.commonCornerRadius
+import com.serranoie.android.buybuddy.ui.util.UiConstants.sliderHeight
+import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalWearMaterialApi::class)
@@ -106,7 +109,7 @@ fun SlideToConfirm(
             modifier =
             Modifier
                 .align(Alignment.Center)
-                .padding(PaddingValues(horizontal = Thumb.Size + 8.dp))
+                .padding(PaddingValues(horizontal = Thumb.Size + smallPadding))
                 .fillMaxWidth(),
         )
 
@@ -149,7 +152,7 @@ fun Track(
     var fullWidth by remember { mutableIntStateOf(0) }
     var endOfTrackPx by remember { mutableStateOf(0f) } // Store endOfTrackPx as state
 
-    val horizontalPadding = 10.dp
+    val horizontalPadding = smallPadding
 
     val startOfTrackPx = 0f
 
@@ -173,7 +176,7 @@ fun Track(
             modifier =
             modifier
                 .onSizeChanged { fullWidth = it.width }
-                .height(56.dp)
+                .height(sliderHeight)
                 .fillMaxWidth()
                 .swipeable(
                     enabled = enabled,
@@ -193,7 +196,7 @@ fun Track(
                 .padding(
                     PaddingValues(
                         horizontal = horizontalPadding,
-                        vertical = 8.dp,
+                        vertical = smallPadding,
                     ),
                 ),
             content = content,
@@ -203,7 +206,7 @@ fun Track(
         Box(
             modifier = modifier
                 .onSizeChanged { fullWidth = it.width }
-                .height(56.dp)
+                .height(sliderHeight)
                 .fillMaxWidth()
         )
     }
@@ -222,9 +225,9 @@ fun Thumb(
             .clickable { if (isLoading) onCancelPressed() }
             .background(
                 color = MaterialTheme.colorScheme.background,
-                shape = RoundedCornerShape(5.dp),
+                shape = RoundedCornerShape(commonCornerRadius),
             )
-            .padding(8.dp),
+            .padding(smallPadding),
     ) {
         if (isLoading) {
             Icon(imageVector = Icons.Rounded.Done, contentDescription = "Mark it purchased")
@@ -286,7 +289,7 @@ private fun Preview() {
 
     Surface {
         Column(
-            verticalArrangement = Arrangement.Absolute.spacedBy(8.dp),
+            verticalArrangement = Arrangement.Absolute.spacedBy(smallPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Column(modifier = Modifier.width(IntrinsicSize.Max)) {
@@ -306,7 +309,7 @@ private fun Preview() {
                     currentStatus = false,
                 )
 
-                Spacer(modifier = Modifier.padding(8.dp))
+                Spacer(modifier = Modifier.padding(smallPadding))
 
                 SlideToConfirm(
                     isLoading = !isLoading,

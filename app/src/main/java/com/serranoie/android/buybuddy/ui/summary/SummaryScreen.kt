@@ -44,12 +44,12 @@ import com.serranoie.android.buybuddy.domain.model.MonthlySumCategoryStatusZero
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusOne
 import com.serranoie.android.buybuddy.domain.model.MonthlySumStatusZero
 import com.serranoie.android.buybuddy.ui.common.CustomTabIndicator
-import com.serranoie.android.buybuddy.ui.common.noRippleClickable
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.summary.screens.incoming.IncomingScreen
 import com.serranoie.android.buybuddy.ui.summary.screens.spent.SpentScreen
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
+import com.serranoie.android.buybuddy.ui.util.noRippleClickable
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -127,7 +127,7 @@ fun SummaryScreen(
                     tabRowItems.forEachIndexed { index, item ->
                         Tab(modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .padding(horizontal = basePadding, vertical = smallPadding)
                             .noRippleClickable { },
                             selected = pagerState.currentPage == index,
                             onClick = {
