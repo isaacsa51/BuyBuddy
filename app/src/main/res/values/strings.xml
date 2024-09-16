@@ -61,7 +61,7 @@
     <string name="edit_button_label">Edit button</string>
     <string name="current_item_information">Current item information</string>
     <string name="edit_screen_date_format">dd \'of\' MMMM, HH:mm a</string>
-    <string name="field_required">A value is required</string>
+    <string name="field_required">A correct value is required</string>
     <string name="title_delete_dialog">Are you sure you want to delete this item?</string>
     <string name="description_delete_dialog">By confirming the removal of this product you accept whether the current product has already been purchased or that it is not necessary.</string>
     <string name="title_usage_dialog">Select the correct usage</string>

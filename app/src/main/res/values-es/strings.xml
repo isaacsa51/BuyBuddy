@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="field_required">Es necesario completar este campo</string>
+    <string name="field_required">Se requiere un valor correcto</string>
     <string name="category_art">Arte</string>
     <string name="category_automotive">Automotriz</string>
     <string name="category_beauty">Belleza</string>
