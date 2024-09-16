@@ -68,6 +68,6 @@ fun TextOutlinedTextFieldPreview() {
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         maxLines = 2,
         textStyle = MaterialTheme.typography.titleLarge,
-        shape = RoundedCornerShape(7.dp)
+        shape = RoundedCornerShape(5.dp)
     )
 }

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,6 +20,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.common.NumberOutlinedField
+import com.serranoie.android.buybuddy.ui.common.TextOutlinedField
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
@@ -64,48 +65,55 @@ fun NameQuestion(
                 vertical = basePadding,
             ),
         ) {
-            OutlinedTextField(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = smallPadding),
-                label = { Text(stringResource(R.string.name)) },
+
+            TextOutlinedField(
                 value = nameItemResponse,
                 onValueChange = onInputResponse,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                label = { Text(text = stringResource(id = R.string.name)) },
+                isValid = {
+                    it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                },
+                errorMessage = stringResource(id = R.string.field_required),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = smallPadding),
                 maxLines = 2,
                 textStyle = MaterialTheme.typography.headlineSmall,
             )
 
-            OutlinedTextField(
-                modifier =
-                Modifier
+            TextOutlinedField(
+                value = descriptionResponse,
+                onValueChange = onDescriptionResponse,
+                label = { Text(text = stringResource(id = R.string.description)) },
+                isValid = {
+                    it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                },
+                errorMessage = stringResource(id = R.string.field_required),
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = smallPadding)
                     .height(120.dp),
-                value = descriptionResponse,
-                label = { Text(stringResource(R.string.description)) },
-                onValueChange = onDescriptionResponse,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                maxLines = 5,
-                textStyle = MaterialTheme.typography.bodyLarge,
+                maxLines = 2,
+                textStyle = MaterialTheme.typography.headlineSmall,
             )
 
-            OutlinedTextField(
-                modifier =
-                Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = smallPadding),
-                label = { Text(stringResource(R.string.price)) },
+            NumberOutlinedField(
                 value = priceText,
                 onValueChange = { newValue ->
                     priceText = newValue
                     isValidPrice.value = newValue.matches(Regex("^\\d+(\\.\\d+)?$"))
                 },
-                isError = !isValidPrice.value,
-                singleLine = true,
+                label = { Text(stringResource(id = R.string.price)) },
+                isValid = { it.isNotBlank() },
+                errorMessage = stringResource(id = R.string.invalid_price_format),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = smallPadding),
                 textStyle = MaterialTheme.typography.headlineSmall,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done
+                ),
             )
 
             if (isValidPrice.value && priceText.isNotBlank()) {

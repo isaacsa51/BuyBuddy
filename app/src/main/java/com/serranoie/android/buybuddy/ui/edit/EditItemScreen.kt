@@ -439,7 +439,7 @@ private fun BasicInfoHolder(
             label = { Text(stringResource(id = R.string.price)) },
             modifier = Modifier.fillMaxWidth(),
             isValid = {
-                val valid = it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                val valid = it.isNotBlank() && it.matches(Regex("^\\d+(\\.\\d+)?$"))
                 onIsValidPrice(valid)
                 valid
             },
