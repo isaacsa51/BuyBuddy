@@ -91,7 +91,6 @@ import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -159,7 +158,10 @@ fun HomeScreen(
             drawerContent = {
                 ModalDrawerSheet(
                     modifier = Modifier.width(modalDrawerWidth),
-                    drawerShape = RoundedCornerShape(topEnd = modalDrawerShape, bottomEnd = modalDrawerShape),
+                    drawerShape = RoundedCornerShape(
+                        topEnd = modalDrawerShape,
+                        bottomEnd = modalDrawerShape
+                    ),
                     drawerTonalElevation = 2.dp,
                 ) {
                     Spacer(modifier = Modifier.height(basePadding))

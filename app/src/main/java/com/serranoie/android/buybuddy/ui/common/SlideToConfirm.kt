@@ -187,7 +187,7 @@ fun Track(
                         startOfTrackPx to Anchor.Start,
                         endOfTrackPx to Anchor.End,
                     ),
-                    thresholds = thresholds,velocityThreshold = Track.VelocityThreshold,
+                    thresholds = thresholds, velocityThreshold = Track.VelocityThreshold,
                 )
                 .background(
                     color = MaterialTheme.colorScheme.tertiary,

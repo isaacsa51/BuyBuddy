@@ -32,8 +32,6 @@ object UiConstants {
     val drawerHeaderHeight = 140.dp
     val drawerAppSpacing = 20.dp
     val drawerIconSize = 60.dp
-    val drawerItemHeight = 48.dp
-
 
     const val CONTENT_ANIMATION_DURATION = 300
 

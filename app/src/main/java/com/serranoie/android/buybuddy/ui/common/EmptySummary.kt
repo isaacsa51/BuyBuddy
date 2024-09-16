@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
@@ -30,14 +29,16 @@ fun EmptySummary() {
             .padding(basePadding)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-    ){
-        Image(modifier =
-        Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(fraction = 0.52f),
+    ) {
+        Image(
+            modifier =
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(fraction = 0.52f),
             painter = painterResource(id = R.drawable.analytics),
             contentDescription = "Empty list image",
-            contentScale = ContentScale.Fit)
+            contentScale = ContentScale.Fit
+        )
 
         Text(
             text = stringResource(R.string.empty_summary),
