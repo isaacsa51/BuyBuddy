@@ -94,7 +94,7 @@ fun NameQuestion(
                     .padding(vertical = smallPadding)
                     .height(120.dp),
                 maxLines = 2,
-                textStyle = MaterialTheme.typography.headlineSmall,
+                textStyle = MaterialTheme.typography.titleLarge,
             )
 
             NumberOutlinedField(
@@ -104,7 +104,7 @@ fun NameQuestion(
                     isValidPrice.value = newValue.matches(Regex("^\\d+(\\.\\d+)?$"))
                 },
                 label = { Text(stringResource(id = R.string.price)) },
-                isValid = { it.isNotBlank() },
+                isValid = { it.isNotEmpty() },
                 errorMessage = stringResource(id = R.string.invalid_price_format),
                 modifier = Modifier
                     .fillMaxWidth()

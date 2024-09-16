@@ -1,6 +1,5 @@
 package com.serranoie.android.buybuddy.ui.quiz.questions
 
-import android.provider.Settings.Global.getString
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectableGroup
@@ -84,9 +83,11 @@ fun PopulateCategoryQuestion(
             Category(4, R.string.category_books),
             Category(5, R.string.category_clothing),
             Category(6, R.string.category_electronics),
-            Category(7, R.string.category_gaming),
-            Category(8, R.string.category_hobbies),
-            Category(9, R.string.category_tools),
+            Category(7, R.string.category_food),
+            Category(8, R.string.category_gaming),
+            Category(9, R.string.category_hobbies),
+            Category(10, R.string.category_tools),
+            Category(11, R.string.category_travel)
         )
 
     CategoryQuestion(

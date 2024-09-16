@@ -78,8 +78,10 @@
     <string name="category_books">Books</string>
     <string name="category_clothing">Clothing</string>
     <string name="category_electronics">Electronics</string>
+    <string name="category_food">Food</string>
     <string name="category_gaming">Gaming</string>
     <string name="category_tools">Tools</string>
+    <string name="category_travel">Travel</string>
     <string name="category_hobbies">Hobbies</string>
     <string name="name_question">What\'s the name of the item?</string>
     <string name="name_helper">Insert the information of the item below</string>

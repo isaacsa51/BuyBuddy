@@ -8,6 +8,7 @@
     <string name="category_books">Libros</string>
     <string name="category_clothing">Ropa</string>
     <string name="category_electronics">Electrónica</string>
+    <string name="category_food">Comida</string>
     <string name="category_gaming">Gaming</string>
     <string name="category_tools">Herramientas</string>
     <string name="category_hobbies">Hobbies</string>
@@ -170,4 +171,5 @@
     <string name="backup_error_reading_json">Error al leer el archivo JSON</string>
 
     <string name="congrats_finding_this">Te ves muy intimidante en tu Honda Civic 2024 Sport+...</string>
+    <string name="category_travel">Viajes</string>
 </resources>
