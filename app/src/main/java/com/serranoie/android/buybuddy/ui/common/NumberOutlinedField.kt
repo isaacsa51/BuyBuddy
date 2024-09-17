@@ -21,7 +21,7 @@ fun NumberOutlinedField(
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     isValid: (String) -> Boolean,
-    errorMessage: String,
+    errorMessage: String?,
     prefix: @Composable (() -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     maxLines: Int = Int.MAX_VALUE,
@@ -46,7 +46,7 @@ fun NumberOutlinedField(
         shape = shape
     )
 
-    if (isInvalid) {
+    if (isInvalid && errorMessage != null) {
         ErrorLabelTxtFld(text = errorMessage)
     }
 }
