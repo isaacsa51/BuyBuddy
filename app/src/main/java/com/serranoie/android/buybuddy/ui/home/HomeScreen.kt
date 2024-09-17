@@ -80,12 +80,17 @@ import com.serranoie.android.buybuddy.ui.navigation.NavigationItem
 import com.serranoie.android.buybuddy.ui.navigation.Route
 import com.serranoie.android.buybuddy.ui.navigation.Screen
 import com.serranoie.android.buybuddy.ui.settings.ThemeMode
+import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.drawerAppSpacing
+import com.serranoie.android.buybuddy.ui.util.UiConstants.drawerHeaderHeight
+import com.serranoie.android.buybuddy.ui.util.UiConstants.drawerIconSize
+import com.serranoie.android.buybuddy.ui.util.UiConstants.modalDrawerShape
+import com.serranoie.android.buybuddy.ui.util.UiConstants.modalDrawerWidth
 import com.serranoie.android.buybuddy.ui.util.getActivity
 import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,17 +157,20 @@ fun HomeScreen(
             gesturesEnabled = drawerState.isOpen,
             drawerContent = {
                 ModalDrawerSheet(
-                    modifier = Modifier.width(295.dp),
-                    drawerShape = RoundedCornerShape(topEnd = 14.dp, bottomEnd = 14.dp),
+                    modifier = Modifier.width(modalDrawerWidth),
+                    drawerShape = RoundedCornerShape(
+                        topEnd = modalDrawerShape,
+                        bottomEnd = modalDrawerShape
+                    ),
                     drawerTonalElevation = 2.dp,
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(basePadding))
 
                     DrawerHeader(themeMode = settingsViewModel.getCurrentTheme())
 
                     Divider()
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(basePadding))
 
                     items.forEachIndexed { index, item ->
                         NavigationDrawerItem(
@@ -284,15 +292,15 @@ fun HomeScreen(
 private fun DrawerHeader(themeMode: ThemeMode) {
     Row(
         modifier = Modifier
-            .height(140.dp)
+            .height(drawerHeaderHeight)
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(20.dp))
+        Spacer(modifier = Modifier.width(drawerAppSpacing))
 
         Box(
             modifier = Modifier
-                .size(60.dp)
+                .size(drawerIconSize)
                 .background(
                     color = if (themeMode == ThemeMode.Light) MaterialTheme.colorScheme.onSurface
                     else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
@@ -305,7 +313,8 @@ private fun DrawerHeader(themeMode: ThemeMode) {
                 modifier = Modifier.fillMaxSize(),
             )
         }
-        Spacer(modifier = Modifier.width(18.dp))
+
+        Spacer(modifier = Modifier.width(basePadding))
 
         Text(
             text = stringResource(id = R.string.app_name),

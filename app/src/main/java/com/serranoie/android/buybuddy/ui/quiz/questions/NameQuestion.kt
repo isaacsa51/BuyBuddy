@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.common.ErrorLabelTxtFld
 import com.serranoie.android.buybuddy.ui.common.NumberOutlinedField
 import com.serranoie.android.buybuddy.ui.common.TextOutlinedField
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
@@ -94,7 +95,7 @@ fun NameQuestion(
                     .padding(vertical = smallPadding)
                     .height(120.dp),
                 maxLines = 2,
-                textStyle = MaterialTheme.typography.headlineSmall,
+                textStyle = MaterialTheme.typography.titleLarge,
             )
 
             NumberOutlinedField(
@@ -105,7 +106,7 @@ fun NameQuestion(
                 },
                 label = { Text(stringResource(id = R.string.price)) },
                 isValid = { it.isNotBlank() },
-                errorMessage = stringResource(id = R.string.invalid_price_format),
+                errorMessage = null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = smallPadding),
@@ -121,12 +122,7 @@ fun NameQuestion(
             }
 
             if (!isValidPrice.value) {
-                Text(
-                    text = stringResource(R.string.invalid_price_format),
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(start = smallPadding),
-                )
+                ErrorLabelTxtFld(text = stringResource(id = R.string.invalid_price_format))
             }
         }
     }

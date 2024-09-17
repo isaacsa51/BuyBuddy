@@ -23,8 +23,8 @@ android {
         applicationId = "com.serranoie.android.buybuddy"
         minSdk = 25
         targetSdk = 34
-        versionCode = 120
-        versionName = "1.2.0"
+        versionCode = 130
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "com.serranoie.android.buybuddy.HiltTestRunner"
         vectorDrawables {
