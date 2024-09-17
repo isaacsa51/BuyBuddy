@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="field_required">Es necesario completar este campo</string>
+    <string name="field_required">Se requiere un valor correcto</string>
     <string name="category_art">Arte</string>
     <string name="category_automotive">Automotriz</string>
     <string name="category_beauty">Belleza</string>
     <string name="category_books">Libros</string>
     <string name="category_clothing">Ropa</string>
     <string name="category_electronics">Electrónica</string>
+    <string name="category_food">Comida</string>
     <string name="category_gaming">Gaming</string>
     <string name="category_tools">Herramientas</string>
     <string name="category_hobbies">Hobbies</string>
@@ -15,7 +16,7 @@
     <string name="name_helper">Ingrese la información del producto abajo</string>
     <string name="category_question">¿Este producto a qué categorías pertenece?</string>
     <string name="category_helper">Seleccione una categoría</string>
-    <string name="usage_question">¿Que tan frecuente usarás este producto??</string>
+    <string name="usage_question">¿Que tan frecuente usarás este producto?</string>
     <string name="usage_helper">Desliza para seleccionar</string>
     <string name="benefit_question">¿Puede escribir algunas razones por las que este producto le será de utilidad?</string>
     <string name="cons_question">¿Qué tal algunas razones por las que es posible que no necesites este artículo?</string>
@@ -110,7 +111,7 @@
     <string name="app_lock_button_icon_desc">Desbloquear App</string>
     <string name="app_lock_unable_to_authenticate">El bloqueo de aplicaciones está deshabilitado porque el dispositivo no puede autenticarse</string>
     <string name="biometric_not_available">Autenticación biométrica no disponible para este dispositivo.</string>
-    <string name="biometric_temporary_not_available">Autenticación biométrica no disponible en este momento.</string>"
+    <string name="biometric_temporary_not_available">Autenticación biométrica no disponible en este momento.</string>
     <string name="biometric_available_not_enrolled">Primero debe registrar/agregar una huella digital/identificación facial…</string>
     <string name="unlock_button">Desbloquear app</string>
 
@@ -123,6 +124,7 @@
     <string name="auth_successful">La autenticación fue exitosa!</string>
     <string name="auth_failed">La autenticación falló!</string>
     <string name="auth_error">Error de autenticación: %s</string>
+    <string name="no_fingerprints_enrolled">No se han registrado huellas dactilares. Registre al menos una huella dactilar para habilitar el bloqueo biométrico.</string>
 
     <!--  Info Values  -->
     <string name="misc_setting_title">Información</string>
@@ -169,4 +171,5 @@
     <string name="backup_error_reading_json">Error al leer el archivo JSON</string>
 
     <string name="congrats_finding_this">Te ves muy intimidante en tu Honda Civic 2024 Sport+...</string>
+    <string name="category_travel">Viajes</string>
 </resources>

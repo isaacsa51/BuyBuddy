@@ -21,6 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.timePickerHeight
 
 @Composable
 fun TimePickerDialog(
@@ -49,20 +52,20 @@ fun TimePickerDialog(
             color = AlertDialogDefaults.containerColor,
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.padding(mediumPadding),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 20.dp),
+                        .padding(bottom = basePadding),
                     text = title,
                     style = MaterialTheme.typography.labelMedium,
                 )
                 content()
                 Row(
                     modifier = Modifier
-                        .height(40.dp)
+                        .height(timePickerHeight)
                         .fillMaxWidth(),
                 ) {
                     Spacer(modifier = Modifier.weight(1f))

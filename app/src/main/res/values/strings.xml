@@ -61,7 +61,7 @@
     <string name="edit_button_label">Edit button</string>
     <string name="current_item_information">Current item information</string>
     <string name="edit_screen_date_format">dd \'of\' MMMM, HH:mm a</string>
-    <string name="field_required">A value is required</string>
+    <string name="field_required">A correct value is required</string>
     <string name="title_delete_dialog">Are you sure you want to delete this item?</string>
     <string name="description_delete_dialog">By confirming the removal of this product you accept whether the current product has already been purchased or that it is not necessary.</string>
     <string name="title_usage_dialog">Select the correct usage</string>
@@ -78,8 +78,10 @@
     <string name="category_books">Books</string>
     <string name="category_clothing">Clothing</string>
     <string name="category_electronics">Electronics</string>
+    <string name="category_food">Food</string>
     <string name="category_gaming">Gaming</string>
     <string name="category_tools">Tools</string>
+    <string name="category_travel">Travel</string>
     <string name="category_hobbies">Hobbies</string>
     <string name="name_question">What\'s the name of the item?</string>
     <string name="name_helper">Insert the information of the item below</string>
@@ -130,6 +132,7 @@
     <string name="auth_failed">Authentication failed!</string>
     <string name="auth_error">Authentication error: %s</string>]
     <string name="unlock_button">Unlock app</string>
+    <string name="no_fingerprints_enrolled">No fingerprints are enrolled. Please enroll at least one fingerprint to enable biometric lock.</string>
 
     <!--  Info Values  -->
     <string name="misc_setting_title">Information</string>

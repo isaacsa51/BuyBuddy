@@ -17,10 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.ui.quiz.questions.Category
+import com.serranoie.android.buybuddy.ui.util.UiConstants.extraSmallPadding
+import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 
 @Composable
 fun RadioButtonOption(
@@ -33,14 +35,14 @@ fun RadioButtonOption(
     Surface(
         shape = MaterialTheme.shapes.small,
         color = if (selected) {
-            MaterialTheme.colorScheme.primaryContainer
+            MaterialTheme.colorScheme.secondaryContainer
         } else {
             MaterialTheme.colorScheme.surface
         },
         border = BorderStroke(
             width = 1.dp,
             color = if (selected) {
-                MaterialTheme.colorScheme.primary
+                MaterialTheme.colorScheme.secondary
             } else {
                 MaterialTheme.colorScheme.outline
             },
@@ -56,21 +58,21 @@ fun RadioButtonOption(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(extraSmallPadding),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(smallPadding))
 
             Text(text, Modifier.weight(1f), style = MaterialTheme.typography.titleLarge)
 
-            Box(Modifier.padding(8.dp)) {
+            Box(Modifier.padding(extraSmallPadding - 2.dp)) {
                 RadioButton(selected, onClick = { onOptionSelected(category) })
             }
         }
     }
 }
 
-@PreviewLightDark
+@Preview(showBackground = true)
 @Composable
 private fun RadioButtonOptionPreview() {
     RadioButtonOption(

@@ -41,9 +41,9 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
@@ -53,6 +53,7 @@ import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -70,6 +71,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -77,8 +79,9 @@ import com.serranoie.android.buybuddy.R
 import com.serranoie.android.buybuddy.domain.model.Category
 import com.serranoie.android.buybuddy.domain.model.Item
 import com.serranoie.android.buybuddy.ui.common.AlertDialogModal
-import com.serranoie.android.buybuddy.ui.common.ErrorLabelTxtFld
+import com.serranoie.android.buybuddy.ui.common.NumberOutlinedField
 import com.serranoie.android.buybuddy.ui.common.SlideToConfirm
+import com.serranoie.android.buybuddy.ui.common.TextOutlinedField
 import com.serranoie.android.buybuddy.ui.common.TimePickerDialog
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
@@ -87,7 +90,6 @@ import com.serranoie.android.buybuddy.ui.util.UiConstants.largePadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.mediumPadding
 import com.serranoie.android.buybuddy.ui.util.UiConstants.smallPadding
 import com.serranoie.android.buybuddy.ui.util.Utils.dateToString
-import com.serranoie.android.buybuddy.ui.util.Utils.formatPrice
 import com.serranoie.android.buybuddy.ui.util.strongHapticFeedback
 import com.serranoie.android.buybuddy.ui.util.toToast
 import com.serranoie.android.buybuddy.ui.util.weakHapticFeedback
@@ -132,6 +134,18 @@ fun EditItemScreen(
     val coroutineScope = rememberCoroutineScope()
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+
+    var isItemNameValid by remember { mutableStateOf(true) }
+    var isItemDescriptionValid by remember { mutableStateOf(true) }
+    var isValidPrice by remember { mutableStateOf(true) }
+    var isBenefitsValid by remember { mutableStateOf(true) }
+    var isDisadvantagesValid by remember { mutableStateOf(true) }
+
+    val isFormValid by remember {
+        derivedStateOf {
+            isItemNameValid && isItemDescriptionValid && isValidPrice && isBenefitsValid && isDisadvantagesValid
+        }
+    }
 
     LaunchedEffect(Unit) {
         userEventsTracker.logCurrentScreen("edit_screen")
@@ -200,9 +214,12 @@ fun EditItemScreen(
                     userEventsTracker,
                     nameItemResponse,
                     onNameItemResponse,
+                    onItemNameValid = { isItemNameValid = it },
                     itemDescription,
                     onItemDescriptionResponse,
+                    onItemDescriptionValid = { isItemDescriptionValid = it },
                     itemPrice,
+                    onIsValidPrice = { isValidPrice = it },
                     onItemPriceResponse,
                     itemUsage,
                     onItemUsageResponse,
@@ -223,8 +240,10 @@ fun EditItemScreen(
                     ReasonsHolder(
                         itemBenefits,
                         onItemBenefitsResponse,
+                        onBenefitsValid = { isBenefitsValid = it },
                         itemDisadvantages,
-                        onItemDisadvantagesResponse
+                        onItemDisadvantagesResponse,
+                        onDisadvantagesValid = { isDisadvantagesValid = it }
                     )
                 }
 
@@ -250,6 +269,7 @@ fun EditItemScreen(
                         navController,
                         productInfo?.itemId!!,
                         onUpdateItemEvent,
+                        isFormValid,
                         view
                     )
                 }
@@ -327,19 +347,21 @@ private fun CategoryHolder(name: String?) {
 
 @Composable
 private fun BasicInfoHolder(
-    userEventsTracker: UserEventsTracker,
+    userEventsTracker: UserEventsTracker?,
     itemName: String,
     onItemNameResponse: (String) -> Unit,
+    onItemNameValid: (Boolean) -> Unit,
     itemDescription: String,
     onItemDescriptionResponse: (String) -> Unit,
+    onItemDescriptionValid: (Boolean) -> Unit,
     itemPrice: Double?,
+    onIsValidPrice: (Boolean) -> Unit,
     onItemPriceResponse: (Double) -> Unit,
     itemUsage: Int,
     onItemUsageResponse: (Int) -> Unit,
     view: View,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    var isValidPrice by remember { mutableStateOf(true) }
     var priceText by remember { mutableStateOf(itemPrice.toString()) }
 
     val steps = listOf(
@@ -353,11 +375,6 @@ private fun BasicInfoHolder(
 
     val sliderRange = 0f..(steps.size - 1).toFloat()
     var sliderPosition by remember { mutableFloatStateOf(itemUsage.toFloat()) }
-
-    // States for empty fields
-    var isItemNameEmpty by remember { mutableStateOf(itemName.isEmpty()) }
-    var isItemDescriptionEmpty by remember { mutableStateOf(itemDescription.isEmpty()) }
-    var isItemPriceEmpty by remember { mutableStateOf(itemPrice == null) }
 
     LaunchedEffect(itemPrice) {
         priceText = itemPrice.toString()
@@ -379,69 +396,62 @@ private fun BasicInfoHolder(
                 .fillMaxWidth(),
         )
 
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+        TextOutlinedField(
             value = itemName,
+            onValueChange = onItemNameResponse,
             label = { Text(stringResource(id = R.string.name)) },
-            onValueChange = {
-                onItemNameResponse(it)
-                isItemNameEmpty = it.isEmpty()
+            modifier = Modifier.fillMaxWidth(),
+            isValid = {
+                val valid = it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                onItemNameValid(valid)
+                valid
             },
+            errorMessage = stringResource(id = R.string.field_required),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 2,
             textStyle = MaterialTheme.typography.titleLarge,
-            shape = RoundedCornerShape(7.dp),
-            isError = isItemNameEmpty
+            shape = RoundedCornerShape(7.dp)
         )
 
-        if (isItemNameEmpty) ErrorLabelTxtFld(text = stringResource(id = R.string.field_required))
-
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+        TextOutlinedField(
             value = itemDescription,
+            onValueChange = onItemDescriptionResponse,
             label = { Text(stringResource(id = R.string.description)) },
-            onValueChange = {
-                onItemDescriptionResponse(it)
-                isItemDescriptionEmpty = it.isEmpty()
+            modifier = Modifier.fillMaxWidth(),
+            isValid = {
+                val valid = it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                onItemDescriptionValid(valid)
+                valid
             },
-            trailingIcon = { Icons.Outlined.Edit },
+            errorMessage = stringResource(id = R.string.field_required),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 2,
             textStyle = MaterialTheme.typography.titleLarge,
-            shape = RoundedCornerShape(7.dp),
-            isError = isItemDescriptionEmpty
+            shape = RoundedCornerShape(7.dp)
         )
 
-        if (isItemDescriptionEmpty) ErrorLabelTxtFld(text = stringResource(id = R.string.field_required))
-
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(id = R.string.price)) },
-            value = if (priceText.isBlank()) {
-                formatPrice(0.0)
-            } else {
-                formatPrice(priceText.toDoubleOrNull() ?: 0.0)
-            },
-            prefix = { Text("$") },
+        NumberOutlinedField(
+            value = priceText,
             onValueChange = { newValue ->
                 priceText = newValue
-                isValidPrice = newValue.matches(Regex("^\\d+(\\.\\d{0,2})?$"))
-
-                if (isValidPrice) {
-                    onItemPriceResponse(newValue.toDoubleOrNull() ?: 0.0)
-                }
+                onItemPriceResponse(newValue.toDoubleOrNull() ?: 0.0)
             },
-            isError = !isValidPrice,
+            label = { Text(stringResource(id = R.string.price)) },
+            modifier = Modifier.fillMaxWidth(),
+            isValid = {
+                val valid = it.isNotBlank() && it.matches(Regex("^\\d+(\\.\\d+)?$"))
+                onIsValidPrice(valid)
+                valid
+            },
+            errorMessage = stringResource(id = R.string.invalid_price_format),
+            prefix = { Text("$") },
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number,
+                keyboardType = KeyboardType.Number
             ),
-            singleLine = true,
             textStyle = MaterialTheme.typography.titleLarge,
-            shape = RoundedCornerShape(7.dp),
+            shape = RoundedCornerShape(7.dp)
         )
-
-        if (!isValidPrice) ErrorLabelTxtFld(text = stringResource(id = R.string.invalid_price_format))
 
         Text(
             text = stringResource(R.string.usage_label),
@@ -463,7 +473,7 @@ private fun BasicInfoHolder(
                     ),
                 )
                 .clickable {
-                    userEventsTracker.logButtonAction("usage_button")
+                    userEventsTracker?.logButtonAction("usage_button")
                     view.weakHapticFeedback()
                     expanded = !expanded
                 },
@@ -498,7 +508,7 @@ private fun BasicInfoHolder(
                         valueRange = sliderRange,
                         steps = steps.size - 2,
                         onValueChange = { newValue ->
-                            userEventsTracker.logAdditionalInfo("new usage value: $newValue")
+                            userEventsTracker?.logAdditionalInfo("new usage value: $newValue")
                             view.strongHapticFeedback()
                             sliderPosition = newValue
                             onItemUsageResponse(newValue.roundToInt())
@@ -514,54 +524,45 @@ private fun BasicInfoHolder(
 private fun ReasonsHolder(
     itemBenefits: String,
     onItemBenefitsResponse: (String) -> Unit,
+    onBenefitsValid: (Boolean) -> Unit,
     itemDisadvantages: String,
-    onItemDisadvantagesResponse: (String) -> Unit
+    onItemDisadvantagesResponse: (String) -> Unit,
+    onDisadvantagesValid: (Boolean) -> Unit
 ) {
     Column {
-        Text(
-            text = stringResource(R.string.benefits),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier
-                .padding(vertical = extraSmallPadding)
-                .fillMaxWidth(),
-        )
 
-        OutlinedTextField(
+        TextOutlinedField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(220.dp)
                 .padding(vertical = extraSmallPadding),
             value = itemBenefits,
             onValueChange = onItemBenefitsResponse,
-            trailingIcon = { Icons.Outlined.Edit },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 5,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            shape = RoundedCornerShape(7.dp),
+            isValid = {
+                val valid = it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                onBenefitsValid(valid)
+                valid
+            },
+            label = { Text(stringResource(id = R.string.benefits)) },
+            errorMessage = stringResource(id = R.string.field_required),
         )
 
-        Text(
-            text = stringResource(R.string.disadvantages),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodySmall,
-            modifier = Modifier
-                .padding(vertical = 4.dp)
-                .fillMaxWidth(),
-        )
-
-        OutlinedTextField(
+        TextOutlinedField(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(220.dp)
                 .padding(vertical = extraSmallPadding),
             value = itemDisadvantages,
-            trailingIcon = { Icons.Outlined.Edit },
             onValueChange = onItemDisadvantagesResponse,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             maxLines = 5,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            shape = RoundedCornerShape(7.dp),
+            isValid = {
+                val valid = it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                onDisadvantagesValid(valid)
+                valid
+            },
+            label = { Text(stringResource(id = R.string.disadvantages)) },
+            errorMessage = stringResource(id = R.string.field_required),
         )
     }
 
@@ -570,7 +571,7 @@ private fun ReasonsHolder(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateHolder(
-    userEventsTracker: UserEventsTracker,
+    userEventsTracker: UserEventsTracker?,
     selectedDateTime: Date?,
     onSelectedDateTimeResponse: (Date) -> Unit,
     view: View
@@ -598,7 +599,7 @@ private fun DateHolder(
             .padding(vertical = basePadding)
             .fillMaxWidth()
             .clickable {
-                userEventsTracker.logButtonAction("date_button")
+                userEventsTracker?.logButtonAction("date_button")
                 view.weakHapticFeedback()
                 showDatePicker = true
             },
@@ -621,19 +622,30 @@ private fun DateHolder(
             confirmButton = {
                 TextButton(
                     onClick = {
-                        userEventsTracker.logButtonAction("ok_date_button")
+                        userEventsTracker?.logButtonAction("ok_date_button")
                         view.weakHapticFeedback()
+
                         val selectedDateMillis = datePickerState.selectedDateMillis
                         if (selectedDateMillis != null) {
-                            val calendar = Calendar.getInstance(TimeZone.getDefault())
-                            calendar.timeInMillis = selectedDateMillis
-                            calendar.set(Calendar.HOUR_OF_DAY, 0)
-                            calendar.set(Calendar.MINUTE, 0)
-                            calendar.set(Calendar.SECOND, 0)
-                            calendar.set(Calendar.MILLISECOND, 0)
+                            val selectedCalendar = Calendar.getInstance().apply {
+                                timeInMillis = selectedDateMillis
+                                timeZone = TimeZone.getDefault()
+                            }
 
-                            onSelectedDateTimeResponse(calendar.time)
+                            val currentCalendar = Calendar.getInstance().apply {
+                                timeZone = TimeZone.getDefault()
+                            }
 
+                            // Check if the selected date is different from the current date
+                            if (selectedCalendar.get(Calendar.YEAR) != currentCalendar.get(Calendar.YEAR) || selectedCalendar.get(
+                                    Calendar.DAY_OF_YEAR
+                                ) != currentCalendar.get(Calendar.DAY_OF_YEAR)
+                            ) {
+                                // Add one day if the selected date is not the current day
+                                selectedCalendar.add(Calendar.DAY_OF_YEAR, 1)
+                            }
+
+                            onSelectedDateTimeResponse(selectedCalendar.time)
                             showDatePicker = false
                             showTimePicker = true
                         }
@@ -642,7 +654,7 @@ private fun DateHolder(
             },
             dismissButton = {
                 TextButton(onClick = {
-                    userEventsTracker.logButtonAction("cancel_date_button")
+                    userEventsTracker?.logButtonAction("cancel_date_button")
                     view.weakHapticFeedback()
                     showDatePicker = false
                 }) {
@@ -666,7 +678,7 @@ private fun DateHolder(
     if (showTimePicker) {
         TimePickerDialog(
             onDismissRequest = {
-                userEventsTracker.logButtonAction("cancel_time_button")
+                userEventsTracker?.logButtonAction("cancel_time_button")
                 showTimePicker = false
             },
             confirmButton = {
@@ -684,18 +696,18 @@ private fun DateHolder(
                             onSelectedDateTimeResponse(selectedDateTime)
                             showTimePicker = false
                             formattedDate = dateToString(selectedDateTime)
-                            userEventsTracker.logAdditionalInfo("selected date: $formattedDate")
+                            userEventsTracker?.logAdditionalInfo("selected date: $formattedDate")
                         } else {
                             context.getString(R.string.error_selected_date).toToast(context)
                         }
                     }
-                    userEventsTracker.logButtonAction("ok_time_button")
+                    userEventsTracker?.logButtonAction("ok_time_button")
                     view.weakHapticFeedback()
                 }) { Text("OK") }
             },
             dismissButton = {
                 TextButton(onClick = {
-                    userEventsTracker.logButtonAction("cancel_time_button")
+                    userEventsTracker?.logButtonAction("cancel_time_button")
                     view.weakHapticFeedback()
                     showTimePicker = false
                 }) {
@@ -714,12 +726,13 @@ private fun DateHolder(
 
 @Composable
 private fun ActionsHolder(
-    userEventsTracker: UserEventsTracker,
+    userEventsTracker: UserEventsTracker?,
     currentItemStatus: Boolean?,
     onItemStatusResponse: (Boolean) -> Unit,
     navController: NavController,
     itemId: Int,
     onUpdateItemEvent: (Int) -> Job,
+    isFormValid: Boolean,
     view: View,
 ) {
     var isSlideToConfirmLoading by remember { mutableStateOf(false) }
@@ -739,7 +752,7 @@ private fun ActionsHolder(
                         onItemStatusResponse(true)
                     }
                 }
-                userEventsTracker.logButtonAction("status_complete_slide")
+                userEventsTracker?.logButtonAction("status_complete_slide")
                 view.strongHapticFeedback()
             },
             onCancelPressed = {
@@ -751,7 +764,7 @@ private fun ActionsHolder(
                         }
                     }
                 }
-                userEventsTracker.logButtonAction("status_pending_slide")
+                userEventsTracker?.logButtonAction("status_pending_slide")
                 view.strongHapticFeedback()
             },
         )
@@ -767,7 +780,7 @@ private fun ActionsHolder(
                     .height(48.dp)
                     .padding(horizontal = extraSmallPadding),
                 onClick = {
-                    userEventsTracker.logButtonAction("cancel_button")
+                    userEventsTracker?.logButtonAction("cancel_button")
                     view.strongHapticFeedback()
                     navController.navigateUp()
                 },
@@ -780,8 +793,9 @@ private fun ActionsHolder(
                     .weight(1f)
                     .height(48.dp)
                     .padding(horizontal = extraSmallPadding),
+                enabled = isFormValid,
                 onClick = {
-                    userEventsTracker.logButtonAction("save_button")
+                    userEventsTracker?.logButtonAction("save_button")
                     view.strongHapticFeedback()
                     coroutineScope.launch {
                         onUpdateItemEvent(itemId)
@@ -791,6 +805,41 @@ private fun ActionsHolder(
             ) {
                 Text(text = stringResource(R.string.save))
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun EditScreenPreview() {
+    val view = LocalView.current
+
+    Surface {
+        Column {
+            CategoryHolder(name = "Category")
+
+            BasicInfoHolder(
+                userEventsTracker = null,
+                itemName = "Item",
+                onItemNameResponse = { },
+                onItemNameValid = { },
+                itemDescription = "Description",
+                onItemDescriptionResponse = { },
+                onItemDescriptionValid = { },
+                itemPrice = 150.0,
+                onIsValidPrice = { },
+                onItemPriceResponse = { },
+                itemUsage = 2,
+                onItemUsageResponse = { },
+                view = view
+            )
+
+            DateHolder(
+                userEventsTracker = null,
+                selectedDateTime = Date(),
+                onSelectedDateTimeResponse = { },
+                view = view
+            )
         }
     }
 }

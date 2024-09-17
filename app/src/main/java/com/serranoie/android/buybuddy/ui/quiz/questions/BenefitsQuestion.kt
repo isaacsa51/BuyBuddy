@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.serranoie.android.buybuddy.R
+import com.serranoie.android.buybuddy.ui.common.TextOutlinedField
 import com.serranoie.android.buybuddy.ui.core.analytics.UserEventsTracker
 import com.serranoie.android.buybuddy.ui.quiz.common.QuestionWrapper
 import com.serranoie.android.buybuddy.ui.util.UiConstants.basePadding
@@ -46,18 +47,19 @@ fun BenefitsQuestion(
         modifier = modifier,
     ) {
         Column {
-            OutlinedTextField(
-                modifier =
-                Modifier
+            TextOutlinedField(
+                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = basePadding)
+                    .padding(top = basePadding)
                     .height(120.dp),
-                label = { Text(stringResource(id = R.string.reasons)) },
                 value = benefitsResponse,
                 onValueChange = onInputResponse,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                label = { Text(text = stringResource(id = R.string.benefits)) },
+                isValid = {
+                    it.isNotBlank() && it.matches(Regex("^[a-zA-Z0-9\\s]+$"))
+                },
+                errorMessage = stringResource(id = R.string.field_required),
                 maxLines = 5,
-                minLines = 3,
                 textStyle = MaterialTheme.typography.bodyLarge,
             )
         }
